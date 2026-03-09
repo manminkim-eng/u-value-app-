@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>건축물 부위 열관류율 종합 시스템 (Ver-2.0)</title>
+
+    <!-- ═══ PWA 설정 ═══ -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1D4ED8">
+    <meta name="description" content="건축물 에너지절약설계기준 열관류율 검토 시스템 (국토교통부고시 제2025-738호)">
+
+    <!-- iOS (Safari) 지원 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="열관류율">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+    <!-- 파비콘 -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        
+        * {
+            font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif !important;
+        }
+        body {
+            font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            background-color: #0B1120;
+            color: #E2E8F0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"] { -moz-appearance: textfield; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0B1120; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+
+        .work-panel { background: #1E293B; border: 1px solid #334155; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); }
+        .input-field { background: #0F172A; border: 1px solid #334155; color: #F8FAFC; }
+        .input-field:focus { outline: none; border-color: #3B82F6; }
+        .capture-bg { background-color: #0F172A; background-image: radial-gradient(circle at 100% 0%, #1E3A8A 0%, transparent 40%); }
+        .blue-gradient-card { background: linear-gradient(135deg, #1D4ED8 0%, #312E81 100%); border-radius: 1rem; position: relative; overflow: hidden; }
+        .data-grid { border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; background: rgba(15,23,42,0.6); }
+
+        table td, table th { vertical-align: middle !important; line-height: 1 !important; }
+        .grid > div { display: flex; flex-direction: column; justify-content: center; }
+        .flex.items-end { align-items: flex-end !important; }
+        .flex.items-center { align-items: center !important; }
+        .flex-col.justify-center { justify-content: center !important; }
+
+        /* ═══════════════════════════════════════════════════
+           A4 인쇄 전용 (Ctrl+P / 인쇄 버튼)
+           ═══════════════════════════════════════════════════ */
+        @page { size: A4 portrait; margin: 0mm; }
+
+        @media print {
+            *, *::before, *::after {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            html, body {
+                margin: 0 !important; padding: 0 !important;
+                width: 210mm !important; height: 297mm !important;
+                background: #FFFFFF !important;
+                overflow: hidden !important;
+            }
+            /* 화면 UI 숨김 */
+            #root > .max-w-7xl { display: none !important; }
+            .fixed { display: none !important; }
+            .print-btn-wrap { display: none !important; }
+            /* A4 캡처 영역만 표시 */
+            #a4-capture-area {
+                position: relative !important;
+                left: 0 !important; top: 0 !important;
+                display: block !important; visibility: visible !important;
+                margin: 0 !important; padding: 0 !important;
+                background-color: #FFFFFF !important;
+                box-shadow: none !important; border: none !important;
+                page-break-after: always !important;
+                page-break-inside: avoid !important;
+            }
+            #a4-capture-area > div:first-child { padding: 6mm 10mm 5mm 10mm !important; }
+            #a4-capture-area > div:nth-child(2) { padding: 5mm 10mm 5mm 10mm !important; }
+        }
+
+        /* PWA 설치 배너 */
+        .pwa-install-banner {
+            background: linear-gradient(135deg, #1D4ED8 0%, #312E81 100%);
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(20px);
+            animation: slideUp 0.4s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+        const SYSTEM_VERSION = "2.0";
+
+        const U_STANDARDS = {
+            '중부1지역': {
+                '거실의 외벽': { '외기에 직접 면하는 경우': { '공동주택': 0.150, '공동주택 외': 0.170 }, '외기에 간접 면하는 경우': { '공동주택': 0.210, '공동주택 외': 0.240 } },
+                '최상층 거실 반자/지붕': { '외기에 직접 면하는 경우': { '해당없음': 0.150 }, '외기에 간접 면하는 경우': { '해당없음': 0.210 } },
+                '최하층 거실 바닥': { '외기에 직접 면하는 경우': { '바닥난방인 경우': 0.150, '바닥난방이 아닌 경우': 0.170 }, '외기에 간접 면하는 경우': { '바닥난방인 경우': 0.210, '바닥난방이 아닌 경우': 0.240 } },
+                '바닥난방인 층간바닥': { '해당없음': { '해당없음': 0.810 } }
+            },
+            '중부2지역': {
+                '거실의 외벽': { '외기에 직접 면하는 경우': { '공동주택': 0.170, '공동주택 외': 0.240 }, '외기에 간접 면하는 경우': { '공동주택': 0.240, '공동주택 외': 0.340 } },
+                '최상층 거실 반자/지붕': { '외기에 직접 면하는 경우': { '해당없음': 0.150 }, '외기에 간접 면하는 경우': { '해당없음': 0.210 } },
+                '최하층 거실 바닥': { '외기에 직접 면하는 경우': { '바닥난방인 경우': 0.170, '바닥난방이 아닌 경우': 0.200 }, '외기에 간접 면하는 경우': { '바닥난방인 경우': 0.240, '바닥난방이 아닌 경우': 0.290 } },
+                '바닥난방인 층간바닥': { '해당없음': { '해당없음': 0.810 } }
+            },
+            '남부지역': {
+                '거실의 외벽': { '외기에 직접 면하는 경우': { '공동주택': 0.220, '공동주택 외': 0.320 }, '외기에 간접 면하는 경우': { '공동주택': 0.310, '공동주택 외': 0.450 } },
+                '최상층 거실 반자/지붕': { '외기에 직접 면하는 경우': { '해당없음': 0.180 }, '외기에 간접 면하는 경우': { '해당없음': 0.260 } },
+                '최하층 거실 바닥': { '외기에 직접 면하는 경우': { '바닥난방인 경우': 0.220, '바닥난방이 아닌 경우': 0.250 }, '외기에 간접 면하는 경우': { '바닥난방인 경우': 0.310, '바닥난방이 아닌 경우': 0.350 } },
+                '바닥난방인 층간바닥': { '해당없음': { '해당없음': 0.810 } }
+            },
+            '제주도': {
+                '거실의 외벽': { '외기에 직접 면하는 경우': { '공동주택': 0.290, '공동주택 외': 0.410 }, '외기에 간접 면하는 경우': { '공동주택': 0.410, '공동주택 외': 0.560 } },
+                '최상층 거실 반자/지붕': { '외기에 직접 면하는 경우': { '해당없음': 0.250 }, '외기에 간접 면하는 경우': { '해당없음': 0.350 } },
+                '최하층 거실 바닥': { '외기에 직접 면하는 경우': { '바닥난방인 경우': 0.290, '바닥난방이 아닌 경우': 0.330 }, '외기에 간접 면하는 경우': { '바닥난방인 경우': 0.410, '바닥난방이 아닌 경우': 0.470 } },
+                '바닥난방인 층간바닥': { '해당없음': { '해당없음': 0.810 } }
+            }
+        };
+
+        const T_STANDARDS = {
+            '중부1지역': { '거실의 외벽': { '외기에 직접 면하는 경우': { '공동주택': [220,255,295,325], '공동주택 외': [190,225,260,285] }, '외기에 간접 면하는 경우': { '공동주택': [150,180,205,225], '공동주택 외': [130,155,175,195] } }, '최상층 거실 반자/지붕': { '외기에 직접 면하는 경우': { '해당없음': [220,260,295,330] }, '외기에 간접 면하는 경우': { '해당없음': [155,180,205,230] } }, '최하층 거실 바닥': { '외기에 직접 면하는 경우': { '바닥난방인 경우': [215,250,290,320], '바닥난방이 아닌 경우': [195,230,265,290] }, '외기에 간접 면하는 경우': { '바닥난방인 경우': [145,170,195,220], '바닥난방이 아닌 경우': [135,155,180,200] } }, '바닥난방인 층간바닥': { '해당없음': { '해당없음': [30,35,45,50] } } },
+            '중부2지역': { '거실의 외벽': { '외기에 직접 면하는 경우': { '공동주택': [190,225,260,285], '공동주택 외': [135,155,180,200] }, '외기에 간접 면하는 경우': { '공동주택': [130,155,175,195], '공동주택 외': [90,105,120,135] } }, '최상층 거실 반자/지붕': { '외기에 직접 면하는 경우': { '해당없음': [220,260,295,330] }, '외기에 간접 면하는 경우': { '해당없음': [155,180,205,230] } }, '최하층 거실 바닥': { '외기에 직접 면하는 경우': { '바닥난방인 경우': [190,220,255,280], '바닥난방이 아닌 경우': [165,195,220,245] }, '외기에 간접 면하는 경우': { '바닥난방인 경우': [125,150,170,185], '바닥난방이 아닌 경우': [110,125,145,160] } }, '바닥난방인 층간바닥': { '해당없음': { '해당없음': [30,35,45,50] } } },
+            '남부지역': { '거실의 외벽': { '외기에 직접 면하는 경우': { '공동주택': [145,170,200,220], '공동주택 외': [100,115,130,145] }, '외기에 간접 면하는 경우': { '공동주택': [100,115,135,150], '공동주택 외': [65,75,90,95] } }, '최상층 거실 반자/지붕': { '외기에 직접 면하는 경우': { '해당없음': [180,215,245,270] }, '외기에 간접 면하는 경우': { '해당없음': [120,145,165,180] } }, '최하층 거실 바닥': { '외기에 직접 면하는 경우': { '바닥난방인 경우': [140,165,190,210], '바닥난방이 아닌 경우': [130,155,175,195] }, '외기에 간접 면하는 경우': { '바닥난방인 경우': [95,110,125,140], '바닥난방이 아닌 경우': [90,105,120,130] } }, '바닥난방인 층간바닥': { '해당없음': { '해당없음': [30,35,45,50] } } },
+            '제주도': { '거실의 외벽': { '외기에 직접 면하는 경우': { '공동주택': [110,130,145,165], '공동주택 외': [75,90,100,110] }, '외기에 간접 면하는 경우': { '공동주택': [75,85,100,110], '공동주택 외': [50,60,70,75] } }, '최상층 거실 반자/지붕': { '외기에 직접 면하는 경우': { '해당없음': [130,150,175,190] }, '외기에 간접 면하는 경우': { '해당없음': [90,105,120,130] } }, '최하층 거실 바닥': { '외기에 직접 면하는 경우': { '바닥난방인 경우': [105,125,140,155], '바닥난방이 아닌 경우': [100,115,130,145] }, '외기에 간접 면하는 경우': { '바닥난방인 경우': [65,80,90,100], '바닥난방이 아닌 경우': [65,75,85,95] } }, '바닥난방인 층간바닥': { '해당없음': { '해당없음': [30,35,45,50] } } }
+        };
+
+        const DB_HIERARCHY = {
+          "A_금속계": { "기본금속": { "동": 370.0, "알루미늄": 200.0, "청동_75Cu_25Sn": 25.0, "황동": 110.0, "납": 34.0, "철_연강": 47.675, "스테인레스강": 15.0, "강재": 53.0 }, "판금_및_가공재": { "강판": 372.094, "아연도강관판": 44.187, "아연도급철판": 44.0 } },
+          "B_비금속_및_자연물계": { "석재": { "대리석": 1.582, "대리석_2600kg": 2.800, "화강석": 2.175, "화강석_2700kg": 3.300 }, "토양_및_골재": { "사질토양": 0.582, "점토질토양_수분94": 1.628, "흙": 0.617, "모래_건조": 0.489, "자갈": 0.617, "잡석": 1.977, "모래_자갈_콘크리트용": 1.733 }, "물_눈_얼음": { "물": 0.605, "얼음": 2.210, "눈_200kg": 0.152, "눈_600kg": 0.640 } },
+          "C_콘크리트계": { "일반콘크리트": { "보통콘크리트": 1.640, "무근콘크리트": 1.512, "철근콘크리트": 1.600, "버림콘크리트": 1.745, "콘크리트옹벽": 1.600, "PC_콘크리트": 1.512, "콘크리트_1_2_4": 1.600 }, "특수_및_경량콘크리트": { "경량콘크리트": 0.524, "기포콘크리트_0.4품_현장타설": 0.130, "기포콘크리트_0.5품_현장타설": 0.160, "기포콘크리트_0.6품_현장타설": 0.190, "신더콘크리트": 0.803, "콘크리트블럭": 0.700, "콘크리트블록_중량": 1.000 } },
+          "D_미장재료계": { "모르타르류": { "모르타르": 1.082, "시멘트몰탈": 1.400, "시멘트모르타르_1_3": 1.400, "메탈라스_몰탈": 1.512, "보호몰탈": 1.512 }, "마감재료": { "회반죽": 0.733, "시멘플라이터": 0.698, "엑체방수": 1.012, "인조석물갈기": 1.280, "인조석바름": 1.512, "테라조": 1.803, "플라스터": 0.617, "흙벽": 0.896 } },
+          "E_목재계": { "일반목재": { "소나무": 0.175, "목재_경량": 0.140, "목재_보통량": 0.170, "목재_중량": 0.190, "삼목": 0.094, "노송나무": 0.105, "졸참나무": 0.187, "나왕": 0.163 }, "가공목재": { "베이어판": 0.140, "합판": 0.128 } },
+          "F_시멘트_및_석고2차제품계": { "보드류": { "석고보드": 0.180, "방수석고보드": 0.238, "파티클보드": 0.150, "석고판_3mm": 0.256, "펄라이트보드": 0.198, "석면시멘트판": 1.268, "목모_시멘트판": 0.152, "하드보드_6mm": 0.256, "플럭시블_보드": 0.617 }, "기타가공품": { "석고플라이터": 0.582, "석면슬레이트": 1.500, "아미텍스": 0.102, "하드텍스": 0.133, "텍스_9mm": 0.094, "석회판": 0.745 } },
+          "G_요업제품계": { "타일_및_벽돌": { "타일": 1.300, "바닥용타일": 1.803, "자기질타일": 1.800, "세라믹타일": 1.280, "골타일": 0.396, "기와": 0.350, "시멘트벽돌": 0.600, "콘크리트벽돌": 1.600, "보통벽돌": 0.617, "내화벽돌": 0.990, "붉은벽돌": 0.780 }, "유리_및_기타": { "석영유리": 1.349, "포유리판_휨유리": 0.047, "판유리_3mm": 0.745, "유리": 0.780, "천연슬레이트_요업": 1.500 } },
+          "H_아스팔트수지_및_바닥방수재계": { "방수재": { "아스팔트": 0.733, "쉬트방수": 0.163, "아스팔트방수": 0.733, "아스팔트싱글": 0.733, "아스팔트펄트": 0.117, "루우핑지": 0.117, "아스팔트루핑_17kg": 0.190, "아스팔트루핑_22kg": 0.270, "아스팔트루핑_26kg": 0.340, "아스팔트루핑_30kg": 0.340, "아스팔트펠트_방수층_17kg": 0.111, "아스팔트펠트_방수층_22kg": 0.140, "아스팔트펠트_방수층_26kg": 0.220, "우레탄마감": 0.190, "PE_필름": 0.210 }, "바닥재": { "아스팔트타일": 0.326, "리놀륨": 0.187, "바닥재_플라스틱계": 0.190, "바닥재_아스팔트계": 0.330, "고무타일": 0.396, "디럭스타일": 0.233 } },
+          "I_섬유판_및_기타계": { "섬유판류": { "연질_섬유판": 0.059, "경질_섬유판": 0.175, "후_지": 0.210, "모직포": 0.128 } },
+          "J_무기질섬유_및_기타수지계": { "수지_및_기타섬유": { "암면": 0.059, "열경화성수지_천정재": 0.190, "합성수지": 0.190, "유리면": 0.047, "우레탄뿜칠": 0.035, "카페트": 0.803, "FRP": 0.261, "우레탄폼판": 0.035, "인슐레이션보드": 0.061, "광재면": 0.047, "천연슬레이트_섬유": 1.442, "고무": 0.175, "비닐장판": 0.082, "모노륨": 3.140, "암면성형판": 0.059, "유리면성형판": 0.035 } },
+          "K_발포수지_및_단열재계": {
+            "KS_M_ISO_4898_EPS": { "1종_A-1": 0.033, "1종_A-2": 0.039, "1종_B": 0.043, "1종_C": 0.043, "2종_A-1": 0.032, "2종_A-2": 0.036, "2종_B": 0.039, "3종_A-1": 0.029, "3종_A-2": 0.031, "3종_B": 0.034, "3종_C": 0.039 },
+            "KS_M_ISO_4898_XPS": { "1종_A-1": 0.026, "1종_A-2": 0.029, "2종_A-1": 0.028, "2종_B-1": 0.026, "2종_B-2": 0.027, "3종_A": 0.026, "3종_B-2": 0.026, "3종_C": 0.026 },
+            "KS_M_ISO_4898_PUR": { "1종_A": 0.024, "1종_B": 0.029, "1종_C": 0.024, "1종_D": 0.023, "1종_E": 0.023, "2종_A": 0.023, "2종_B": 0.024, "2종_C": 0.029, "3종_A": 0.023, "3종_B": 0.024, "3종_C": 0.029 },
+            "KS_M_ISO_4898_PF": { "1종_A": 0.022, "1종_B": 0.037, "1종_C": 0.022, "1종_D": 0.022, "2종_A": 0.022, "2종_B": 0.037, "3종_A": 0.039 },
+            "KS_L_9102_미네랄울": { "보온판_1호": 0.037, "보온판_2호": 0.036, "보온판_3호": 0.038, "펠트": 0.039, "보온대_1호": 0.040, "보온대_2호": 0.039, "블랭킷_1호a": 0.039, "블랭킷_1호b": 0.037, "블랭킷_2호": 0.036, "보온통": 0.036 },
+            "KS_L_9102_그라스울": { "보온판_24K": 0.037, "보온판_32K": 0.036, "보온판_40K": 0.035, "보온판_48K_to_120K": 0.034, "보온대_a": 0.044, "보온대_b": 0.044, "보온대_c": 0.044, "블랭킷_a": 0.040, "블랭킷_b": 0.036, "보온통": 0.036 },
+            "KS_F_5660_폴리에스테르": { "1급": 0.034, "2급": 0.040, "3급": 0.045 },
+            "KS_M_3871_분무식PUR": { "1종_A": 0.022, "1종_B": 0.032, "1종_C": 0.040, "2종_A": 0.022, "2종_B": 0.032 },
+            "일반_기타단열": { "발포경질비닐": 0.035, "발포페놀": 0.035, "발포폴리에틸렌": 0.035, "발포폴리스틸렌": 0.059, "비닐스폰지": 0.117, "보온재": 0.035, "방습막_PS필림": 0.211, "방습막_PE필림": 0.050, "압출법보호판_특호": 0.027, "압출법보호판_1호": 0.028, "압출법보호판_2호": 0.029, "압출법보호판_3호": 0.031, "비드법보호판_1호": 0.036, "비드법보호판_2호": 0.037, "비드법보호판_3호": 0.040, "비드법보호판_4호": 0.043, "경질우레탄폼보호판_1종1호": 0.024, "경질우레탄폼보호판_1종2호": 0.024, "경질우레탄폼보호판_1종3호": 0.026, "경질우레탄폼보호판_2종1호": 0.023, "경질우레탄폼보호판_2종2호": 0.023, "경질우레탄폼보호판_2종3호": 0.028, "미네랄울_암면_벨트": 0.037, "미네랄울_암면_1호": 0.037, "미네랄울_암면_2호": 0.036, "미네랄울_암면_3호": 0.038, "미네랄울_일반": 0.036, "락울": 0.036, "미네랄_보드": 0.045, "그라스울_64K": 0.035, "그라스울_48K": 0.035, "그라스울_32K": 0.037, "그라스울_24K": 0.038, "암면뿜칠재_습식_반습식": 0.042, "발포경질폴리우레탄": 0.023 }
+          },
+          "L_기타재료계": { "기타마감_및_판넬": { "규조토": 0.094, "마그네이트": 0.082, "보온벽돌": 0.140, "발포유리": 0.082, "탄화코르크": 0.059, "경석": 0.105, "신더콘크리트_기타": 0.047, "띠억새등": 0.070, "톱밥": 0.128, "양모": 0.117, "센드위치판넬": 0.034, "시멘트블럭": 0.617, "마이톤": 0.087, "복합판넬": 0.454, "바닥차음재": 0.039, "알루미늄복합판넬": 0.500, "벽지_비닐계": 0.270, "벽지_종이계": 0.170 } },
+          "M_창호_및_공기층": { "창_문_공기층": { "공기층_현장시공": 0.117, "이중창": 3.373, "문_철제": 3.373 } }
+        };
+
+
+        const App = () => {
+            const [projectName, setProjectName] = useState('만민 건축사 신사옥 신축공사');
+            const [region,   setRegion]   = useState('중부2지역');
+            const [part,     setPart]     = useState('거실의 외벽');
+            const [exposure, setExposure] = useState('외기에 직접 면하는 경우');
+            const [usage,    setUsage]    = useState('공동주택 외');
+            const [layers, setLayers] = useState([
+                { id: 1, cat: "D_미장재료계",          group: "모르타르류",          name: "시멘트몰탈",   t: 20,  lambda: 1.4   },
+                { id: 2, cat: "K_발포수지_및_단열재계", group: "KS_M_ISO_4898_XPS",  name: "1종_A-1",     t: 155, lambda: 0.026 },
+                { id: 3, cat: "C_콘크리트계",           group: "일반콘크리트",        name: "철근콘크리트", t: 200, lambda: 1.6   }
+            ]);
+
+            useEffect(() => { if (window.lucide) window.lucide.createIcons(); });
+            useEffect(() => { const p = Object.keys(U_STANDARDS[region]||{}); if (!p.includes(part)) setPart(p[0]||''); }, [region]);
+            useEffect(() => { const e = Object.keys((U_STANDARDS[region]||{})[part]||{}); if (!e.includes(exposure)) setExposure(e[0]||''); }, [region, part]);
+            useEffect(() => { const u = Object.keys(((U_STANDARDS[region]||{})[part]||{})[exposure]||{}); if (!u.includes(usage)) setUsage(u[0]||''); }, [region, part, exposure]);
+
+            const targetU = useMemo(() => { try { return U_STANDARDS[region]?.[part]?.[exposure]?.[usage]||0; } catch(e){return 0;} }, [region,part,exposure,usage]);
+            const targetT = useMemo(() => { try { return T_STANDARDS[region]?.[part]?.[exposure]?.[usage]||[0,0,0,0]; } catch(e){return [0,0,0,0];} }, [region,part,exposure,usage]);
+
+            const surfaceRes = useMemo(() => {
+                let ri=0.11, ro=0.043;
+                const direct = exposure?.includes('직접')||false;
+                if (part==='거실의 외벽')             { ri=0.11;  ro=direct?0.043:0.11; }
+                else if (part.includes('지붕'))       { ri=0.086; ro=direct?0.043:0.086; }
+                else if (part.includes('바닥'))       { ri=0.086; ro=(part==='바닥난방인 층간바닥')?0.086:(direct?0.043:0.15); }
+                return { ri, ro };
+            }, [part, exposure]);
+
+            const calculatedLayers = useMemo(() => layers.map(l => {
+                let r = 0;
+                if (l.name?.includes('공기층')) { const da=(l.t||0)/10; r=(da<=1)?(0.086*da):0.086; }
+                else { r=(l.lambda||0)>0?((l.t||0)/1000/l.lambda):0; }
+                return {...l, r};
+            }), [layers]);
+
+            const totalR = useMemo(() =>
+                (surfaceRes.ri||0)+(surfaceRes.ro||0)+calculatedLayers.reduce((a,c)=>a+(c.r||0),0),
+            [surfaceRes, calculatedLayers]);
+
+            const currentU = totalR>0 ? (Math.round((1/totalR)*1000)/1000).toFixed(3) : '0.000';
+            const isPass   = parseFloat(currentU) <= targetU;
+
+            const updateLayer = (id, field, val) => {
+                setLayers(prev => prev.map(l => {
+                    if (l.id !== id) return l;
+                    const u = {...l, [field]: val};
+                    if (field==='cat') {
+                        const fg = Object.keys(DB_HIERARCHY[val]||{})[0]||'';
+                        u.group  = fg;
+                        const fm = Object.keys((DB_HIERARCHY[val]||{})[fg]||{})[0]||'';
+                        u.name   = fm;
+                        u.lambda = ((DB_HIERARCHY[val]||{})[fg]||{})[fm]||0;
+                    } else if (field==='group') {
+                        const fm = Object.keys((DB_HIERARCHY[l.cat]||{})[val]||{})[0]||'';
+                        u.name   = fm;
+                        u.lambda = ((DB_HIERARCHY[l.cat]||{})[val]||{})[fm]||0;
+                    } else if (field==='name') {
+                        u.lambda = ((DB_HIERARCHY[l.cat]||{})[l.group]||{})[val]||0;
+                    }
+                    return u;
+                }));
+            };
+
+            // ════════════════════════════════════════════════════════════
+            //  downloadPNG : html2canvas 한글 텍스트 처짐 최종 해결
+            //
+            //  실패 원인:
+            //   - line-height:1 / overflow:hidden+고정height → 한글 글자 잘림
+            //  최종 전략:
+            //   - T(text, fs, color, extra) : line-height = fs*1.15px (한글 안전값)
+            //   - overflow:hidden / 고정height 완전 금지
+            //   - 간격: SP(h) spacer div 만 사용
+            //   - 수직정렬: padding-top 만 사용
+            // ══════════════════════════════════════════════════
+            //  dom-to-image (cdnjs) 사용: 화면 DOM 직접 캡처
+            //  → 오프스크린 DOM 재구성 불필요
+            //  → 웹폰트/CSS/flex 모두 정확히 렌더링
+            // ══════════════════════════════════════════════════
+
+            // 클론을 body에 붙여 캡처 → 뷰포트 제약 없이 정확한 렌더링
+            /*
+             * ★ 참고파일(공공기관_건축사_업무대가_산출기_v1_4) 검증된 캡처 방식 그대로 적용
+             *  1. document.fonts.ready + 150ms 대기 → 폰트 완전 로드 보장
+             *  2. transform:scale() 트릭 → dom-to-image scale 옵션 오작동 우회
+             *  3. A4 오프스크린 요소: 캡처 전 visibility:visible 처리
+             */
+            const captureToPng = async (nodeId, filename, bg) => {
+                const lib = window.domtoimage;
+                if (!lib) { alert('dom-to-image 로드 실패. 인터넷 연결을 확인해 주세요.'); return; }
+
+                const node = document.getElementById(nodeId);
+                if (!node) { alert(nodeId + ' 요소를 찾을 수 없습니다.'); return; }
+
+                // 오프스크린 요소(A4): position/left를 임시로 화면 내로 이동
+                const origPosition = node.style.position;
+                const origLeft     = node.style.left;
+                const origTop      = node.style.top;
+                const origZIndex   = node.style.zIndex;
+                const isOffscreen  = origLeft === '-9999px';
+
+                if (isOffscreen) {
+                    node.style.position = 'fixed';
+                    node.style.left     = '0px';
+                    node.style.top      = '0px';
+                    node.style.zIndex   = '-9999'; // 화면 뒤로
+                }
+
+                try {
+                    // ① 폰트 완전 로드 대기
+                    await document.fonts.ready;
+                    // ② 레이아웃 재계산 + 렌더링 안정화 대기
+                    await new Promise(r => setTimeout(r, 200));
+
+                    const scale = 3;
+                    const w = node.offsetWidth;
+                    const h = node.offsetHeight;
+
+                    if (!w || !h) throw new Error(`요소 크기 오류: ${nodeId} (${w}x${h})`);
+
+                    // ③ transform:scale 트릭 (참고파일 핵심 패턴)
+                    const dataUrl = await lib.toPng(node, {
+                        width:  w * scale,
+                        height: h * scale,
+                        style: {
+                            transform:       `scale(${scale})`,
+                            transformOrigin: 'top left',
+                            width:           w + 'px',
+                            height:          h + 'px',
+                        },
+                    });
+
+                    const link = document.createElement('a');
+                    link.href     = dataUrl;
+                    link.download = filename + '_' + Date.now() + '.png';
+                    link.click();
+
+                } catch (err) {
+                    console.error('이미지 저장 실패:', err);
+                    alert('저장 중 오류가 발생했습니다.\n' + err);
+                } finally {
+                    // 원복
+                    if (isOffscreen) {
+                        node.style.position = origPosition;
+                        node.style.left     = origLeft;
+                        node.style.top      = origTop;
+                        node.style.zIndex   = origZIndex;
+                    }
+                }
+            };
+
+            const downloadPNG   = () => captureToPng('report-area',    '열관류율_검토서',    '#0F172A');
+            const downloadA4PNG = () => captureToPng('a4-capture-area', '열관류율_검토서_A4', '#FFFFFF');
+
+            // ═══════════════════════════════════════════════
+            //  PWA 설치 프롬프트
+            // ═══════════════════════════════════════════════
+            const [installPrompt, setInstallPrompt] = useState(null);
+            const [showInstallBanner, setShowInstallBanner] = useState(false);
+
+            useEffect(() => {
+                const handler = (e) => {
+                    e.preventDefault();
+                    setInstallPrompt(e);
+                    // 이미 설치되어 있으면 배너 안 보여줌
+                    if (!window.matchMedia('(display-mode: standalone)').matches) {
+                        setShowInstallBanner(true);
+                    }
+                };
+                window.addEventListener('beforeinstallprompt', handler);
+                return () => window.removeEventListener('beforeinstallprompt', handler);
+            }, []);
+
+            const handleInstall = async () => {
+                if (!installPrompt) return;
+                installPrompt.prompt();
+                const result = await installPrompt.userChoice;
+                if (result.outcome === 'accepted') {
+                    console.log('[PWA] 설치 완료');
+                }
+                setInstallPrompt(null);
+                setShowInstallBanner(false);
+            };
+
+            // ═══════════════════════════════════════════════
+            //  A4 인쇄 자동 스케일링 (beforeprint / afterprint)
+            // ═══════════════════════════════════════════════
+            useEffect(() => {
+                const handleBeforePrint = () => {
+                    const node = document.getElementById('a4-capture-area');
+                    if (!node) return;
+                    const A4_W = 794, A4_H = 1123;
+                    node.dataset.origStyle = node.getAttribute('style') || '';
+                    node.style.position = 'absolute';
+                    node.style.left = '0px'; node.style.top = '0px';
+                    node.style.width = A4_W + 'px';
+                    node.style.zIndex = '-99999'; node.style.visibility = 'hidden';
+                    node.style.transform = 'none';
+                    void node.offsetHeight;
+                    const contentH = node.scrollHeight;
+                    const scale = Math.min(1, A4_H / contentH);
+                    node.style.position = 'relative';
+                    node.style.left = '0'; node.style.top = '0';
+                    node.style.visibility = 'visible'; node.style.zIndex = '1';
+                    node.style.backgroundColor = '#FFFFFF';
+                    node.style.overflow = 'hidden';
+                    if (scale < 1) {
+                        node.style.width = (A4_W / scale) + 'px';
+                        node.style.transform = `scale(${scale})`;
+                        node.style.transformOrigin = 'top left';
+                    } else {
+                        node.style.width = A4_W + 'px';
+                        node.style.transform = 'none';
+                    }
+                };
+                const handleAfterPrint = () => {
+                    const node = document.getElementById('a4-capture-area');
+                    if (!node) return;
+                    const orig = node.dataset.origStyle;
+                    if (orig !== undefined) {
+                        node.setAttribute('style', orig);
+                        delete node.dataset.origStyle;
+                    }
+                };
+                window.addEventListener('beforeprint', handleBeforePrint);
+                window.addEventListener('afterprint',  handleAfterPrint);
+                return () => {
+                    window.removeEventListener('beforeprint', handleBeforePrint);
+                    window.removeEventListener('afterprint',  handleAfterPrint);
+                };
+            }, []);
+
+
+            return (
+                <>
+                <div className="max-w-7xl mx-auto p-4 lg:p-8 flex flex-col lg:flex-row gap-8">
+
+                    {/* ── LEFT PANEL ── */}
+                    <div className="w-full lg:w-1/2 flex flex-col gap-4">
+                        <div className="work-panel rounded-2xl p-6 shadow-2xl">
+                            <h2 className="text-xl font-bold text-white flex items-center gap-2 mb-1">
+                                <i data-lucide="settings" className="w-5 h-5 text-blue-400"></i> 검토 조건 및 입력 설정
+                            </h2>
+                            <p className="text-[10px] text-slate-400 mb-4 font-bold uppercase tracking-wider pl-7">
+                                [국토교통부 제2025-738호 적용]
+                            </p>
+
+                            {/* 출력 버튼 3종 */}
+                            <div className="flex flex-wrap gap-2 mb-5">
+                                <button onClick={()=>window.print()}
+                                    className="print-btn-wrap flex-1 flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-600 active:scale-95 transition-all text-white rounded-xl py-3 px-3 border border-blue-400/50 shadow-md group min-w-[120px]">
+                                    <i data-lucide="printer" className="w-4 h-4 text-blue-200"></i>
+                                    <div className="text-left">
+                                        <p className="text-[10px] font-black uppercase tracking-widest leading-none">A4 인쇄</p>
+                                        <p className="text-[7px] text-blue-300 mt-0.5 font-bold">Ctrl+P</p>
+                                    </div>
+                                </button>
+                                <button onClick={downloadA4PNG}
+                                    className="flex-1 flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all text-white rounded-xl py-3 px-3 border border-slate-500 shadow-md group min-w-[120px]">
+                                    <i data-lucide="file-text" className="w-4 h-4 text-blue-300 group-hover:text-blue-200"></i>
+                                    <div className="text-left">
+                                        <p className="text-[10px] font-black uppercase tracking-widest leading-none">A4 출력</p>
+                                        <p className="text-[7px] text-slate-400 mt-0.5 font-bold">흰 배경 PNG</p>
+                                    </div>
+                                </button>
+                                <button onClick={downloadPNG}
+                                    className="flex-1 flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all text-white rounded-xl py-3 px-3 border border-slate-500 shadow-md group min-w-[120px]">
+                                    <i data-lucide="smartphone" className="w-4 h-4 text-emerald-400 group-hover:text-emerald-300"></i>
+                                    <div className="text-left">
+                                        <p className="text-[10px] font-black uppercase tracking-widest leading-none">모바일 출력</p>
+                                        <p className="text-[7px] text-slate-400 mt-0.5 font-bold">다크 카드 PNG</p>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="flex gap-3 items-end">
+                                    <div className="flex-1">
+                                        <label className="text-[10px] text-slate-500 mb-1 block font-bold uppercase tracking-wider">프로젝트명</label>
+                                        <input type="text" value={projectName} onChange={e=>setProjectName(e.target.value)} className="w-full input-field rounded-lg p-2.5 text-sm h-[42px] font-bold" />
+                                    </div>
+                                    <div className="w-[150px] bg-blue-900/30 border border-blue-500/40 rounded-lg flex flex-col items-center justify-center h-[42px]">
+                                        <span className="text-[8px] text-blue-400 font-black uppercase tracking-widest text-center px-1">법적 기준 (W/㎡K 이하)</span>
+                                        <span className="text-sm font-black text-white">{targetU ? targetU.toFixed(3) : '-'}</span>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-2 bg-slate-800/40 p-3 rounded-xl border border-slate-700/50 text-[11px]">
+                                    <div><label className="text-slate-500 mb-1 block font-bold">지역</label>
+                                        <select value={region} onChange={e=>setRegion(e.target.value)} className="w-full input-field rounded p-1.5">
+                                            {Object.keys(U_STANDARDS).map(r=><option key={r} value={r}>{r}</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div><label className="text-slate-500 mb-1 block font-bold">부위</label>
+                                            <select value={part} onChange={e=>setPart(e.target.value)} className="w-full input-field rounded p-1.5">
+                                                {Object.keys(U_STANDARDS[region]||{}).map(p=><option key={p} value={p}>{p}</option>)}
+                                            </select>
+                                        </div>
+                                        <div><label className="text-slate-500 mb-1 block font-bold">외기조건</label>
+                                            <select value={exposure} onChange={e=>setExposure(e.target.value)} className="w-full input-field rounded p-1.5">
+                                                {Object.keys((U_STANDARDS[region]||{})[part]||{}).map(e=><option key={e} value={e}>{e}</option>)}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div><label className="text-slate-500 mb-1 block font-bold">용도/난방 여부</label>
+                                        <select value={usage} onChange={e=>setUsage(e.target.value)} className="w-full input-field rounded p-1.5">
+                                            {Object.keys(((U_STANDARDS[region]||{})[part]||{})[exposure]||{}).map(u=><option key={u} value={u}>{u}</option>)}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="bg-emerald-900/20 border border-emerald-500/30 rounded-xl p-3">
+                                    <h3 className="text-emerald-400 text-[9px] font-bold mb-2 flex items-center gap-1.5 uppercase tracking-widest">
+                                        <i data-lucide="info" className="w-3 h-3"></i> [별표 3] 단열재 최소 두께 기준 (mm)
+                                    </h3>
+                                    <div className="grid grid-cols-4 gap-2 text-center">
+                                        {['가','나','다','라'].map((grade,idx)=>(
+                                            <div key={grade} className="bg-slate-900/60 rounded p-1.5 border border-slate-700/50 text-center">
+                                                <span className="text-[8px] text-slate-500 font-bold block mb-1">{grade}급</span>
+                                                <span className="text-xs font-black text-emerald-400 font-mono tracking-tighter">{targetT[idx]||'-'}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-8 flex flex-col">
+                                <div className="flex justify-between items-center mb-3 border-b border-slate-700 pb-2">
+                                    <h2 className="text-md font-bold text-white flex items-center gap-2 tracking-tight">
+                                        <i data-lucide="layers" className="w-4 h-4 text-emerald-400"></i> 단열 및 재료 구성
+                                        <span className="text-[10px] text-slate-400 font-normal ml-2">(실외 → 실내 방향)</span>
+                                    </h2>
+                                    <button onClick={()=>setLayers([...layers,{id:Date.now(),cat:"C_콘크리트계",group:"일반콘크리트",name:"철근콘크리트",t:10,lambda:1.6}])}
+                                        className="bg-emerald-600 text-white text-[9px] px-3 py-2 rounded-md font-bold active:scale-95 transition-all shadow-lg">
+                                        + 재료 추가
+                                    </button>
+                                </div>
+                                <div className="space-y-4">
+                                    {layers.map(layer=>(
+                                        <div key={layer.id} className="bg-[#0F172A] border border-slate-600 rounded-lg p-4 relative border-l-4 border-l-slate-500 hover:border-l-blue-500 transition-colors shadow-sm">
+                                            <button onClick={()=>setLayers(layers.filter(l=>l.id!==layer.id))} className="absolute right-2 top-2 text-slate-600 hover:text-red-400 transition-colors">
+                                                <i data-lucide="trash-2" className="w-4 h-4"></i>
+                                            </button>
+                                            <div className="space-y-3 mb-3">
+                                                <select value={layer.cat} onChange={e=>updateLayer(layer.id,'cat',e.target.value)} className="input-field rounded p-1.5 text-[11px] w-full">
+                                                    {Object.keys(DB_HIERARCHY).map(c=><option key={c} value={c}>{c.replace(/_/g,' ')}</option>)}
+                                                </select>
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <select value={layer.group} onChange={e=>updateLayer(layer.id,'group',e.target.value)} className="input-field rounded p-1.5 text-[11px] w-full">
+                                                        {Object.keys(DB_HIERARCHY[layer.cat]||{}).map(g=><option key={g} value={g}>{g.replace(/_/g,' ')}</option>)}
+                                                    </select>
+                                                    <select value={layer.name} onChange={e=>updateLayer(layer.id,'name',e.target.value)} className="input-field rounded p-1.5 text-[11px] w-full truncate">
+                                                        {Object.keys((DB_HIERARCHY[layer.cat]||{})[layer.group]||{}).map(m=><option key={m} value={m}>{m.replace(/_/g,' ')}</option>)}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-4 items-end">
+                                                <div className="flex-1">
+                                                    <label className="text-[8px] text-slate-500 block mb-0.5 font-bold uppercase tracking-tighter font-mono">T (mm)</label>
+                                                    <input type="number" value={layer.t} onChange={e=>updateLayer(layer.id,'t',Number(e.target.value))} className="input-field rounded p-2 text-sm w-full text-[#FACC15] font-mono font-bold" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <label className="text-[8px] text-slate-500 block mb-0.5 font-bold uppercase tracking-tighter font-mono">λ (W/mK)</label>
+                                                    <input type="number" step="0.001" value={layer.lambda} disabled={layer.name?.includes('공기층')} onChange={e=>updateLayer(layer.id,'lambda',Number(e.target.value))} className="input-field rounded p-2 text-sm w-full font-mono opacity-70" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ── RIGHT PANEL (화면 미리보기) ── */}
+                    <div className="w-full lg:w-1/2 flex flex-col items-center justify-start pb-10 lg:pb-20 sticky top-4">
+                        <div id="report-area" className="capture-bg w-full max-w-[680px] p-6 lg:p-10 relative shadow-2xl rounded-3xl border border-slate-700 overflow-hidden min-h-[950px] flex flex-col">
+                            <header className="mb-6 pb-5 border-b border-slate-700/60 relative z-10">
+                                <p className="text-blue-400 font-black text-[10px] lg:text-xs tracking-widest mb-1 uppercase">Heat Transfer Coefficient Report</p>
+                                <h1 className="text-2xl lg:text-3xl font-black text-white leading-tight mb-1">{projectName}</h1>
+                                <div className="text-slate-500 font-black uppercase tracking-tighter font-mono text-[9px] lg:text-[10px]">
+                                    <span>국토교통부 제2025-738호 적용</span>
+                                </div>
+                            </header>
+
+                            {/* 1. 조건 */}
+                            <div className="mb-6 relative z-10">
+                                <h2 className="text-slate-200 text-[13px] font-black mb-4 flex items-center gap-2 uppercase tracking-widest font-mono">
+                                    <i data-lucide="check-square" className="w-4 h-4 text-emerald-400"></i> 1. 열관류율 검토 조건
+                                </h2>
+                                <div className="grid grid-cols-4 gap-2 text-center font-bold">
+                                    {[{l:'대상지역',v:region},{l:'건축부위',v:part},{l:'외기조건',v:exposure},{l:'세부용도',v:usage}].map(x=>(
+                                        <div key={x.l} className="bg-slate-800/60 p-2 lg:p-3 rounded-xl border border-slate-700/50 shadow-inner flex flex-col justify-center min-h-[60px] lg:min-h-[70px]" style={{display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center',textAlign:'center'}}>
+                                            <span className="text-slate-400 text-[8px] lg:text-[9px] block mb-1 uppercase tracking-wider">{x.l}</span>
+                                            <span className="text-white text-[9px] lg:text-[11px] break-keep leading-snug font-black font-mono">{x.v}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* 2. 판정 */}
+                            <div className="blue-gradient-card p-4 lg:p-5 mb-8 shadow-2xl border border-blue-400/20 z-10 ring-1 ring-white/10">
+                                <h2 className="text-blue-100 text-[13px] font-black mb-4 flex items-center gap-2 uppercase tracking-[0.2em] font-mono">
+                                    <i data-lucide="shield-check" className="w-4 h-4 text-emerald-300"></i> 2. 단열조치 적합여부 최종 판정
+                                </h2>
+                                <div className="grid grid-cols-2 gap-4 mb-4 text-center">
+                                    <div className="bg-black/20 rounded-xl p-3 lg:p-4 border border-white/10 shadow-inner flex flex-col justify-center" style={{display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center'}}>
+                                        <p className="text-blue-200 text-[9px] mb-2 font-black uppercase tracking-widest leading-tight" style={{textAlign:'center'}}>법적 기준<br/>(W/㎡K 이하)</p>
+                                        <div className="flex items-end justify-center gap-1" style={{display:'flex',alignItems:'flex-end',justifyContent:'center'}}>
+                                            <span className="text-2xl lg:text-3xl font-black text-white tracking-tighter font-mono leading-none">{targetU?targetU.toFixed(3):'-'}</span>
+                                            <span className="text-white/60 text-[9px] font-bold mb-1 uppercase" style={{marginBottom:'4px',lineHeight:'1'}}>W/㎡K</span>
+                                        </div>
+                                    </div>
+                                    <div className="bg-black/20 rounded-xl p-3 lg:p-4 border border-white/10 shadow-inner flex flex-col justify-center" style={{display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center'}}>
+                                        <p className="text-blue-200 text-[9px] mb-2 font-black uppercase tracking-widest leading-tight" style={{textAlign:'center'}}>설계 산출값<br/>(U)</p>
+                                        <div className="flex items-end justify-center gap-1 relative z-10" style={{display:'flex',alignItems:'flex-end',justifyContent:'center'}}>
+                                            <span className="text-2xl lg:text-3xl font-black text-[#FACC15] font-mono drop-shadow-lg tracking-tighter leading-none">{currentU}</span>
+                                            <span className="text-white/60 text-[9px] font-bold uppercase" style={{marginBottom:'4px',lineHeight:'1'}}>W/㎡K</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="bg-[#0F172A]/60 backdrop-blur-xl rounded-xl p-3 lg:p-4 border border-white/20 flex justify-between items-center relative z-10 shadow-2xl">
+                                    <div>
+                                        <span className="text-white text-[11px] lg:text-[13px] font-black block mb-1 uppercase font-mono">Status</span>
+                                        <span className="text-blue-300 text-[7px] font-bold uppercase tracking-widest opacity-80 whitespace-nowrap">국토교통부고시 제6조 기준</span>
+                                    </div>
+                                    <div className={`flex items-center gap-2 lg:gap-3 px-6 lg:px-10 py-3 lg:py-4 rounded-xl shadow-lg border border-white/10 flex-nowrap shrink-0 ${isPass?'bg-emerald-500 text-slate-900':'bg-red-500 text-white animate-pulse'}`}>
+                                        <i data-lucide={isPass?'check-circle':'alert-circle'} className="w-5 lg:w-6 h-5 lg:h-6"></i>
+                                        <span className="text-2xl lg:text-3xl font-black tracking-[0.2em] uppercase leading-none font-mono whitespace-nowrap">{isPass?'적 합':'부적합'}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 3. 산출 근거 */}
+                            <div className="data-grid relative z-10 p-4 lg:p-8 overflow-hidden shadow-2xl flex-1 w-full">
+                                <h2 className="text-slate-200 text-[13px] font-black mb-6 border-b border-slate-700/50 pb-4 flex items-center justify-between tracking-widest uppercase font-mono">
+                                    <span className="flex items-center gap-2"><i data-lucide="calculator" className="w-5 h-5 text-emerald-400"></i> 3. 부위별 상세 산출 근거</span>
+                                    <span className="text-[11px] text-slate-500 italic font-bold tracking-normal">U = 1 / ΣR</span>
+                                </h2>
+                                <table className="w-full text-[12px] lg:text-[13px] text-left border-collapse font-mono table-fixed">
+                                    <colgroup>
+                                        <col style={{width:'8%'}}/><col style={{width:'50%'}}/><col style={{width:'12%'}}/><col style={{width:'15%'}}/><col style={{width:'15%'}}/>
+                                    </colgroup>
+                                    <thead>
+                                        <tr className="text-slate-500 bg-slate-800/40 uppercase font-black tracking-tight border-b border-slate-700 text-[10px] lg:text-[12px]">
+                                            <th className="p-2 lg:p-3 text-center" style={{verticalAlign:'middle'}}>NO</th>
+                                            <th className="p-2 lg:p-3" style={{verticalAlign:'middle'}}>재료 및 사양</th>
+                                            <th className="p-2 lg:p-3 text-right" style={{verticalAlign:'middle'}}>T(mm)</th>
+                                            <th className="p-2 lg:p-3 text-right" style={{verticalAlign:'middle'}}>λ</th>
+                                            <th className="p-2 lg:p-3 text-right text-blue-300 font-bold" style={{verticalAlign:'middle'}}>Res.(R)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="text-slate-100 divide-y divide-slate-700/30 text-[11px] lg:text-[12px]">
+                                        <tr className="bg-slate-800/10">
+                                            <td className="p-2 lg:p-3 text-center text-slate-500 font-black italic" style={{verticalAlign:'middle'}}>실외</td>
+                                            <td colSpan="3" className="p-2 lg:p-3 text-slate-300 font-bold tracking-tight" style={{verticalAlign:'middle'}}>실외 표면열전달저항</td>
+                                            <td className="p-2 lg:p-3 text-right font-mono text-blue-400 font-black tracking-tight text-[13px] lg:text-[15px]" style={{verticalAlign:'middle'}}>{surfaceRes.ro.toFixed(3)}</td>
+                                        </tr>
+                                        {calculatedLayers.map((l,i)=>(
+                                            <tr key={l.id} className="hover:bg-white/5 transition-colors">
+                                                <td className="p-2 lg:p-3 text-center text-slate-400 font-mono font-black opacity-50" style={{verticalAlign:'middle'}}>{i+1}</td>
+                                                <td className="p-2 lg:p-3 font-black tracking-tight leading-tight break-keep py-3 overflow-visible whitespace-normal" style={{verticalAlign:'middle'}}>{l.name?.replace(/_/g,' ')}</td>
+                                                <td className="p-2 lg:p-3 text-right font-mono font-black text-[#FACC15] text-[13px] lg:text-[15px]" style={{verticalAlign:'middle'}}>{l.name?.includes('공기층')?'-':(l.t||0).toString().substring(0,3)}</td>
+                                                <td className="p-2 lg:p-3 text-right font-mono font-bold opacity-60 text-[11px] lg:text-[13px]" style={{verticalAlign:'middle'}}>{l.name?.includes('공기층')?'-':(l.lambda||0).toFixed(3)}</td>
+                                                <td className="p-2 lg:p-3 text-right font-mono text-blue-300 font-black tracking-tight text-[13px] lg:text-[15px]" style={{verticalAlign:'middle'}}>{l.r.toFixed(3)}</td>
+                                            </tr>
+                                        ))}
+                                        <tr className="bg-slate-800/10">
+                                            <td className="p-2 lg:p-3 text-center text-slate-500 font-black italic" style={{verticalAlign:'middle'}}>실내</td>
+                                            <td colSpan="3" className="p-2 lg:p-3 text-slate-300 font-bold tracking-tight" style={{verticalAlign:'middle'}}>실내 표면열전달저항</td>
+                                            <td className="p-2 lg:p-3 text-right font-mono text-blue-400 font-black tracking-tight text-[13px] lg:text-[15px]" style={{verticalAlign:'middle'}}>{surfaceRes.ri.toFixed(3)}</td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot className="border-t-2 border-slate-600 bg-blue-900/10 shadow-inner">
+                                        <tr>
+                                            <td colSpan="4" className="p-3 lg:p-5 text-right text-[12px] lg:text-[13px] font-black text-slate-200 uppercase tracking-widest italic" style={{verticalAlign:'middle'}}>Total Thermal Resistance (ΣR)</td>
+                                            <td className="p-3 lg:p-5 text-right font-mono text-emerald-400 text-[13px] lg:text-[15px] tracking-tighter font-black drop-shadow-lg" style={{verticalAlign:'middle'}}>{totalR.toFixed(3)}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+
+                                <div className="mt-8 bg-black/80 rounded-3xl p-4 lg:p-6 border border-white/10 text-center text-white font-mono shadow-2xl ring-1 ring-white/5 uppercase tracking-tighter">
+                                    <p className="text-sm lg:text-xl font-black flex items-center justify-center gap-2 lg:gap-3 whitespace-nowrap overflow-x-auto overflow-y-hidden">
+                                        <span className="opacity-40 italic">U = 1 / {totalR.toFixed(3)}</span>
+                                        <span className="text-blue-500 font-bold">=</span>
+                                        <span className="text-[#FACC15] text-3xl lg:text-4xl drop-shadow-[0_0_15px_rgba(250,204,21,0.4)] px-1 italic">{currentU}</span>
+                                        <span className="text-slate-500 text-[10px] lg:text-sm font-black tracking-widest">W/㎡K</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <footer className="mt-8 mb-0 relative z-10 flex flex-col items-end opacity-30 text-[11px] lg:text-[12px] text-slate-500 uppercase tracking-[0.4em] font-mono">
+                                <p className="font-black whitespace-nowrap">Developed MANMIN Ver-{SYSTEM_VERSION}</p>
+                            </footer>
+                        </div>
+
+                        {/* 하단 고정 PNG 저장 버튼 */}
+                        <div className="fixed bottom-6 right-6 z-50">
+                            <button onClick={downloadPNG} className="group flex items-center gap-3 lg:gap-4 bg-blue-600 hover:bg-blue-500 text-white px-8 lg:px-10 py-4 lg:py-5 rounded-[2rem] shadow-[0_20px_60px_rgba(37,99,235,0.6)] transition-all active:scale-95 border border-white/20 ring-4 ring-blue-500/20 hover:ring-blue-500/40">
+                                <i data-lucide="file-down" className="w-5 lg:w-6 h-5 lg:h-6"></i>
+                                <span className="font-black text-lg lg:text-xl tracking-[0.2em] font-mono uppercase">PNG 저장</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── A4 숨김 캡처 영역: dom-to-image가 직접 캡처 ── */}
+                <div id="a4-capture-area" style={{
+                    position:'fixed', left:'-9999px', top:0,
+                    width:'794px',
+                    backgroundColor:'#FFFFFF',
+                    fontFamily:"'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif",
+                    color:'#1E293B',
+                    boxSizing:'border-box',
+                }}>
+                    {/* 헤더 바 */}
+                    <div style={{background:'linear-gradient(90deg,#1D4ED8 0%,#312E81 100%)',padding:'28px 48px 24px'}}>
+                        <div style={{color:'#93C5FD',fontSize:'10px',fontWeight:900,letterSpacing:'0.25em',textTransform:'uppercase',marginBottom:'8px'}}>
+                            Heat Transfer Coefficient Report · 국토교통부 제2025-738호 적용
+                        </div>
+                        <div style={{color:'#FFFFFF',fontSize:'28px',fontWeight:900,marginBottom:'6px'}}>
+                            {projectName}
+                        </div>
+                        <div style={{color:'#BFDBFE',fontSize:'10px',fontWeight:700}}>
+                            Developed MANMIN Ver-{SYSTEM_VERSION}
+                        </div>
+                    </div>
+
+                    <div style={{padding:'32px 48px 40px'}}>
+                        {/* 1. 검토 조건 */}
+                        <div style={{marginBottom:'28px'}}>
+                            <div style={{display:'flex',alignItems:'center',gap:'10px',flexWrap:'nowrap',marginBottom:'14px',paddingBottom:'10px',borderBottom:'2px solid #1D4ED8'}}>
+                                <div style={{width:'4px',height:'20px',background:'#1D4ED8',borderRadius:'2px',flexShrink:0}}></div>
+                                <span style={{fontSize:'13px',fontWeight:900,color:'#1E293B',letterSpacing:'0.12em',textTransform:'uppercase',whiteSpace:'nowrap'}}>1. 열관류율 검토 조건</span>
+                            </div>
+                            <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'10px'}}>
+                                {[{l:'대상지역',v:region},{l:'건축부위',v:part},{l:'외기조건',v:exposure},{l:'세부용도',v:usage}].map(x=>(
+                                    <div key={x.l} style={{background:'#F1F5F9',border:'1px solid #CBD5E1',borderRadius:'10px',padding:'14px 10px',textAlign:'center'}}>
+                                        <div style={{fontSize:'8px',color:'#64748B',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'8px'}}>{x.l}</div>
+                                        <div style={{fontSize:'12px',color:'#1E293B',fontWeight:900}}>{x.v}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* 2. 판정 */}
+                        <div style={{marginBottom:'28px'}}>
+                            <div style={{display:'flex',alignItems:'center',gap:'10px',flexWrap:'nowrap',marginBottom:'14px',paddingBottom:'10px',borderBottom:'2px solid #1D4ED8'}}>
+                                <div style={{width:'4px',height:'20px',background:'#1D4ED8',borderRadius:'2px',flexShrink:0}}></div>
+                                <span style={{fontSize:'13px',fontWeight:900,color:'#1E293B',letterSpacing:'0.12em',textTransform:'uppercase',whiteSpace:'nowrap'}}>2. 단열조치 적합여부 최종 판정</span>
+                            </div>
+                            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'12px'}}>
+                                <div style={{background:'#F8FAFC',border:'2px solid #CBD5E1',borderRadius:'12px',padding:'18px',textAlign:'center'}}>
+                                    <div style={{fontSize:'9px',color:'#64748B',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'10px'}}>법적 기준 (W/㎡K 이하)</div>
+                                    <div style={{fontSize:'30px',fontWeight:900,color:'#1E293B',fontFamily:'monospace'}}>{targetU?targetU.toFixed(3):'-'}</div>
+                                </div>
+                                <div style={{background:'#FEF9C3',border:'2px solid #FDE047',borderRadius:'12px',padding:'18px',textAlign:'center'}}>
+                                    <div style={{fontSize:'9px',color:'#92400E',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'10px'}}>설계 산출값 (U)</div>
+                                    <div style={{fontSize:'30px',fontWeight:900,color:'#92400E',fontFamily:'monospace'}}>{currentU}</div>
+                                </div>
+                                <div style={{background:isPass?'#DCFCE7':'#FEE2E2',border:`2px solid ${isPass?'#16A34A':'#DC2626'}`,borderRadius:'12px',padding:'18px',textAlign:'center'}}>
+                                    <div style={{fontSize:'9px',color:isPass?'#14532D':'#7F1D1D',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'10px'}}>STATUS · 국토교통부고시 제6조</div>
+                                    <div style={{fontSize:'28px',fontWeight:900,letterSpacing:'0.2em',color:isPass?'#15803D':'#DC2626',fontFamily:'monospace'}}>{isPass?'적  합':'부적합'}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 3. 산출 근거 */}
+                        <div style={{marginBottom:'24px'}}>
+                            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'nowrap',marginBottom:'14px',paddingBottom:'10px',borderBottom:'2px solid #1D4ED8'}}>
+                                <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                                    <div style={{width:'4px',height:'20px',background:'#1D4ED8',borderRadius:'2px',flexShrink:0}}></div>
+                                    <span style={{fontSize:'13px',fontWeight:900,color:'#1E293B',letterSpacing:'0.12em',textTransform:'uppercase',whiteSpace:'nowrap'}}>3. 부위별 상세 산출 근거</span>
+                                </div>
+                                <span style={{fontSize:'11px',color:'#94A3B8',fontStyle:'italic',fontWeight:700}}>U = 1 / ΣR</span>
+                            </div>
+                            <table style={{width:'100%',borderCollapse:'collapse',fontSize:'12px',fontFamily:'monospace'}}>
+                                <colgroup>
+                                    <col style={{width:'7%'}}/><col style={{width:'48%'}}/><col style={{width:'13%'}}/><col style={{width:'16%'}}/><col style={{width:'16%'}}/>
+                                </colgroup>
+                                <thead>
+                                    <tr style={{background:'#1E293B',color:'#FFFFFF'}}>
+                                        {['NO','재료 및 사양','T(mm)','λ','Res.(R)'].map((h,i)=>(
+                                            <th key={h} style={{padding:'10px 8px',textAlign:i===0?'center':i>1?'right':'left',fontWeight:900,fontSize:'10px',letterSpacing:'0.1em'}}>{h}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style={{background:'#F8FAFC',borderBottom:'1px solid #E2E8F0'}}>
+                                        <td style={{padding:'10px 8px',textAlign:'center',color:'#94A3B8',fontStyle:'italic',fontWeight:700,fontSize:'11px'}}>실외</td>
+                                        <td colSpan="3" style={{padding:'10px 8px',color:'#475569',fontWeight:600}}>실외 표면열전달저항</td>
+                                        <td style={{padding:'10px 8px',textAlign:'right',color:'#1D4ED8',fontWeight:900}}>{surfaceRes.ro.toFixed(3)}</td>
+                                    </tr>
+                                    {calculatedLayers.map((l,i)=>(
+                                        <tr key={l.id} style={{background:i%2===0?'#FFFFFF':'#F8FAFC',borderBottom:'1px solid #E2E8F0'}}>
+                                            <td style={{padding:'10px 8px',textAlign:'center',color:'#94A3B8',fontWeight:700}}>{i+1}</td>
+                                            <td style={{padding:'10px 8px',fontWeight:700,color:'#1E293B'}}>{l.name?.replace(/_/g,' ')}</td>
+                                            <td style={{padding:'10px 8px',textAlign:'right',color:'#B45309',fontWeight:900}}>{l.name?.includes('공기층')?'-':(l.t||0).toString().substring(0,3)}</td>
+                                            <td style={{padding:'10px 8px',textAlign:'right',color:'#475569',fontWeight:600,opacity:0.8}}>{l.name?.includes('공기층')?'-':(l.lambda||0).toFixed(3)}</td>
+                                            <td style={{padding:'10px 8px',textAlign:'right',color:'#1D4ED8',fontWeight:900}}>{l.r.toFixed(3)}</td>
+                                        </tr>
+                                    ))}
+                                    <tr style={{background:'#F8FAFC',borderBottom:'1px solid #E2E8F0'}}>
+                                        <td style={{padding:'10px 8px',textAlign:'center',color:'#94A3B8',fontStyle:'italic',fontWeight:700,fontSize:'11px'}}>실내</td>
+                                        <td colSpan="3" style={{padding:'10px 8px',color:'#475569',fontWeight:600}}>실내 표면열전달저항</td>
+                                        <td style={{padding:'10px 8px',textAlign:'right',color:'#1D4ED8',fontWeight:900}}>{surfaceRes.ri.toFixed(3)}</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr style={{background:'#EFF6FF',borderTop:'2px solid #1D4ED8'}}>
+                                        <td colSpan="4" style={{padding:'12px 8px',textAlign:'right',fontWeight:900,fontSize:'11px',color:'#1E293B',letterSpacing:'0.1em',textTransform:'uppercase',fontStyle:'italic'}}>Total Thermal Resistance (ΣR)</td>
+                                        <td style={{padding:'12px 8px',textAlign:'right',fontWeight:900,color:'#059669',fontSize:'14px'}}>{totalR.toFixed(3)}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        {/* U값 결과 */}
+                        <div style={{background:'#1E293B',borderRadius:'14px',padding:'20px 28px',display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',flexWrap:'nowrap',marginBottom:'24px'}}>
+                            <span style={{color:'#64748B',fontSize:'14px',fontWeight:700,fontFamily:'monospace',fontStyle:'italic',whiteSpace:'nowrap'}}>U = 1 / {totalR.toFixed(3)}</span>
+                            <span style={{color:'#3B82F6',fontWeight:900,fontSize:'20px',whiteSpace:'nowrap'}}>=</span>
+                            <span style={{color:'#FACC15',fontWeight:900,fontSize:'34px',fontFamily:'monospace',letterSpacing:'-0.02em',whiteSpace:'nowrap'}}>{currentU}</span>
+                            <span style={{color:'#94A3B8',fontSize:'13px',fontWeight:700,letterSpacing:'0.1em',whiteSpace:'nowrap'}}>W/㎡K</span>
+                        </div>
+
+                        {/* 하단 서명 */}
+                        <div style={{borderTop:'1px solid #E2E8F0',paddingTop:'12px',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'nowrap'}}>
+                            <span style={{fontSize:'9px',color:'#94A3B8',fontWeight:700,letterSpacing:'0.12em',textTransform:'uppercase',whiteSpace:'nowrap'}}>건축물 에너지절약설계기준 · 국토교통부고시 제2025-738호</span>
+                            <span style={{fontSize:'9px',color:'#CBD5E1',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',whiteSpace:'nowrap'}}>DEVELOPED MANMIN VER-{SYSTEM_VERSION}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ═══ PWA 설치 배너 ═══ */}
+                {showInstallBanner && (
+                    <div className="fixed bottom-20 left-4 right-4 lg:left-auto lg:right-6 lg:bottom-24 lg:w-[380px] z-[60] pwa-install-banner rounded-2xl p-4 shadow-2xl">
+                        <div className="flex items-center gap-3">
+                            <img src="icons/icon-192.png" className="w-12 h-12 rounded-xl shadow-lg flex-shrink-0" alt="앱 아이콘" />
+                            <div className="flex-1 min-w-0">
+                                <p className="text-white text-[13px] font-black leading-tight">홈 화면에 설치하시겠습니까?</p>
+                                <p className="text-blue-200 text-[10px] mt-1 font-bold opacity-80">오프라인에서도 사용 가능한 앱으로 설치됩니다</p>
+                            </div>
+                            <div className="flex gap-2 flex-shrink-0">
+                                <button onClick={()=>setShowInstallBanner(false)}
+                                    className="text-white/60 hover:text-white text-[11px] font-bold px-3 py-2 rounded-lg transition-colors">
+                                    닫기
+                                </button>
+                                <button onClick={handleInstall}
+                                    className="bg-white text-blue-700 text-[11px] font-black px-4 py-2 rounded-lg shadow-md hover:bg-blue-50 active:scale-95 transition-all">
+                                    설치
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                </>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+
+    <!-- ═══ Service Worker 등록 ═══ -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('[PWA] SW 등록 완료 — scope:', reg.scope))
+                    .catch(err => console.warn('[PWA] SW 등록 실패:', err));
+            });
+        }
+    </script>
+</body>
+</html>

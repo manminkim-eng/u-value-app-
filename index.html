@@ -1,860 +1,1255 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>건축물 부위 열관류율 종합 시스템 (Ver-2.0)</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>열관류율 종합 검토 시스템 [MANMIN-Ver3.0]</title>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#1d4ed8"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="열관류율"/>
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png"/>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
 
-    <!-- ═══ PWA 설정 ═══ -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1D4ED8">
-    <meta name="description" content="건축물 에너지절약설계기준 열관류율 검토 시스템 (국토교통부고시 제2025-738호)">
+<style>
+/* ═══ RESET ═══ */
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f0f4f9;color:#1a2744;min-height:100vh;}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+input[type="number"]{-moz-appearance:textfield;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:#f0f4f9;}
+::-webkit-scrollbar-thumb{background:#bfdbfe;border-radius:10px;}
+.mono{font-family:'JetBrains Mono','Courier New',monospace!important;}
 
-    <!-- iOS (Safari) 지원 -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="열관류율">
-    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+/* ═══ HEADER — 참고파일 컨셉 ═══ */
+.app-header{background:#dbeafe;position:sticky;top:0;z-index:40;box-shadow:0 2px 16px rgba(147,197,253,.45);}
+.header-inner{max-width:1280px;margin:0 auto;padding:0 20px;height:62px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.brand-logo{display:flex;align-items:center;gap:12px;min-width:0;flex:1;}
+.brand-icon{width:40px;height:40px;background:#1d4ed8;border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(29,78,216,.38);flex-shrink:0;}
+.brand-icon svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.brand-texts{min-width:0;}
+.brand-title{font-size:16px;font-weight:900;color:#1e3a8a;letter-spacing:-.02em;line-height:1.25;white-space:nowrap;}
+.brand-sub{font-size:10px;color:#3b82f6;margin-top:2px;white-space:nowrap;font-weight:600;}
+.hdr-btns{display:flex;gap:8px;flex-shrink:0;}
+.btn-print{background:#e63312;color:#fff;border:none;padding:9px 16px;border-radius:9px;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;transition:all .15s;box-shadow:0 2px 10px rgba(230,51,18,.35);white-space:nowrap;}
+.btn-print:hover{background:#c62a0c;}
+.btn-print:active{transform:scale(.97);}
+.btn-print svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.btn-mobpng{background:#1d4ed8;color:#fff;border:none;padding:9px 14px;border-radius:9px;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;transition:all .15s;box-shadow:0 2px 10px rgba(29,78,216,.3);white-space:nowrap;}
+.btn-mobpng:hover{background:#1e40af;}
+.btn-mobpng:active{transform:scale(.97);}
 
-    <!-- 파비콘 -->
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+/* ═══ TAB BAR — 참고파일 스타일 ═══ */
+.tab-bar{background:#bfdbfe;border-top:1px solid rgba(147,197,253,.35);overflow-x:auto;scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-bar-inner{max-width:1280px;margin:0 auto;padding:0 8px;display:flex;}
+.tab-btn{background:none;border:none;cursor:pointer;color:#1e40af;font-family:inherit;padding:11px 16px;font-size:12px;font-weight:700;position:relative;transition:color .15s,background .15s;display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;letter-spacing:.02em;}
+.tab-btn:hover{color:#1e3a8a;background:rgba(30,58,138,.07);}
+.tab-btn.active{color:#1e3a8a;}
+.tab-btn.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:#f97316;border-radius:2px 2px 0 0;}
+.tab-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+/* ═══ MAIN ═══ */
+.main-wrap{max-width:1280px;margin:0 auto;padding:18px 16px 90px;}
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+/* ═══ TWO-COL (입력+결과 50:50) ═══ */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
 
-    <style>
-        
-        * {
-            font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif !important;
-        }
-        body {
-            font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
-            background-color: #0B1120;
-            color: #E2E8F0;
-            -webkit-tap-highlight-color: transparent;
-        }
+/* ═══ CARD ═══ */
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 1px 4px rgba(15,23,42,.06);overflow:hidden;}
+.card-head{display:flex;align-items:center;gap:9px;padding:14px 16px 13px;border-bottom:1px solid #eef1f6;}
+.card-icon{width:28px;height:28px;border-radius:7px;background:#eff6ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.card-icon svg{width:13px;height:13px;stroke:#1d4ed8;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.card-title{font-size:12px;font-weight:800;color:#1a2744;letter-spacing:.04em;}
+.card-badge{margin-left:auto;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;white-space:nowrap;}
+.card-badge-em{margin-left:auto;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:#ecfdf5;color:#059669;border:1px solid #a7f3d0;white-space:nowrap;}
+.card-badge-fail{margin-left:auto;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:#fff1f2;color:#e11d48;border:1px solid #fecdd3;white-space:nowrap;}
+.card-body{padding:14px 16px;}
 
-        input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type="number"] { -moz-appearance: textfield; }
+/* ═══ FIELDS ═══ */
+.flbl{font-size:10px;font-weight:700;color:#6b7a99;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px;}
+.finput{width:100%;padding:8px 11px;background:#f8fafd;border:1.5px solid #dde3ed;border-radius:8px;color:#1a2744;font-size:12px;font-weight:600;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s;}
+.finput:focus{border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.1);background:#fff;}
+.fselect{width:100%;padding:8px 28px 8px 10px;background:#f8fafd;border:1.5px solid #dde3ed;border-radius:8px;color:#1a2744;font-size:11px;font-weight:700;font-family:inherit;outline:none;cursor:pointer;transition:border-color .15s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231d4ed8' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+.fselect:focus{border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.1);background-color:#fff;}
 
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #0B1120; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+/* ═══ LAYER CARD ═══ */
+.layer-card{background:#f8fafd;border:1.5px solid #e2e8f0;border-left:3px solid #1d4ed8;border-radius:10px;padding:12px;position:relative;transition:all .15s;}
+.layer-card:hover{border-left-color:#0284c7;box-shadow:0 2px 8px rgba(29,78,216,.1);}
 
-        .work-panel { background: #1E293B; border: 1px solid #334155; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); }
-        .input-field { background: #0F172A; border: 1px solid #334155; color: #F8FAFC; }
-        .input-field:focus { outline: none; border-color: #3B82F6; }
-        .capture-bg { background-color: #0F172A; background-image: radial-gradient(circle at 100% 0%, #1E3A8A 0%, transparent 40%); }
-        .blue-gradient-card { background: linear-gradient(135deg, #1D4ED8 0%, #312E81 100%); border-radius: 1rem; position: relative; overflow: hidden; }
-        .data-grid { border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; background: rgba(15,23,42,0.6); }
+/* ═══ VERDICT CARDS ═══ */
+.v3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.vc{border-radius:10px;padding:13px;text-align:center;}
+.vc-n{background:#f8fafd;border:1.5px solid #e2e8f0;}
+.vc-a{background:#fefce8;border:1.5px solid #fde047;}
+.vc-p{background:#f0fdf4;border:1.5px solid #86efac;}
+.vc-f{background:#fff1f2;border:1.5px solid #fecdd3;}
 
-        table td, table th { vertical-align: middle !important; line-height: 1 !important; }
-        .grid > div { display: flex; flex-direction: column; justify-content: center; }
-        .flex.items-end { align-items: flex-end !important; }
-        .flex.items-center { align-items: center !important; }
-        .flex-col.justify-center { justify-content: center !important; }
+/* ═══ RESULT TABLE ═══ */
+.rtbl{width:100%;border-collapse:collapse;}
+.rtbl th{background:#eff6ff;color:#1e40af;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:8px 10px;border-bottom:2px solid #bfdbfe;border-top:1px solid #e2e8f0;}
+.rtbl td{padding:8px 10px;border-bottom:1px solid #e2e8f0;font-size:12px;vertical-align:middle!important;line-height:1!important;}
+.rtbl tfoot td{background:#eff6ff;border-top:2px solid #93c5fd;font-weight:800;}
 
-        /* ═══════════════════════════════════════════════════
-           A4 인쇄 전용 (Ctrl+P / 인쇄 버튼)
-           ═══════════════════════════════════════════════════ */
-        @page { size: A4 portrait; margin: 0mm; }
+/* ═══ FORMULA BOX ═══ */
+.fml-box-lg{background:linear-gradient(135deg,#1e3a8a,#1d4ed8);border-radius:12px;padding:16px 22px;text-align:center;}
 
-        @media print {
-            *, *::before, *::after {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
-            html, body {
-                margin: 0 !important; padding: 0 !important;
-                width: 210mm !important; height: 297mm !important;
-                background: #FFFFFF !important;
-                overflow: hidden !important;
-            }
-            /* 화면 UI 숨김 */
-            #root > .max-w-7xl { display: none !important; }
-            .fixed { display: none !important; }
-            .print-btn-wrap { display: none !important; }
-            /* A4 캡처 영역만 표시 */
-            #a4-capture-area {
-                position: relative !important;
-                left: 0 !important; top: 0 !important;
-                display: block !important; visibility: visible !important;
-                margin: 0 !important; padding: 0 !important;
-                background-color: #FFFFFF !important;
-                box-shadow: none !important; border: none !important;
-                page-break-after: always !important;
-                page-break-inside: avoid !important;
-            }
-            #a4-capture-area > div:first-child { padding: 6mm 10mm 5mm 10mm !important; }
-            #a4-capture-area > div:nth-child(2) { padding: 5mm 10mm 5mm 10mm !important; }
-        }
+/* ═══ THICKNESS BADGES ═══ */
+.t-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.t-badge{background:#fff;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 4px;text-align:center;}
 
-        /* PWA 설치 배너 */
-        .pwa-install-banner {
-            background: linear-gradient(135deg, #1D4ED8 0%, #312E81 100%);
-            border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(20px);
-            animation: slideUp 0.4s ease-out;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to   { transform: translateY(0);    opacity: 1; }
-        }
-    </style>
+/* ═══ INFO CARD ═══ */
+.info-strip{background:#eff6ff;border:1px solid #bfdbfe;border-radius:9px;padding:10px 13px;margin-bottom:14px;display:flex;align-items:flex-start;gap:8px;}
+.info-strip svg{width:13px;height:13px;stroke:#1d4ed8;fill:none;stroke-width:2;flex-shrink:0;margin-top:2px;}
+.info-strip p{font-size:10.5px;color:#1e40af;font-weight:600;line-height:1.7;}
+
+/* ═══ BTN-ADD ═══ */
+.btn-add{background:#ecfdf5;color:#059669;border:1px solid #a7f3d0;border-radius:7px;padding:5px 11px;font-size:10px;font-weight:800;cursor:pointer;transition:all .15s;font-family:inherit;}
+.btn-add:hover{background:#d1fae5;}
+
+/* ═══ FULL-WIDTH PANEL (A4/mobile/material) ═══ */
+.full-panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 1px 4px rgba(15,23,42,.06);}
+
+/* ═══ A4 PREVIEW ═══ */
+.a4-preview-wrap{background:#e2e8f0;border-radius:0 0 14px 14px;padding:24px;display:flex;justify-content:center;overflow-x:auto;min-height:400px;}
+.a4-preview-inner{background:#fff;box-shadow:0 6px 40px rgba(0,0,0,.18);border:1px solid #c8d0dc;border-radius:2px;}
+
+/* ═══ MOBILE PREVIEW ═══ */
+.mob-preview-wrap{background:#e2e8f0;border-radius:0 0 14px 14px;padding:28px;display:flex;justify-content:center;align-items:flex-start;overflow-x:auto;min-height:400px;}
+
+/* ═══ MATERIAL TAB ═══ */
+.mat-wrap{padding:16px;}
+.mat-cat-bar{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+.mat-cat-btn{padding:6px 13px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid #dde3ed;color:#6b7a99;transition:all .15s;background:#fff;font-family:inherit;}
+.mat-cat-btn.active{background:#1d4ed8;color:#fff;border-color:#1d4ed8;}
+.mat-cat-btn:hover:not(.active){border-color:#1d4ed8;color:#1d4ed8;background:#eff6ff;}
+.mat-group-hd{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#f8fafd;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;margin-bottom:4px;transition:background .15s;font-family:inherit;width:100%;}
+.mat-group-hd:hover{background:#eff6ff;}
+.mat-tbl{width:100%;border-collapse:collapse;font-size:11px;}
+.mat-tbl th{background:#1d4ed8;color:#fff;padding:7px 10px;text-align:left;font-weight:700;font-size:10px;border-bottom:1px solid rgba(255,255,255,.1);}
+.mat-tbl td{padding:7px 10px;border-bottom:1px solid #eef1f6;color:#374151;}
+.mat-tbl tr:last-child td{border-bottom:none;}
+.mat-tbl tr:nth-child(even) td{background:#f8fafd;}
+.ga-pill{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:800;}
+.gb-pill{background:#f0fdf4;border:1px solid #a7f3d0;color:#059669;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:800;}
+.gc-pill{background:#fefce8;border:1px solid #fde047;color:#854d0e;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:800;}
+.gd-pill{background:#fff1f2;border:1px solid #fecdd3;color:#be123c;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:800;}
+
+/* ═══ FAB ═══ */
+.fab-pill{position:fixed;bottom:22px;right:18px;z-index:50;background:linear-gradient(135deg,#0c4da2,#1d4ed8);color:#fff;border:none;border-radius:16px;padding:11px 18px;cursor:pointer;box-shadow:0 4px 22px rgba(12,77,162,.55);display:flex;align-items:center;gap:7px;font-size:13px;font-weight:800;font-family:inherit;line-height:1.3;transition:transform .15s,box-shadow .15s;white-space:nowrap;}
+.fab-pill:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(12,77,162,.72);}
+.fab-pill:active{transform:translateY(0) scale(.97);}
+
+/* ═══ MODAL ═══ */
+.fml-overlay{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;animation:fmlFadeIn .2s ease-out;}
+.fml-overlay.hidden{display:none;}
+@keyframes fmlFadeIn{from{opacity:0}to{opacity:1}}
+.fml-modal{background:#fff;border-radius:20px;width:100%;max-width:820px;max-height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.35);animation:fmlUp .26s cubic-bezier(.34,1.5,.64,1);}
+@keyframes fmlUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.fml-hd{background:linear-gradient(135deg,#081e44,#0c4da2,#1565c0);color:#fff;padding:18px 20px 0;flex-shrink:0;}
+.fml-hd-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:10px;}
+.fml-hd-title{font-size:17px;font-weight:900;letter-spacing:-.01em;}
+.fml-hd-sub{font-size:10px;color:rgba(255,255,255,.6);margin-top:3px;font-weight:600;}
+.fml-close{background:rgba(255,255,255,.13);border:none;color:#fff;border-radius:50%;width:32px;height:32px;flex-shrink:0;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .15s;font-family:inherit;}
+.fml-close:hover{background:rgba(255,255,255,.28);}
+.fml-itabs{display:flex;overflow-x:auto;scrollbar-width:none;}
+.fml-itabs::-webkit-scrollbar{display:none;}
+.fml-itab{padding:10px 16px;border:none;background:transparent;color:rgba(255,255,255,.6);font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:all .15s;flex-shrink:0;}
+.fml-itab:hover:not(.on){color:rgba(255,255,255,.88);}
+.fml-itab.on{color:#fff;border-bottom-color:#f97316;}
+.fml-bd{overflow-y:auto;padding:20px;flex:1;}
+.fml-bd::-webkit-scrollbar{width:4px;}
+.fml-bd::-webkit-scrollbar-thumb{background:#bfdbfe;border-radius:3px;}
+.fml-panel{display:none;}
+.fml-panel.on{display:block;}
+
+/* modal content */
+.fml-sec{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin:16px 0 8px;display:flex;align-items:center;gap:7px;border-left:3px solid #1d4ed8;padding-left:9px;color:#1a2744;}
+.fml-sec:first-child{margin-top:0;}
+.fml-card{background:#f8fafc;border:1px solid #e4e9f0;border-radius:10px;padding:12px 13px;margin-bottom:8px;}
+.fml-eq{display:block;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#1d4ed8;background:#eff6ff;border-radius:8px;padding:10px 13px;margin:6px 0;word-break:break-all;line-height:1.75;}
+.fml-eq.amber{background:#fff7ed;color:#b45309;}
+.fml-eq.em{background:#f0fdf4;color:#059669;}
+.fml-note{font-size:10px;color:#64748b;margin-top:5px;line-height:1.8;}
+.fml-hi{border:1.5px solid #bfdbfe;background:#eff6ff;border-radius:10px;padding:12px 13px;margin-bottom:8px;font-size:11px;line-height:1.8;color:#1e3a8a;}
+.fml-hi.amber{border-color:#fde68a;background:#fefce8;color:#854d0e;}
+.fml-hi.em{border-color:#a7f3d0;background:#f0fdf4;color:#065f46;}
+.fml-g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;}
+.fml-tbl{width:100%;border-collapse:collapse;font-size:11px;border-radius:8px;overflow:hidden;}
+.fml-tbl th{background:#0c4da2;color:#fff;padding:7px 10px;text-align:center;font-weight:700;font-size:10px;}
+.fml-tbl td{padding:7px 10px;border-bottom:1px solid #e4e9f0;}
+.fml-tbl tr:last-child td{border-bottom:none;}
+.fml-tbl tr:nth-child(even) td{background:#f8fafc;}
+.fml-tbl td:first-child{font-weight:700;color:#1a2744;text-align:left;padding-left:12px;}
+.fml-tbl td:last-child{font-weight:800;color:#1d4ed8;font-size:12px;text-align:right;}
+.exp-card{border:1px solid #e4e9f0;border-radius:12px;padding:15px;margin-bottom:10px;}
+
+/* ═══ A4 REPORT STYLES (used inside capture div) ═══ */
+.a4-rpt{font-family:'Pretendard','Apple SD Gothic Neo',sans-serif;width:794px;background:#fff;color:#1a1a1a;box-sizing:border-box;}
+.a4-top{background:linear-gradient(90deg,#0c4da2,#1d4ed8);padding:24px 42px 20px;}
+.a4-bar{height:5px;background:#f97316;border-radius:2px;margin-bottom:14px;}
+.a4-body{padding:26px 42px 32px;}
+.a4-sec-hd{display:flex;align-items:center;gap:8px;margin-bottom:11px;padding-bottom:9px;border-bottom:2px solid #1d4ed8;}
+.a4-sec-bar{width:3px;height:15px;background:#1d4ed8;border-radius:2px;}
+.a4-sec-label{font-size:11px;font-weight:900;color:#1a2744;letter-spacing:.1em;text-transform:uppercase;}
+.a4-cond-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px;}
+.a4-cond-cell{background:#f8fafd;border:1px solid #e2e8f0;border-radius:8px;padding:11px 8px;text-align:center;}
+.a4-cond-lbl{font-size:8px;color:#94a3b8;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;}
+.a4-cond-val{font-size:11px;color:#1a2744;font-weight:800;}
+.a4-verdict-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;}
+.a4-vtbl{width:100%;border-collapse:collapse;font-size:11px;font-family:'JetBrains Mono',monospace;margin-bottom:18px;}
+.a4-vtbl th{background:#1e293b;color:#fff;padding:8px 7px;font-size:10px;font-weight:700;letter-spacing:.07em;}
+.a4-vtbl td{padding:8px 7px;border-bottom:1px solid #e2e8f0;}
+.a4-vtbl tfoot td{background:#eff6ff;border-top:2px solid #1d4ed8;font-weight:900;}
+.a4-u-bar{background:#1e293b;border-radius:12px;padding:14px 22px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+.a4-footer{border-top:1px solid #e2e8f0;padding-top:9px;display:flex;justify-content:space-between;align-items:center;}
+
+/* ═══ PRINT ═══ */
+@page{size:A4 portrait;margin:0mm;}
+@media print{
+  *,*::before,*::after{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  .no-print{display:none!important;}
+  html,body{margin:0!important;padding:0!important;width:210mm!important;height:297mm!important;background:#fff!important;overflow:hidden!important;}
+  #a4-hidden{position:relative!important;left:0!important;top:0!important;display:block!important;visibility:visible!important;margin:0!important;background:#fff!important;box-shadow:none!important;border:none!important;}
+  #root>*:not(#a4-hidden){display:none!important;}
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media(min-width:769px){
+  .mob-only{display:none!important;}
+}
+@media(max-width:768px){
+  .two-col{grid-template-columns:1fr;}
+  .desk-only{display:none!important;}
+  .brand-title{font-size:13px;}
+  .brand-sub{display:none;}
+  .btn-mobpng span{display:none;}
+  .btn-print span.txt{display:none;}
+  .tab-btn{padding:10px 11px;font-size:11px;}
+  .main-wrap{padding:12px 10px 90px;}
+  .fml-overlay{padding:0;align-items:flex-end;}
+  .fml-modal{border-radius:20px 20px 0 0;max-height:92vh;}
+  .fml-g2{grid-template-columns:1fr;}
+  .v3{grid-template-columns:1fr 1fr 1fr;}
+}
+@media(max-width:480px){
+  .v3{grid-template-columns:1fr 1fr;}
+  .hdr-btns .btn-mobpng{display:none;}
+}
+table td,table th{vertical-align:middle!important;line-height:1!important;}
+</style>
 </head>
 <body>
-    <div id="root"></div>
+<div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
-        const SYSTEM_VERSION = "2.0";
+<script type="text/babel">
+const {useState,useEffect,useMemo,useRef}=React;
+const VER="3.0";
 
-        const U_STANDARDS = {
-            '중부1지역': {
-                '거실의 외벽': { '외기에 직접 면하는 경우': { '공동주택': 0.150, '공동주택 외': 0.170 }, '외기에 간접 면하는 경우': { '공동주택': 0.210, '공동주택 외': 0.240 } },
-                '최상층 거실 반자/지붕': { '외기에 직접 면하는 경우': { '해당없음': 0.150 }, '외기에 간접 면하는 경우': { '해당없음': 0.210 } },
-                '최하층 거실 바닥': { '외기에 직접 면하는 경우': { '바닥난방인 경우': 0.150, '바닥난방이 아닌 경우': 0.170 }, '외기에 간접 면하는 경우': { '바닥난방인 경우': 0.210, '바닥난방이 아닌 경우': 0.240 } },
-                '바닥난방인 층간바닥': { '해당없음': { '해당없음': 0.810 } }
-            },
-            '중부2지역': {
-                '거실의 외벽': { '외기에 직접 면하는 경우': { '공동주택': 0.170, '공동주택 외': 0.240 }, '외기에 간접 면하는 경우': { '공동주택': 0.240, '공동주택 외': 0.340 } },
-                '최상층 거실 반자/지붕': { '외기에 직접 면하는 경우': { '해당없음': 0.150 }, '외기에 간접 면하는 경우': { '해당없음': 0.210 } },
-                '최하층 거실 바닥': { '외기에 직접 면하는 경우': { '바닥난방인 경우': 0.170, '바닥난방이 아닌 경우': 0.200 }, '외기에 간접 면하는 경우': { '바닥난방인 경우': 0.240, '바닥난방이 아닌 경우': 0.290 } },
-                '바닥난방인 층간바닥': { '해당없음': { '해당없음': 0.810 } }
-            },
-            '남부지역': {
-                '거실의 외벽': { '외기에 직접 면하는 경우': { '공동주택': 0.220, '공동주택 외': 0.320 }, '외기에 간접 면하는 경우': { '공동주택': 0.310, '공동주택 외': 0.450 } },
-                '최상층 거실 반자/지붕': { '외기에 직접 면하는 경우': { '해당없음': 0.180 }, '외기에 간접 면하는 경우': { '해당없음': 0.260 } },
-                '최하층 거실 바닥': { '외기에 직접 면하는 경우': { '바닥난방인 경우': 0.220, '바닥난방이 아닌 경우': 0.250 }, '외기에 간접 면하는 경우': { '바닥난방인 경우': 0.310, '바닥난방이 아닌 경우': 0.350 } },
-                '바닥난방인 층간바닥': { '해당없음': { '해당없음': 0.810 } }
-            },
-            '제주도': {
-                '거실의 외벽': { '외기에 직접 면하는 경우': { '공동주택': 0.290, '공동주택 외': 0.410 }, '외기에 간접 면하는 경우': { '공동주택': 0.410, '공동주택 외': 0.560 } },
-                '최상층 거실 반자/지붕': { '외기에 직접 면하는 경우': { '해당없음': 0.250 }, '외기에 간접 면하는 경우': { '해당없음': 0.350 } },
-                '최하층 거실 바닥': { '외기에 직접 면하는 경우': { '바닥난방인 경우': 0.290, '바닥난방이 아닌 경우': 0.330 }, '외기에 간접 면하는 경우': { '바닥난방인 경우': 0.410, '바닥난방이 아닌 경우': 0.470 } },
-                '바닥난방인 층간바닥': { '해당없음': { '해당없음': 0.810 } }
-            }
-        };
+/* ══════════════════════ DATA ══════════════════════ */
+const U_STD={
+  '중부1지역':{'거실의 외벽':{'외기에 직접 면하는 경우':{'공동주택':0.150,'공동주택 외':0.170},'외기에 간접 면하는 경우':{'공동주택':0.210,'공동주택 외':0.240}},'최상층 거실 반자/지붕':{'외기에 직접 면하는 경우':{'해당없음':0.150},'외기에 간접 면하는 경우':{'해당없음':0.210}},'최하층 거실 바닥':{'외기에 직접 면하는 경우':{'바닥난방인 경우':0.150,'바닥난방이 아닌 경우':0.170},'외기에 간접 면하는 경우':{'바닥난방인 경우':0.210,'바닥난방이 아닌 경우':0.240}},'바닥난방인 층간바닥':{'해당없음':{'해당없음':0.810}}},
+  '중부2지역':{'거실의 외벽':{'외기에 직접 면하는 경우':{'공동주택':0.170,'공동주택 외':0.240},'외기에 간접 면하는 경우':{'공동주택':0.240,'공동주택 외':0.340}},'최상층 거실 반자/지붕':{'외기에 직접 면하는 경우':{'해당없음':0.150},'외기에 간접 면하는 경우':{'해당없음':0.210}},'최하층 거실 바닥':{'외기에 직접 면하는 경우':{'바닥난방인 경우':0.170,'바닥난방이 아닌 경우':0.200},'외기에 간접 면하는 경우':{'바닥난방인 경우':0.240,'바닥난방이 아닌 경우':0.290}},'바닥난방인 층간바닥':{'해당없음':{'해당없음':0.810}}},
+  '남부지역':{'거실의 외벽':{'외기에 직접 면하는 경우':{'공동주택':0.220,'공동주택 외':0.320},'외기에 간접 면하는 경우':{'공동주택':0.310,'공동주택 외':0.450}},'최상층 거실 반자/지붕':{'외기에 직접 면하는 경우':{'해당없음':0.180},'외기에 간접 면하는 경우':{'해당없음':0.260}},'최하층 거실 바닥':{'외기에 직접 면하는 경우':{'바닥난방인 경우':0.220,'바닥난방이 아닌 경우':0.250},'외기에 간접 면하는 경우':{'바닥난방인 경우':0.310,'바닥난방이 아닌 경우':0.350}},'바닥난방인 층간바닥':{'해당없음':{'해당없음':0.810}}},
+  '제주도':{'거실의 외벽':{'외기에 직접 면하는 경우':{'공동주택':0.290,'공동주택 외':0.410},'외기에 간접 면하는 경우':{'공동주택':0.410,'공동주택 외':0.560}},'최상층 거실 반자/지붕':{'외기에 직접 면하는 경우':{'해당없음':0.250},'외기에 간접 면하는 경우':{'해당없음':0.350}},'최하층 거실 바닥':{'외기에 직접 면하는 경우':{'바닥난방인 경우':0.290,'바닥난방이 아닌 경우':0.330},'외기에 간접 면하는 경우':{'바닥난방인 경우':0.410,'바닥난방이 아닌 경우':0.470}},'바닥난방인 층간바닥':{'해당없음':{'해당없음':0.810}}}
+};
+const T_STD={
+  '중부1지역':{'거실의 외벽':{'외기에 직접 면하는 경우':{'공동주택':[220,255,295,325],'공동주택 외':[190,225,260,285]},'외기에 간접 면하는 경우':{'공동주택':[150,180,205,225],'공동주택 외':[130,155,175,195]}},'최상층 거실 반자/지붕':{'외기에 직접 면하는 경우':{'해당없음':[220,260,295,330]},'외기에 간접 면하는 경우':{'해당없음':[155,180,205,230]}},'최하층 거실 바닥':{'외기에 직접 면하는 경우':{'바닥난방인 경우':[215,250,290,320],'바닥난방이 아닌 경우':[195,230,265,290]},'외기에 간접 면하는 경우':{'바닥난방인 경우':[145,170,195,220],'바닥난방이 아닌 경우':[135,155,180,200]}},'바닥난방인 층간바닥':{'해당없음':{'해당없음':[30,35,45,50]}}},
+  '중부2지역':{'거실의 외벽':{'외기에 직접 면하는 경우':{'공동주택':[190,225,260,285],'공동주택 외':[135,155,180,200]},'외기에 간접 면하는 경우':{'공동주택':[130,155,175,195],'공동주택 외':[90,105,120,135]}},'최상층 거실 반자/지붕':{'외기에 직접 면하는 경우':{'해당없음':[220,260,295,330]},'외기에 간접 면하는 경우':{'해당없음':[155,180,205,230]}},'최하층 거실 바닥':{'외기에 직접 면하는 경우':{'바닥난방인 경우':[190,220,255,280],'바닥난방이 아닌 경우':[165,195,220,245]},'외기에 간접 면하는 경우':{'바닥난방인 경우':[125,150,170,185],'바닥난방이 아닌 경우':[110,125,145,160]}},'바닥난방인 층간바닥':{'해당없음':{'해당없음':[30,35,45,50]}}},
+  '남부지역':{'거실의 외벽':{'외기에 직접 면하는 경우':{'공동주택':[145,170,200,220],'공동주택 외':[100,115,130,145]},'외기에 간접 면하는 경우':{'공동주택':[100,115,135,150],'공동주택 외':[65,75,90,95]}},'최상층 거실 반자/지붕':{'외기에 직접 면하는 경우':{'해당없음':[180,215,245,270]},'외기에 간접 면하는 경우':{'해당없음':[120,145,165,180]}},'최하층 거실 바닥':{'외기에 직접 면하는 경우':{'바닥난방인 경우':[140,165,190,210],'바닥난방이 아닌 경우':[130,155,175,195]},'외기에 간접 면하는 경우':{'바닥난방인 경우':[95,110,125,140],'바닥난방이 아닌 경우':[90,105,120,130]}},'바닥난방인 층간바닥':{'해당없음':{'해당없음':[30,35,45,50]}}},
+  '제주도':{'거실의 외벽':{'외기에 직접 면하는 경우':{'공동주택':[110,130,145,165],'공동주택 외':[75,90,100,110]},'외기에 간접 면하는 경우':{'공동주택':[75,85,100,110],'공동주택 외':[50,60,70,75]}},'최상층 거실 반자/지붕':{'외기에 직접 면하는 경우':{'해당없음':[130,150,175,190]},'외기에 간접 면하는 경우':{'해당없음':[90,105,120,130]}},'최하층 거실 바닥':{'외기에 직접 면하는 경우':{'바닥난방인 경우':[105,125,140,155],'바닥난방이 아닌 경우':[100,115,130,145]},'외기에 간접 면하는 경우':{'바닥난방인 경우':[65,80,90,100],'바닥난방이 아닌 경우':[65,75,85,95]}},'바닥난방인 층간바닥':{'해당없음':{'해당없음':[30,35,45,50]}}}
+};
 
-        const T_STANDARDS = {
-            '중부1지역': { '거실의 외벽': { '외기에 직접 면하는 경우': { '공동주택': [220,255,295,325], '공동주택 외': [190,225,260,285] }, '외기에 간접 면하는 경우': { '공동주택': [150,180,205,225], '공동주택 외': [130,155,175,195] } }, '최상층 거실 반자/지붕': { '외기에 직접 면하는 경우': { '해당없음': [220,260,295,330] }, '외기에 간접 면하는 경우': { '해당없음': [155,180,205,230] } }, '최하층 거실 바닥': { '외기에 직접 면하는 경우': { '바닥난방인 경우': [215,250,290,320], '바닥난방이 아닌 경우': [195,230,265,290] }, '외기에 간접 면하는 경우': { '바닥난방인 경우': [145,170,195,220], '바닥난방이 아닌 경우': [135,155,180,200] } }, '바닥난방인 층간바닥': { '해당없음': { '해당없음': [30,35,45,50] } } },
-            '중부2지역': { '거실의 외벽': { '외기에 직접 면하는 경우': { '공동주택': [190,225,260,285], '공동주택 외': [135,155,180,200] }, '외기에 간접 면하는 경우': { '공동주택': [130,155,175,195], '공동주택 외': [90,105,120,135] } }, '최상층 거실 반자/지붕': { '외기에 직접 면하는 경우': { '해당없음': [220,260,295,330] }, '외기에 간접 면하는 경우': { '해당없음': [155,180,205,230] } }, '최하층 거실 바닥': { '외기에 직접 면하는 경우': { '바닥난방인 경우': [190,220,255,280], '바닥난방이 아닌 경우': [165,195,220,245] }, '외기에 간접 면하는 경우': { '바닥난방인 경우': [125,150,170,185], '바닥난방이 아닌 경우': [110,125,145,160] } }, '바닥난방인 층간바닥': { '해당없음': { '해당없음': [30,35,45,50] } } },
-            '남부지역': { '거실의 외벽': { '외기에 직접 면하는 경우': { '공동주택': [145,170,200,220], '공동주택 외': [100,115,130,145] }, '외기에 간접 면하는 경우': { '공동주택': [100,115,135,150], '공동주택 외': [65,75,90,95] } }, '최상층 거실 반자/지붕': { '외기에 직접 면하는 경우': { '해당없음': [180,215,245,270] }, '외기에 간접 면하는 경우': { '해당없음': [120,145,165,180] } }, '최하층 거실 바닥': { '외기에 직접 면하는 경우': { '바닥난방인 경우': [140,165,190,210], '바닥난방이 아닌 경우': [130,155,175,195] }, '외기에 간접 면하는 경우': { '바닥난방인 경우': [95,110,125,140], '바닥난방이 아닌 경우': [90,105,120,130] } }, '바닥난방인 층간바닥': { '해당없음': { '해당없음': [30,35,45,50] } } },
-            '제주도': { '거실의 외벽': { '외기에 직접 면하는 경우': { '공동주택': [110,130,145,165], '공동주택 외': [75,90,100,110] }, '외기에 간접 면하는 경우': { '공동주택': [75,85,100,110], '공동주택 외': [50,60,70,75] } }, '최상층 거실 반자/지붕': { '외기에 직접 면하는 경우': { '해당없음': [130,150,175,190] }, '외기에 간접 면하는 경우': { '해당없음': [90,105,120,130] } }, '최하층 거실 바닥': { '외기에 직접 면하는 경우': { '바닥난방인 경우': [105,125,140,155], '바닥난방이 아닌 경우': [100,115,130,145] }, '외기에 간접 면하는 경우': { '바닥난방인 경우': [65,80,90,100], '바닥난방이 아닌 경우': [65,75,85,95] } }, '바닥난방인 층간바닥': { '해당없음': { '해당없음': [30,35,45,50] } } }
-        };
+const DB={
+  "A_금속계":{label:"A. 금속계",groups:{"기본금속":{label:"기본금속",items:{"동":370.0,"알루미늄":200.0,"청동_75Cu_25Sn":25.0,"황동":110.0,"납":34.0,"철_연강":47.675,"스테인레스강":15.0,"강재":53.0}},"판금·가공재":{label:"판금·가공재",items:{"강판":372.094,"아연도강관판":44.187,"아연도급철판":44.0}}}},
+  "B_비금속·자연물계":{label:"B. 비금속·자연물계",groups:{"석재":{label:"석재",items:{"대리석":1.582,"대리석_2600kg":2.800,"화강석":2.175,"화강석_2700kg":3.300}},"토양·골재":{label:"토양·골재",items:{"사질토양":0.582,"점토질토양":1.628,"흙":0.617,"모래_건조":0.489,"자갈":0.617,"잡석":1.977,"모래_자갈_콘크리트용":1.733}},"물·눈·얼음":{label:"물·눈·얼음",items:{"물":0.605,"얼음":2.210,"눈_200kg":0.152,"눈_600kg":0.640}}}},
+  "C_콘크리트계":{label:"C. 콘크리트계",groups:{"일반콘크리트":{label:"일반콘크리트",items:{"보통콘크리트":1.640,"무근콘크리트":1.512,"철근콘크리트":1.600,"버림콘크리트":1.745,"콘크리트옹벽":1.600,"PC콘크리트":1.512}},"특수·경량콘크리트":{label:"특수·경량콘크리트",items:{"경량콘크리트":0.524,"기포콘크리트_0.4품":0.130,"기포콘크리트_0.5품":0.160,"기포콘크리트_0.6품":0.190,"신더콘크리트":0.803,"콘크리트블럭":0.700}}}},
+  "D_미장재료계":{label:"D. 미장재료계",groups:{"모르타르류":{label:"모르타르류",items:{"모르타르":1.082,"시멘트몰탈":1.400,"시멘트모르타르_1_3":1.400,"메탈라스몰탈":1.512,"보호몰탈":1.512}},"마감재료":{label:"마감재료",items:{"회반죽":0.733,"인조석물갈기":1.280,"테라조":1.803,"플라스터":0.617,"흙벽":0.896}}}},
+  "E_목재계":{label:"E. 목재계",groups:{"일반목재":{label:"일반목재",items:{"소나무":0.175,"목재_경량":0.140,"목재_보통":0.170,"목재_중량":0.190,"삼목":0.094,"노송나무":0.105,"졸참나무":0.187,"나왕":0.163}},"가공목재":{label:"가공목재",items:{"베이어판":0.140,"합판":0.128}}}},
+  "F_시멘트·석고계":{label:"F. 시멘트·석고계",groups:{"보드류":{label:"보드류",items:{"석고보드":0.180,"방수석고보드":0.238,"파티클보드":0.150,"석고판_3mm":0.256,"펄라이트보드":0.198,"목모시멘트판":0.152,"하드보드_6mm":0.256}},"기타가공품":{label:"기타가공품",items:{"석고플라이터":0.582,"아미텍스":0.102,"하드텍스":0.133,"텍스_9mm":0.094}}}},
+  "G_요업제품계":{label:"G. 요업제품계",groups:{"타일·벽돌":{label:"타일·벽돌",items:{"타일":1.300,"바닥용타일":1.803,"자기질타일":1.800,"세라믹타일":1.280,"기와":0.350,"시멘트벽돌":0.600,"콘크리트벽돌":1.600,"보통벽돌":0.617,"내화벽돌":0.990,"붉은벽돌":0.780}},"유리·기타":{label:"유리·기타",items:{"판유리_3mm":0.745,"유리":0.780,"천연슬레이트":1.500}}}},
+  "H_방수·바닥재계":{label:"H. 방수·바닥재계",groups:{"방수재":{label:"방수재",items:{"아스팔트":0.733,"쉬트방수":0.163,"아스팔트루핑_17kg":0.190,"아스팔트루핑_22kg":0.270,"아스팔트루핑_26kg":0.340,"우레탄마감":0.190,"PE필름":0.210}},"바닥재":{label:"바닥재",items:{"아스팔트타일":0.326,"리놀륨":0.187,"바닥재_플라스틱":0.190,"고무타일":0.396,"디럭스타일":0.233}}}},
+  "I_섬유판계":{label:"I. 섬유판계",groups:{"섬유판류":{label:"섬유판류",items:{"연질섬유판":0.059,"경질섬유판":0.175,"후지":0.210,"모직포":0.128}}}},
+  "J_무기질섬유계":{label:"J. 무기질섬유계",groups:{"수지·기타섬유":{label:"수지·기타섬유",items:{"암면":0.059,"유리면":0.047,"우레탄뿜칠":0.035,"우레탄폼판":0.035,"인슐레이션보드":0.061,"광재면":0.047,"고무":0.175,"비닐장판":0.082,"모노륨":3.140,"암면성형판":0.059,"유리면성형판":0.035}}}},
+  "K_단열재계":{label:"K. 단열재계",groups:{
+    "EPS_비드법":{label:"EPS 비드법 (KS M ISO 4898)",items:{"1종_A-1":0.033,"1종_A-2":0.039,"1종_B":0.043,"1종_C":0.043,"2종_A-1":0.032,"2종_A-2":0.036,"2종_B":0.039,"3종_A-1":0.029,"3종_A-2":0.031,"3종_B":0.034,"3종_C":0.039}},
+    "XPS_압출법":{label:"XPS 압출법 (KS M ISO 4898)",items:{"1종_A-1":0.026,"1종_A-2":0.029,"2종_A-1":0.028,"2종_B-1":0.026,"2종_B-2":0.027,"3종_A":0.026,"3종_B-2":0.026,"3종_C":0.026}},
+    "PUR_경질우레탄":{label:"PUR 경질우레탄 (KS M ISO 4898)",items:{"1종_A":0.024,"1종_B":0.029,"1종_C":0.024,"1종_D":0.023,"1종_E":0.023,"2종_A":0.023,"2종_B":0.024,"2종_C":0.029,"3종_A":0.023,"3종_B":0.024,"3종_C":0.029}},
+    "PF_페놀폼":{label:"PF 페놀폼 (KS M ISO 4898)",items:{"1종_A":0.022,"1종_B":0.037,"1종_C":0.022,"1종_D":0.022,"2종_A":0.022,"2종_B":0.037,"3종_A":0.039}},
+    "미네랄울":{label:"미네랄울 (KS L 9102)",items:{"보온판_1호":0.037,"보온판_2호":0.036,"보온판_3호":0.038,"펠트":0.039,"보온대_1호":0.040,"보온대_2호":0.039,"블랭킷_1호a":0.039,"블랭킷_1호b":0.037,"블랭킷_2호":0.036}},
+    "그라스울":{label:"그라스울 (KS L 9102)",items:{"보온판_24K":0.037,"보온판_32K":0.036,"보온판_40K":0.035,"보온판_48K+":0.034,"블랭킷_a":0.040,"블랭킷_b":0.036}},
+    "폴리에스테르":{label:"폴리에스테르 (KS F 5660)",items:{"1급":0.034,"2급":0.040,"3급":0.045}},
+    "분무식PUR":{label:"분무식 PUR (KS M 3871)",items:{"1종_A":0.022,"1종_B":0.032,"1종_C":0.040,"2종_A":0.022,"2종_B":0.032}},
+    "기타단열재":{label:"기타단열재",items:{"비드법보호판_1호":0.036,"비드법보호판_2호":0.037,"비드법보호판_3호":0.040,"비드법보호판_4호":0.043,"압출법보호판_특호":0.027,"압출법보호판_1호":0.028,"압출법보호판_2호":0.029,"경질우레탄_1종1호":0.024,"경질우레탄_2종1호":0.023,"발포경질폴리우레탄":0.023}}
+  }},
+  "L_기타재료계":{label:"L. 기타재료계",groups:{"기타마감·판넬":{label:"기타마감·판넬",items:{"규조토":0.094,"보온벽돌":0.140,"발포유리":0.082,"탄화코르크":0.059,"톱밥":0.128,"양모":0.117,"센드위치판넬":0.034,"복합판넬":0.454,"바닥차음재":0.039,"알루미늄복합판넬":0.500,"벽지_비닐계":0.270,"벽지_종이계":0.170}}}},
+  "M_창호·공기층":{label:"M. 창호·공기층",groups:{"창·문·공기층":{label:"창·문·공기층",items:{"공기층_현장시공":0.117,"이중창":3.373,"문_철제":3.373}}}}
+};
 
-        const DB_HIERARCHY = {
-          "A_금속계": { "기본금속": { "동": 370.0, "알루미늄": 200.0, "청동_75Cu_25Sn": 25.0, "황동": 110.0, "납": 34.0, "철_연강": 47.675, "스테인레스강": 15.0, "강재": 53.0 }, "판금_및_가공재": { "강판": 372.094, "아연도강관판": 44.187, "아연도급철판": 44.0 } },
-          "B_비금속_및_자연물계": { "석재": { "대리석": 1.582, "대리석_2600kg": 2.800, "화강석": 2.175, "화강석_2700kg": 3.300 }, "토양_및_골재": { "사질토양": 0.582, "점토질토양_수분94": 1.628, "흙": 0.617, "모래_건조": 0.489, "자갈": 0.617, "잡석": 1.977, "모래_자갈_콘크리트용": 1.733 }, "물_눈_얼음": { "물": 0.605, "얼음": 2.210, "눈_200kg": 0.152, "눈_600kg": 0.640 } },
-          "C_콘크리트계": { "일반콘크리트": { "보통콘크리트": 1.640, "무근콘크리트": 1.512, "철근콘크리트": 1.600, "버림콘크리트": 1.745, "콘크리트옹벽": 1.600, "PC_콘크리트": 1.512, "콘크리트_1_2_4": 1.600 }, "특수_및_경량콘크리트": { "경량콘크리트": 0.524, "기포콘크리트_0.4품_현장타설": 0.130, "기포콘크리트_0.5품_현장타설": 0.160, "기포콘크리트_0.6품_현장타설": 0.190, "신더콘크리트": 0.803, "콘크리트블럭": 0.700, "콘크리트블록_중량": 1.000 } },
-          "D_미장재료계": { "모르타르류": { "모르타르": 1.082, "시멘트몰탈": 1.400, "시멘트모르타르_1_3": 1.400, "메탈라스_몰탈": 1.512, "보호몰탈": 1.512 }, "마감재료": { "회반죽": 0.733, "시멘플라이터": 0.698, "엑체방수": 1.012, "인조석물갈기": 1.280, "인조석바름": 1.512, "테라조": 1.803, "플라스터": 0.617, "흙벽": 0.896 } },
-          "E_목재계": { "일반목재": { "소나무": 0.175, "목재_경량": 0.140, "목재_보통량": 0.170, "목재_중량": 0.190, "삼목": 0.094, "노송나무": 0.105, "졸참나무": 0.187, "나왕": 0.163 }, "가공목재": { "베이어판": 0.140, "합판": 0.128 } },
-          "F_시멘트_및_석고2차제품계": { "보드류": { "석고보드": 0.180, "방수석고보드": 0.238, "파티클보드": 0.150, "석고판_3mm": 0.256, "펄라이트보드": 0.198, "석면시멘트판": 1.268, "목모_시멘트판": 0.152, "하드보드_6mm": 0.256, "플럭시블_보드": 0.617 }, "기타가공품": { "석고플라이터": 0.582, "석면슬레이트": 1.500, "아미텍스": 0.102, "하드텍스": 0.133, "텍스_9mm": 0.094, "석회판": 0.745 } },
-          "G_요업제품계": { "타일_및_벽돌": { "타일": 1.300, "바닥용타일": 1.803, "자기질타일": 1.800, "세라믹타일": 1.280, "골타일": 0.396, "기와": 0.350, "시멘트벽돌": 0.600, "콘크리트벽돌": 1.600, "보통벽돌": 0.617, "내화벽돌": 0.990, "붉은벽돌": 0.780 }, "유리_및_기타": { "석영유리": 1.349, "포유리판_휨유리": 0.047, "판유리_3mm": 0.745, "유리": 0.780, "천연슬레이트_요업": 1.500 } },
-          "H_아스팔트수지_및_바닥방수재계": { "방수재": { "아스팔트": 0.733, "쉬트방수": 0.163, "아스팔트방수": 0.733, "아스팔트싱글": 0.733, "아스팔트펄트": 0.117, "루우핑지": 0.117, "아스팔트루핑_17kg": 0.190, "아스팔트루핑_22kg": 0.270, "아스팔트루핑_26kg": 0.340, "아스팔트루핑_30kg": 0.340, "아스팔트펠트_방수층_17kg": 0.111, "아스팔트펠트_방수층_22kg": 0.140, "아스팔트펠트_방수층_26kg": 0.220, "우레탄마감": 0.190, "PE_필름": 0.210 }, "바닥재": { "아스팔트타일": 0.326, "리놀륨": 0.187, "바닥재_플라스틱계": 0.190, "바닥재_아스팔트계": 0.330, "고무타일": 0.396, "디럭스타일": 0.233 } },
-          "I_섬유판_및_기타계": { "섬유판류": { "연질_섬유판": 0.059, "경질_섬유판": 0.175, "후_지": 0.210, "모직포": 0.128 } },
-          "J_무기질섬유_및_기타수지계": { "수지_및_기타섬유": { "암면": 0.059, "열경화성수지_천정재": 0.190, "합성수지": 0.190, "유리면": 0.047, "우레탄뿜칠": 0.035, "카페트": 0.803, "FRP": 0.261, "우레탄폼판": 0.035, "인슐레이션보드": 0.061, "광재면": 0.047, "천연슬레이트_섬유": 1.442, "고무": 0.175, "비닐장판": 0.082, "모노륨": 3.140, "암면성형판": 0.059, "유리면성형판": 0.035 } },
-          "K_발포수지_및_단열재계": {
-            "KS_M_ISO_4898_EPS": { "1종_A-1": 0.033, "1종_A-2": 0.039, "1종_B": 0.043, "1종_C": 0.043, "2종_A-1": 0.032, "2종_A-2": 0.036, "2종_B": 0.039, "3종_A-1": 0.029, "3종_A-2": 0.031, "3종_B": 0.034, "3종_C": 0.039 },
-            "KS_M_ISO_4898_XPS": { "1종_A-1": 0.026, "1종_A-2": 0.029, "2종_A-1": 0.028, "2종_B-1": 0.026, "2종_B-2": 0.027, "3종_A": 0.026, "3종_B-2": 0.026, "3종_C": 0.026 },
-            "KS_M_ISO_4898_PUR": { "1종_A": 0.024, "1종_B": 0.029, "1종_C": 0.024, "1종_D": 0.023, "1종_E": 0.023, "2종_A": 0.023, "2종_B": 0.024, "2종_C": 0.029, "3종_A": 0.023, "3종_B": 0.024, "3종_C": 0.029 },
-            "KS_M_ISO_4898_PF": { "1종_A": 0.022, "1종_B": 0.037, "1종_C": 0.022, "1종_D": 0.022, "2종_A": 0.022, "2종_B": 0.037, "3종_A": 0.039 },
-            "KS_L_9102_미네랄울": { "보온판_1호": 0.037, "보온판_2호": 0.036, "보온판_3호": 0.038, "펠트": 0.039, "보온대_1호": 0.040, "보온대_2호": 0.039, "블랭킷_1호a": 0.039, "블랭킷_1호b": 0.037, "블랭킷_2호": 0.036, "보온통": 0.036 },
-            "KS_L_9102_그라스울": { "보온판_24K": 0.037, "보온판_32K": 0.036, "보온판_40K": 0.035, "보온판_48K_to_120K": 0.034, "보온대_a": 0.044, "보온대_b": 0.044, "보온대_c": 0.044, "블랭킷_a": 0.040, "블랭킷_b": 0.036, "보온통": 0.036 },
-            "KS_F_5660_폴리에스테르": { "1급": 0.034, "2급": 0.040, "3급": 0.045 },
-            "KS_M_3871_분무식PUR": { "1종_A": 0.022, "1종_B": 0.032, "1종_C": 0.040, "2종_A": 0.022, "2종_B": 0.032 },
-            "일반_기타단열": { "발포경질비닐": 0.035, "발포페놀": 0.035, "발포폴리에틸렌": 0.035, "발포폴리스틸렌": 0.059, "비닐스폰지": 0.117, "보온재": 0.035, "방습막_PS필림": 0.211, "방습막_PE필림": 0.050, "압출법보호판_특호": 0.027, "압출법보호판_1호": 0.028, "압출법보호판_2호": 0.029, "압출법보호판_3호": 0.031, "비드법보호판_1호": 0.036, "비드법보호판_2호": 0.037, "비드법보호판_3호": 0.040, "비드법보호판_4호": 0.043, "경질우레탄폼보호판_1종1호": 0.024, "경질우레탄폼보호판_1종2호": 0.024, "경질우레탄폼보호판_1종3호": 0.026, "경질우레탄폼보호판_2종1호": 0.023, "경질우레탄폼보호판_2종2호": 0.023, "경질우레탄폼보호판_2종3호": 0.028, "미네랄울_암면_벨트": 0.037, "미네랄울_암면_1호": 0.037, "미네랄울_암면_2호": 0.036, "미네랄울_암면_3호": 0.038, "미네랄울_일반": 0.036, "락울": 0.036, "미네랄_보드": 0.045, "그라스울_64K": 0.035, "그라스울_48K": 0.035, "그라스울_32K": 0.037, "그라스울_24K": 0.038, "암면뿜칠재_습식_반습식": 0.042, "발포경질폴리우레탄": 0.023 }
-          },
-          "L_기타재료계": { "기타마감_및_판넬": { "규조토": 0.094, "마그네이트": 0.082, "보온벽돌": 0.140, "발포유리": 0.082, "탄화코르크": 0.059, "경석": 0.105, "신더콘크리트_기타": 0.047, "띠억새등": 0.070, "톱밥": 0.128, "양모": 0.117, "센드위치판넬": 0.034, "시멘트블럭": 0.617, "마이톤": 0.087, "복합판넬": 0.454, "바닥차음재": 0.039, "알루미늄복합판넬": 0.500, "벽지_비닐계": 0.270, "벽지_종이계": 0.170 } },
-          "M_창호_및_공기층": { "창_문_공기층": { "공기층_현장시공": 0.117, "이중창": 3.373, "문_철제": 3.373 } }
-        };
+/* DB_HIERARCHY for layer builder */
+const DB_H={};
+Object.entries(DB).forEach(([k,c])=>{const g={};Object.entries(c.groups).forEach(([gk,gv])=>{g[gk]=gv.items;});DB_H[k]=g;});
 
+const lambdaColor=v=>v<=0.034?'#1d4ed8':v<=0.040?'#059669':v<=0.046?'#b45309':v<=0.052?'#be123c':'#4b5563';
+const lambdaGrade=v=>v<=0.034?'가':v<=0.040?'나':v<=0.046?'다':v<=0.052?'라':'—';
+const lambdaPill=v=>{
+  const g=lambdaGrade(v);
+  const cls=g==='가'?'ga-pill':g==='나'?'gb-pill':g==='다'?'gc-pill':g==='라'?'gd-pill':'';
+  return <span className={cls}>{g}급</span>;
+};
 
-        const App = () => {
-            const [projectName, setProjectName] = useState('만민 건축사 신사옥 신축공사');
-            const [region,   setRegion]   = useState('중부2지역');
-            const [part,     setPart]     = useState('거실의 외벽');
-            const [exposure, setExposure] = useState('외기에 직접 면하는 경우');
-            const [usage,    setUsage]    = useState('공동주택 외');
-            const [layers, setLayers] = useState([
-                { id: 1, cat: "D_미장재료계",          group: "모르타르류",          name: "시멘트몰탈",   t: 20,  lambda: 1.4   },
-                { id: 2, cat: "K_발포수지_및_단열재계", group: "KS_M_ISO_4898_XPS",  name: "1종_A-1",     t: 155, lambda: 0.026 },
-                { id: 3, cat: "C_콘크리트계",           group: "일반콘크리트",        name: "철근콘크리트", t: 200, lambda: 1.6   }
-            ]);
+/* ══════════════════════ A4 REPORT ══════════════════════ */
+const A4Report=({projectName,region,part,exposure,usage,sr,cl,totalR,currentU,targetU,isPass})=>(
+  <div className="a4-rpt" id="a4-hidden" style={{position:'fixed',left:'-9999px',top:0,zIndex:-1}}>
+    <div className="a4-top">
 
-            useEffect(() => { if (window.lucide) window.lucide.createIcons(); });
-            useEffect(() => { const p = Object.keys(U_STANDARDS[region]||{}); if (!p.includes(part)) setPart(p[0]||''); }, [region]);
-            useEffect(() => { const e = Object.keys((U_STANDARDS[region]||{})[part]||{}); if (!e.includes(exposure)) setExposure(e[0]||''); }, [region, part]);
-            useEffect(() => { const u = Object.keys(((U_STANDARDS[region]||{})[part]||{})[exposure]||{}); if (!u.includes(usage)) setUsage(u[0]||''); }, [region, part, exposure]);
+      <div style={{color:'#bfdbfe',fontSize:'9px',fontWeight:700,letterSpacing:'.2em',textTransform:'uppercase',marginBottom:'7px'}}>Heat Transfer Coefficient Report · 국토교통부 제2025-738호</div>
+      <div style={{color:'#fff',fontSize:'22px',fontWeight:900,marginBottom:'5px'}}>{projectName}</div>
+      <div style={{color:'#93c5fd',fontSize:'9px',fontWeight:600,letterSpacing:'.12em'}}>MANMIN Ver-{VER} · 건축물 에너지절약설계기준</div>
+    </div>
+    <div className="a4-body">
+      {/* 1 조건 */}
+      <div style={{marginBottom:'20px'}}>
+        <div className="a4-sec-hd"><div className="a4-sec-bar"></div><span className="a4-sec-label" style={{fontSize:'12px'}}>1. 열관류율 검토 조건</span></div>
+        <div className="a4-cond-grid">
+          {[{l:'대상지역',v:region},{l:'건축부위',v:part},{l:'외기조건',v:exposure},{l:'세부용도',v:usage}].map(x=>(
+            <div key={x.l} className="a4-cond-cell" style={{background:'#f0f6ff',border:'1px solid #bfdbfe'}}><div className="a4-cond-lbl">{x.l}</div><div className="a4-cond-val" style={{fontSize:'12px'}}>{x.v}</div></div>
+          ))}
+        </div>
+      </div>
+      {/* 2 판정 */}
+      <div style={{marginBottom:'20px'}}>
+        <div className="a4-sec-hd"><div className="a4-sec-bar"></div><span className="a4-sec-label" style={{fontSize:'12px'}}>2. 단열조치 적합여부 최종 판정</span></div>
+        <div className="a4-verdict-grid">
+          <div style={{background:'#f8fafd',border:'1.5px solid #e2e8f0',borderRadius:'10px',padding:'14px',textAlign:'center'}}>
+            <div style={{fontSize:'8px',color:'#94a3b8',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:'7px'}}>법적 기준 (W/㎡K 이하)</div>
+            <div style={{fontSize:'24px',fontWeight:900,color:'#1a2744',fontFamily:'JetBrains Mono,monospace'}}>{targetU?targetU.toFixed(3):'—'}</div>
+          </div>
+          <div style={{background:'#fefce8',border:'1.5px solid #fde047',borderRadius:'10px',padding:'14px',textAlign:'center'}}>
+            <div style={{fontSize:'8px',color:'#854d0e',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:'7px'}}>설계 산출값 (U)</div>
+            <div style={{fontSize:'24px',fontWeight:900,color:'#854d0e',fontFamily:'JetBrains Mono,monospace'}}>{currentU}</div>
+          </div>
+          <div style={{background:isPass?'#f0fdf4':'#fff1f2',border:`1.5px solid ${isPass?'#86efac':'#fecdd3'}`,borderRadius:'10px',padding:'14px',textAlign:'center'}}>
+            <div style={{fontSize:'8px',color:isPass?'#065f46':'#881337',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:'7px'}}>STATUS · 제6조</div>
+            <div style={{fontSize:'22px',fontWeight:900,color:isPass?'#059669':'#e11d48',fontFamily:'JetBrains Mono,monospace',letterSpacing:'.1em'}}>{isPass?'적  합':'부적합'}</div>
+          </div>
+        </div>
+      </div>
+      {/* 3 산출 */}
+      <div style={{marginBottom:'16px'}}>
+        <div className="a4-sec-hd" style={{justifyContent:'space-between'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'8px'}}><div className="a4-sec-bar"></div><span className="a4-sec-label" style={{fontSize:'12px'}}>3. 부위별 상세 산출 근거</span></div>
+          <span style={{fontSize:'10px',color:'#94a3b8',fontStyle:'italic',fontWeight:700,fontFamily:'JetBrains Mono,monospace'}}>U = 1 / ΣR</span>
+        </div>
+        <table className="a4-vtbl" style={{width:'100%',borderCollapse:'collapse',fontSize:'12px',fontFamily:'JetBrains Mono,monospace'}}>
+          <colgroup><col style={{width:'7%'}}/><col style={{width:'47%'}}/><col style={{width:'14%'}}/><col style={{width:'16%'}}/><col style={{width:'16%'}}/></colgroup>
+          <thead><tr style={{background:'#dbeafe'}}>{['NO','재료 및 사양','T(mm)','λ(W/mK)','R(m²K/W)'].map((h,i)=><th key={h} style={{padding:'10px 9px',textAlign:i===0?'center':i>1?'right':'left',fontWeight:800,fontSize:'11px',color:'#1e3a8a',letterSpacing:'.04em',borderBottom:'2px solid #93c5fd'}}>{h}</th>)}</tr></thead>
+          <tbody>
+            <tr style={{background:'#f0f6ff',borderBottom:'1px solid #dbeafe'}}>
+              <td style={{padding:'11px 9px',textAlign:'center',color:'#6b7a99',fontStyle:'italic',fontSize:'10px',fontWeight:700}}>실외</td>
+              <td colSpan={3} style={{padding:'11px 9px',color:'#475569',fontWeight:600,fontSize:'12px'}}>실외 표면열전달저항</td>
+              <td style={{padding:'11px 9px',textAlign:'right',color:'#1d4ed8',fontWeight:900,fontSize:'13px'}}>{sr.ro.toFixed(3)}</td>
+            </tr>
+            {cl.map((l,i)=>(
+              <tr key={l.id} style={{background:i%2===0?'#fff':'#f5f9ff',borderBottom:'1px solid #e8effc'}}>
+                <td style={{padding:'12px 9px',textAlign:'center',color:'#94a3b8',fontWeight:700,fontSize:'11px'}}>{i+1}</td>
+                <td style={{padding:'12px 9px',fontWeight:700,color:'#1a2744',fontSize:'12px',lineHeight:1.4}}>{(l.name||'').replace(/_/g,' ')}</td>
+                <td style={{padding:'12px 9px',textAlign:'right',color:'#b45309',fontWeight:800,fontSize:'12px'}}>{l.name?.includes('공기층')?'—':(l.t||0)}</td>
+                <td style={{padding:'12px 9px',textAlign:'right',color:'#475569',fontWeight:600,fontSize:'12px'}}>{l.name?.includes('공기층')?'—':(l.lambda||0).toFixed(3)}</td>
+                <td style={{padding:'12px 9px',textAlign:'right',color:'#1d4ed8',fontWeight:900,fontSize:'13px'}}>{l.r.toFixed(3)}</td>
+              </tr>
+            ))}
+            <tr style={{background:'#f0f6ff',borderBottom:'1px solid #dbeafe'}}>
+              <td style={{padding:'11px 9px',textAlign:'center',color:'#6b7a99',fontStyle:'italic',fontSize:'10px',fontWeight:700}}>실내</td>
+              <td colSpan={3} style={{padding:'11px 9px',color:'#475569',fontWeight:600,fontSize:'12px'}}>실내 표면열전달저항</td>
+              <td style={{padding:'11px 9px',textAlign:'right',color:'#1d4ed8',fontWeight:900,fontSize:'13px'}}>{sr.ri.toFixed(3)}</td>
+            </tr>
+          </tbody>
+          <tfoot><tr style={{background:'#e8f0fe',borderTop:'2px solid #93c5fd'}}>
+            <td colSpan={4} style={{padding:'11px 9px',textAlign:'right',fontWeight:800,fontSize:'11px',color:'#1e3a8a',letterSpacing:'.06em',textTransform:'uppercase',fontStyle:'italic'}}>Total Thermal Resistance (ΣR)</td>
+            <td style={{padding:'11px 9px',textAlign:'right',fontWeight:900,color:'#059669',fontSize:'16px'}}>{totalR.toFixed(3)}</td>
+          </tr></tfoot>
+        </table>
+      </div>
+      <div style={{background:'linear-gradient(135deg,#eff6ff,#e8f0fe)',border:'1px solid #bfdbfe',borderRadius:'12px',padding:'14px 22px',display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',flexWrap:'wrap',marginBottom:'16px'}}>
+        <span style={{color:'#6b7a99',fontSize:'12px',fontFamily:'JetBrains Mono,monospace',fontStyle:'italic'}}>U = 1 / {totalR.toFixed(3)}</span>
+        <span style={{color:'#1d4ed8',fontWeight:700,fontSize:'18px'}}>=</span>
+        <span style={{color:'#b45309',fontWeight:900,fontSize:'28px',fontFamily:'JetBrains Mono,monospace'}}>{currentU}</span>
+        <span style={{color:'#94a3b8',fontSize:'12px',fontWeight:700}}>W/㎡K</span>
+      </div>
+      <div className="a4-footer">
+        <span style={{fontSize:'8px',color:'#94a3b8',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase'}}>건축물 에너지절약설계기준 · 국토교통부고시 제2025-738호</span>
+        <span style={{fontSize:'8px',color:'#94a3b8',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',fontFamily:'JetBrains Mono,monospace'}}>MANMIN Ver-{VER}</span>
+      </div>
+    </div>
+  </div>
+);
 
-            const targetU = useMemo(() => { try { return U_STANDARDS[region]?.[part]?.[exposure]?.[usage]||0; } catch(e){return 0;} }, [region,part,exposure,usage]);
-            const targetT = useMemo(() => { try { return T_STANDARDS[region]?.[part]?.[exposure]?.[usage]||[0,0,0,0]; } catch(e){return [0,0,0,0];} }, [region,part,exposure,usage]);
+/* ══════════════════════ MOBILE CARD ══════════════════════ */
+/* 360px 최소 기준 · 가로 360~390px · 세로 800~915px 대응 */
+const MobileCard=({projectName,region,part,exposure,usage,sr,cl,totalR,currentU,targetU,isPass})=>(
+  <div id="mob-hidden" style={{position:'fixed',left:'-9998px',top:0,zIndex:-1,width:'360px',background:'#1e3456',borderRadius:'20px',overflow:'hidden',fontFamily:"'Pretendard','Apple SD Gothic Neo',sans-serif"}}>
+    {/* ── 헤더 ── */}
+    <div style={{background:'#162a4a',padding:'20px 18px 16px',borderBottom:'1px solid rgba(255,255,255,.08)'}}>
+      <div style={{fontSize:'8px',fontWeight:700,color:'#7da8d8',letterSpacing:'.18em',textTransform:'uppercase',marginBottom:'6px'}}>열관류율 종합 검토 시스템</div>
+      <div style={{fontSize:'15px',fontWeight:900,color:'#e8f1fb',marginBottom:'4px',lineHeight:1.3}}>{projectName}</div>
+      <div style={{fontSize:'8px',fontWeight:700,color:'#5b84b1',letterSpacing:'.08em',textTransform:'uppercase'}}>MANMIN Ver-{VER} · 국토교통부 제2025-738호</div>
+    </div>
+    <div style={{padding:'14px 16px',display:'flex',flexDirection:'column',gap:'12px'}}>
+      {/* ── 검토 조건 ── */}
+      <div style={{background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.1)',borderRadius:'10px',padding:'12px 14px'}}>
+        <div style={{fontSize:'8px',fontWeight:800,color:'#7da8d8',letterSpacing:'.12em',textTransform:'uppercase',marginBottom:'9px'}}>검토 조건</div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px'}}>
+          {[{l:'지역',v:region},{l:'부위',v:part},{l:'외기조건',v:exposure},{l:'용도',v:usage}].map(x=>(
+            <div key={x.l} style={{background:'rgba(255,255,255,.06)',borderRadius:'7px',padding:'8px 10px'}}>
+              <div style={{fontSize:'8px',color:'#5b84b1',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:'3px'}}>{x.l}</div>
+              <div style={{fontSize:'10px',color:'#c8ddf0',fontWeight:700,lineHeight:1.3}}>{x.v}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* ── 판정 카드 ── */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'9px'}}>
+        <div style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:'12px',padding:'13px 10px',textAlign:'center'}}>
+          <div style={{fontSize:'9px',fontWeight:700,color:'#5b84b1',letterSpacing:'.07em',marginBottom:'6px',textTransform:'uppercase'}}>법적 기준</div>
+          <div style={{fontSize:'22px',fontWeight:900,color:'#c8ddf0',fontFamily:'JetBrains Mono,monospace',lineHeight:1}}>{targetU?targetU.toFixed(3):'—'}</div>
+          <div style={{fontSize:'8px',color:'#3d6080',marginTop:'5px',fontWeight:600}}>W/㎡K 이하</div>
+        </div>
+        <div style={{background:isPass?'rgba(16,185,129,.18)':'rgba(225,29,72,.18)',border:`1.5px solid ${isPass?'rgba(52,211,153,.4)':'rgba(251,113,133,.4)'}`,borderRadius:'12px',padding:'13px 10px',textAlign:'center'}}>
+          <div style={{fontSize:'9px',fontWeight:700,color:isPass?'#34d399':'#fb7185',letterSpacing:'.07em',marginBottom:'6px',textTransform:'uppercase'}}>설계값 · 판정</div>
+          <div style={{fontSize:'22px',fontWeight:900,color:isPass?'#10b981':'#f43f5e',fontFamily:'JetBrains Mono,monospace',lineHeight:1}}>{currentU}</div>
+          <div style={{fontSize:'11px',fontWeight:900,color:isPass?'#059669':'#e11d48',marginTop:'5px',letterSpacing:'.06em'}}>{isPass?'✓ 적합':'✗ 부적합'}</div>
+        </div>
+      </div>
+      {/* ── U 수식 ── */}
+      <div style={{background:'rgba(0,0,0,.25)',borderRadius:'12px',padding:'12px 14px',textAlign:'center',lineHeight:1.5}}>
+        <div style={{color:'#4a6d8c',fontSize:'10px',fontFamily:'JetBrains Mono,monospace',fontStyle:'italic',marginBottom:'4px'}}>U = 1 / {totalR.toFixed(3)}</div>
+        <div>
+          <span style={{color:'#f59e0b',fontSize:'26px',fontWeight:900,fontFamily:'JetBrains Mono,monospace'}}>{currentU}</span>
+          <span style={{color:'#4a6d8c',fontSize:'11px',marginLeft:'6px',fontWeight:600}}>W/㎡K</span>
+        </div>
+      </div>
+      {/* ── 상세 테이블 ── */}
+      <div style={{background:'rgba(255,255,255,.04)',borderRadius:'10px',padding:'10px 12px'}}>
+        <div style={{fontSize:'8px',fontWeight:800,color:'#7da8d8',letterSpacing:'.12em',textTransform:'uppercase',marginBottom:'8px'}}>부위별 산출 근거</div>
+        <table style={{width:'100%',borderCollapse:'collapse',fontSize:'11px',fontFamily:'JetBrains Mono,monospace'}}>
+          <thead>
+            <tr style={{borderBottom:'1.5px solid rgba(255,255,255,.1)'}}>
+              {['재료 및 사양','T','λ','R'].map((h,i)=>(
+                <th key={h} style={{padding:'5px 4px 7px',textAlign:i===0?'left':'right',color:'#4a6d8c',fontWeight:700,fontSize:'8px',letterSpacing:'.07em',textTransform:'uppercase'}}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style={{padding:'5px 4px',color:'#4a6d8c',fontStyle:'italic',fontSize:'9px'}}>실외</td><td colSpan={2}></td><td style={{padding:'5px 4px',textAlign:'right',color:'#7da8d8',fontWeight:700}}>{sr.ro.toFixed(3)}</td></tr>
+            {cl.map((l,i)=>(
+              <tr key={l.id} style={{borderBottom:'1px solid rgba(255,255,255,.05)'}}>
+                <td style={{padding:'6px 4px',color:'#b8cfe6',fontWeight:600,maxWidth:'140px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:'10px'}}>{(l.name||'').replace(/_/g,' ')}</td>
+                <td style={{padding:'6px 4px',textAlign:'right',color:'#fcd34d',fontSize:'10px'}}>{l.name?.includes('공기층')?'—':(l.t||0)}</td>
+                <td style={{padding:'6px 4px',textAlign:'right',color:'#6b8aab',fontSize:'10px'}}>{l.name?.includes('공기층')?'—':(l.lambda||0).toFixed(3)}</td>
+                <td style={{padding:'6px 4px',textAlign:'right',color:'#7da8d8',fontWeight:700,fontSize:'11px'}}>{l.r.toFixed(3)}</td>
+              </tr>
+            ))}
+            <tr style={{borderBottom:'1px solid rgba(255,255,255,.1)'}}><td style={{padding:'5px 4px',color:'#4a6d8c',fontStyle:'italic',fontSize:'9px'}}>실내</td><td colSpan={2}></td><td style={{padding:'5px 4px',textAlign:'right',color:'#7da8d8',fontWeight:700}}>{sr.ri.toFixed(3)}</td></tr>
+            <tr style={{borderTop:'1px solid rgba(255,255,255,.12)'}}>
+              <td colSpan={3} style={{padding:'8px 4px 4px',textAlign:'right',color:'#4a6d8c',fontSize:'8px',fontStyle:'italic',fontWeight:600,letterSpacing:'.04em'}}>Total Thermal Resistance (ΣR)</td>
+              <td style={{padding:'8px 4px 4px',textAlign:'right',color:'#34d399',fontWeight:900,fontSize:'14px'}}>{totalR.toFixed(3)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      {/* ── 푸터 ── */}
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingTop:'4px',borderTop:'1px solid rgba(255,255,255,.07)'}}>
+        <span style={{fontSize:'7.5px',color:'#2d4a6a',fontWeight:600,textTransform:'uppercase',letterSpacing:'.07em'}}>국토교통부 제2025-738호</span>
+        <span style={{fontSize:'7.5px',color:'#2d4a6a',fontWeight:700,fontFamily:'JetBrains Mono,monospace'}}>MANMIN Ver-{VER}</span>
+      </div>
+    </div>
+  </div>
+);
 
-            const surfaceRes = useMemo(() => {
-                let ri=0.11, ro=0.043;
-                const direct = exposure?.includes('직접')||false;
-                if (part==='거실의 외벽')             { ri=0.11;  ro=direct?0.043:0.11; }
-                else if (part.includes('지붕'))       { ri=0.086; ro=direct?0.043:0.086; }
-                else if (part.includes('바닥'))       { ri=0.086; ro=(part==='바닥난방인 층간바닥')?0.086:(direct?0.043:0.15); }
-                return { ri, ro };
-            }, [part, exposure]);
+/* ══════════════════════ MATERIAL TAB ══════════════════════ */
+const MaterialTab=()=>{
+  const [selCat,setSelCat]=useState('K_단열재계');
+  const [openGrp,setOpenGrp]=useState({});
+  const [query,setQuery]=useState('');
+  const cat=DB[selCat];
+  const q=query.trim().toLowerCase();
+  const filteredGroups=useMemo(()=>{
+    if(!cat)return{};
+    if(!q)return cat.groups;
+    const res={};
+    Object.entries(cat.groups).forEach(([gk,g])=>{
+      const mi={};Object.entries(g.items).forEach(([ik,v])=>{if(ik.toLowerCase().replace(/_/g,' ').includes(q))mi[ik]=v;});
+      if(g.label.toLowerCase().includes(q)||Object.keys(mi).length>0)res[gk]={...g,items:Object.keys(mi).length>0?mi:g.items};
+    });
+    return res;
+  },[selCat,q,cat]);
+  useEffect(()=>{if(q){const o={};Object.keys(cat?.groups||{}).forEach(k=>{o[k]=true;});setOpenGrp(o);}else{setOpenGrp({});}},[(q?'q':'')]);
+  const toggleGrp=k=>setOpenGrp(p=>({...p,[k]:!p[k]}));
 
-            const calculatedLayers = useMemo(() => layers.map(l => {
-                let r = 0;
-                if (l.name?.includes('공기층')) { const da=(l.t||0)/10; r=(da<=1)?(0.086*da):0.086; }
-                else { r=(l.lambda||0)>0?((l.t||0)/1000/l.lambda):0; }
-                return {...l, r};
-            }), [layers]);
+  return(
+    <div className="mat-wrap">
+      <div style={{display:'flex',gap:'10px',marginBottom:'12px',flexWrap:'wrap',alignItems:'center'}}>
+        <input style={{flex:1,minWidth:'160px',padding:'8px 11px',background:'#f8fafd',border:'1.5px solid #dde3ed',borderRadius:'8px',color:'#1a2744',fontSize:'12px',fontFamily:'inherit',outline:'none',transition:'border-color .15s'}} placeholder="🔍 재료명 검색..." value={query} onChange={e=>setQuery(e.target.value)} onFocus={e=>e.target.style.borderColor='#1d4ed8'} onBlur={e=>e.target.style.borderColor='#dde3ed'}/>
+        {selCat==='K_단열재계'&&(
+          <div style={{display:'flex',gap:'5px',flexWrap:'wrap'}}>
+            {[{l:'가급 λ≤0.034',c:'#eff6ff',bc:'#bfdbfe',tc:'#1d4ed8'},{l:'나급 ≤0.040',c:'#f0fdf4',bc:'#a7f3d0',tc:'#059669'},{l:'다급 ≤0.046',c:'#fefce8',bc:'#fde047',tc:'#854d0e'},{l:'라급 ≤0.052',c:'#fff1f2',bc:'#fecdd3',tc:'#be123c'}].map(({l,c,bc,tc})=>(
+              <span key={l} style={{background:c,border:`1px solid ${bc}`,color:tc,borderRadius:'6px',padding:'3px 8px',fontSize:'9px',fontWeight:800}}>{l}</span>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="mat-cat-bar">
+        {Object.entries(DB).map(([k,c])=>(
+          <button key={k} className={`mat-cat-btn${selCat===k?' active':''}`} onClick={()=>{setSelCat(k);setOpenGrp({});setQuery('');}}>{c.label}</button>
+        ))}
+      </div>
+      <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
+        {Object.entries(filteredGroups).map(([gk,g])=>{
+          const isOpen=!!openGrp[gk]||!!q;
+          const items=Object.entries(g.items);
+          return(
+            <div key={gk} style={{border:'1px solid #e2e8f0',borderRadius:'10px',overflow:'hidden',background:'#fff'}}>
+              <button className="mat-group-hd" onClick={()=>toggleGrp(gk)}>
+                <span style={{fontSize:'11px',fontWeight:700,color:'#1a2744',flex:1,textAlign:'left'}}>{g.label}</span>
+                <span style={{fontSize:'10px',color:'#94a3b8',marginRight:'8px'}}>{items.length}종</span>
+                <span style={{color:'#94a3b8',fontSize:'12px',transition:'transform .2s',display:'inline-block',transform:isOpen?'rotate(180deg)':'rotate(0)'}}>▾</span>
+              </button>
+              {isOpen&&(
+                <table className="mat-tbl">
+                  <thead><tr>
+                    <th style={{textAlign:'left',paddingLeft:'12px'}}>재료명 (소분류)</th>
+                    <th style={{textAlign:'right',width:'110px'}}>λ (W/mK)</th>
+                    {selCat==='K_단열재계'&&<th style={{textAlign:'center',width:'60px'}}>등급</th>}
+                  </tr></thead>
+                  <tbody>
+                    {items.map(([ik,v],idx)=>(
+                      <tr key={ik} style={{background:idx%2===0?'#fff':'#f8fafd'}}>
+                        <td style={{paddingLeft:'12px',color:'#374151',fontWeight:500}}>{ik.replace(/_/g,' ')}</td>
+                        <td style={{textAlign:'right',color:lambdaColor(v),fontWeight:800,fontFamily:'JetBrains Mono,monospace'}}>{v.toFixed(3)}</td>
+                        {selCat==='K_단열재계'&&<td style={{textAlign:'center'}}>{lambdaPill(v)}</td>}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          );
+        })}
+        {Object.keys(filteredGroups).length===0&&(
+          <div style={{textAlign:'center',padding:'32px',color:'#94a3b8',fontSize:'12px'}}>검색 결과가 없습니다</div>
+        )}
+      </div>
+    </div>
+  );
+};
 
-            const totalR = useMemo(() =>
-                (surfaceRes.ri||0)+(surfaceRes.ro||0)+calculatedLayers.reduce((a,c)=>a+(c.r||0),0),
-            [surfaceRes, calculatedLayers]);
-
-            const currentU = totalR>0 ? (Math.round((1/totalR)*1000)/1000).toFixed(3) : '0.000';
-            const isPass   = parseFloat(currentU) <= targetU;
-
-            const updateLayer = (id, field, val) => {
-                setLayers(prev => prev.map(l => {
-                    if (l.id !== id) return l;
-                    const u = {...l, [field]: val};
-                    if (field==='cat') {
-                        const fg = Object.keys(DB_HIERARCHY[val]||{})[0]||'';
-                        u.group  = fg;
-                        const fm = Object.keys((DB_HIERARCHY[val]||{})[fg]||{})[0]||'';
-                        u.name   = fm;
-                        u.lambda = ((DB_HIERARCHY[val]||{})[fg]||{})[fm]||0;
-                    } else if (field==='group') {
-                        const fm = Object.keys((DB_HIERARCHY[l.cat]||{})[val]||{})[0]||'';
-                        u.name   = fm;
-                        u.lambda = ((DB_HIERARCHY[l.cat]||{})[val]||{})[fm]||0;
-                    } else if (field==='name') {
-                        u.lambda = ((DB_HIERARCHY[l.cat]||{})[l.group]||{})[val]||0;
-                    }
-                    return u;
-                }));
-            };
-
-            // ════════════════════════════════════════════════════════════
-            //  downloadPNG : html2canvas 한글 텍스트 처짐 최종 해결
-            //
-            //  실패 원인:
-            //   - line-height:1 / overflow:hidden+고정height → 한글 글자 잘림
-            //  최종 전략:
-            //   - T(text, fs, color, extra) : line-height = fs*1.15px (한글 안전값)
-            //   - overflow:hidden / 고정height 완전 금지
-            //   - 간격: SP(h) spacer div 만 사용
-            //   - 수직정렬: padding-top 만 사용
-            // ══════════════════════════════════════════════════
-            //  dom-to-image (cdnjs) 사용: 화면 DOM 직접 캡처
-            //  → 오프스크린 DOM 재구성 불필요
-            //  → 웹폰트/CSS/flex 모두 정확히 렌더링
-            // ══════════════════════════════════════════════════
-
-            // 클론을 body에 붙여 캡처 → 뷰포트 제약 없이 정확한 렌더링
-            /*
-             * ★ 참고파일(공공기관_건축사_업무대가_산출기_v1_4) 검증된 캡처 방식 그대로 적용
-             *  1. document.fonts.ready + 150ms 대기 → 폰트 완전 로드 보장
-             *  2. transform:scale() 트릭 → dom-to-image scale 옵션 오작동 우회
-             *  3. A4 오프스크린 요소: 캡처 전 visibility:visible 처리
-             */
-            const captureToPng = async (nodeId, filename, bg) => {
-                const lib = window.domtoimage;
-                if (!lib) { alert('dom-to-image 로드 실패. 인터넷 연결을 확인해 주세요.'); return; }
-
-                const node = document.getElementById(nodeId);
-                if (!node) { alert(nodeId + ' 요소를 찾을 수 없습니다.'); return; }
-
-                // 오프스크린 요소(A4): position/left를 임시로 화면 내로 이동
-                const origPosition = node.style.position;
-                const origLeft     = node.style.left;
-                const origTop      = node.style.top;
-                const origZIndex   = node.style.zIndex;
-                const isOffscreen  = origLeft === '-9999px';
-
-                if (isOffscreen) {
-                    node.style.position = 'fixed';
-                    node.style.left     = '0px';
-                    node.style.top      = '0px';
-                    node.style.zIndex   = '-9999'; // 화면 뒤로
-                }
-
-                try {
-                    // ① 폰트 완전 로드 대기
-                    await document.fonts.ready;
-                    // ② 레이아웃 재계산 + 렌더링 안정화 대기
-                    await new Promise(r => setTimeout(r, 200));
-
-                    const scale = 3;
-                    const w = node.offsetWidth;
-                    const h = node.offsetHeight;
-
-                    if (!w || !h) throw new Error(`요소 크기 오류: ${nodeId} (${w}x${h})`);
-
-                    // ③ transform:scale 트릭 (참고파일 핵심 패턴)
-                    const dataUrl = await lib.toPng(node, {
-                        width:  w * scale,
-                        height: h * scale,
-                        style: {
-                            transform:       `scale(${scale})`,
-                            transformOrigin: 'top left',
-                            width:           w + 'px',
-                            height:          h + 'px',
-                        },
-                    });
-
-                    const link = document.createElement('a');
-                    link.href     = dataUrl;
-                    link.download = filename + '_' + Date.now() + '.png';
-                    link.click();
-
-                } catch (err) {
-                    console.error('이미지 저장 실패:', err);
-                    alert('저장 중 오류가 발생했습니다.\n' + err);
-                } finally {
-                    // 원복
-                    if (isOffscreen) {
-                        node.style.position = origPosition;
-                        node.style.left     = origLeft;
-                        node.style.top      = origTop;
-                        node.style.zIndex   = origZIndex;
-                    }
-                }
-            };
-
-            const downloadPNG   = () => captureToPng('report-area',    '열관류율_검토서',    '#0F172A');
-            const downloadA4PNG = () => captureToPng('a4-capture-area', '열관류율_검토서_A4', '#FFFFFF');
-
-            // ═══════════════════════════════════════════════
-            //  PWA 설치 프롬프트
-            // ═══════════════════════════════════════════════
-            const [installPrompt, setInstallPrompt] = useState(null);
-            const [showInstallBanner, setShowInstallBanner] = useState(false);
-
-            useEffect(() => {
-                const handler = (e) => {
-                    e.preventDefault();
-                    setInstallPrompt(e);
-                    // 이미 설치되어 있으면 배너 안 보여줌
-                    if (!window.matchMedia('(display-mode: standalone)').matches) {
-                        setShowInstallBanner(true);
-                    }
-                };
-                window.addEventListener('beforeinstallprompt', handler);
-                return () => window.removeEventListener('beforeinstallprompt', handler);
-            }, []);
-
-            const handleInstall = async () => {
-                if (!installPrompt) return;
-                installPrompt.prompt();
-                const result = await installPrompt.userChoice;
-                if (result.outcome === 'accepted') {
-                    console.log('[PWA] 설치 완료');
-                }
-                setInstallPrompt(null);
-                setShowInstallBanner(false);
-            };
-
-            // ═══════════════════════════════════════════════
-            //  A4 인쇄 자동 스케일링 (beforeprint / afterprint)
-            // ═══════════════════════════════════════════════
-            useEffect(() => {
-                const handleBeforePrint = () => {
-                    const node = document.getElementById('a4-capture-area');
-                    if (!node) return;
-                    const A4_W = 794, A4_H = 1123;
-                    node.dataset.origStyle = node.getAttribute('style') || '';
-                    node.style.position = 'absolute';
-                    node.style.left = '0px'; node.style.top = '0px';
-                    node.style.width = A4_W + 'px';
-                    node.style.zIndex = '-99999'; node.style.visibility = 'hidden';
-                    node.style.transform = 'none';
-                    void node.offsetHeight;
-                    const contentH = node.scrollHeight;
-                    const scale = Math.min(1, A4_H / contentH);
-                    node.style.position = 'relative';
-                    node.style.left = '0'; node.style.top = '0';
-                    node.style.visibility = 'visible'; node.style.zIndex = '1';
-                    node.style.backgroundColor = '#FFFFFF';
-                    node.style.overflow = 'hidden';
-                    if (scale < 1) {
-                        node.style.width = (A4_W / scale) + 'px';
-                        node.style.transform = `scale(${scale})`;
-                        node.style.transformOrigin = 'top left';
-                    } else {
-                        node.style.width = A4_W + 'px';
-                        node.style.transform = 'none';
-                    }
-                };
-                const handleAfterPrint = () => {
-                    const node = document.getElementById('a4-capture-area');
-                    if (!node) return;
-                    const orig = node.dataset.origStyle;
-                    if (orig !== undefined) {
-                        node.setAttribute('style', orig);
-                        delete node.dataset.origStyle;
-                    }
-                };
-                window.addEventListener('beforeprint', handleBeforePrint);
-                window.addEventListener('afterprint',  handleAfterPrint);
-                return () => {
-                    window.removeEventListener('beforeprint', handleBeforePrint);
-                    window.removeEventListener('afterprint',  handleAfterPrint);
-                };
-            }, []);
-
-
-            return (
-                <>
-                <div className="max-w-7xl mx-auto p-4 lg:p-8 flex flex-col lg:flex-row gap-8">
-
-                    {/* ── LEFT PANEL ── */}
-                    <div className="w-full lg:w-1/2 flex flex-col gap-4">
-                        <div className="work-panel rounded-2xl p-6 shadow-2xl">
-                            <h2 className="text-xl font-bold text-white flex items-center gap-2 mb-1">
-                                <i data-lucide="settings" className="w-5 h-5 text-blue-400"></i> 검토 조건 및 입력 설정
-                            </h2>
-                            <p className="text-[10px] text-slate-400 mb-4 font-bold uppercase tracking-wider pl-7">
-                                [국토교통부 제2025-738호 적용]
-                            </p>
-
-                            {/* 출력 버튼 3종 */}
-                            <div className="flex flex-wrap gap-2 mb-5">
-                                <button onClick={()=>window.print()}
-                                    className="print-btn-wrap flex-1 flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-600 active:scale-95 transition-all text-white rounded-xl py-3 px-3 border border-blue-400/50 shadow-md group min-w-[120px]">
-                                    <i data-lucide="printer" className="w-4 h-4 text-blue-200"></i>
-                                    <div className="text-left">
-                                        <p className="text-[10px] font-black uppercase tracking-widest leading-none">A4 인쇄</p>
-                                        <p className="text-[7px] text-blue-300 mt-0.5 font-bold">Ctrl+P</p>
-                                    </div>
-                                </button>
-                                <button onClick={downloadA4PNG}
-                                    className="flex-1 flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all text-white rounded-xl py-3 px-3 border border-slate-500 shadow-md group min-w-[120px]">
-                                    <i data-lucide="file-text" className="w-4 h-4 text-blue-300 group-hover:text-blue-200"></i>
-                                    <div className="text-left">
-                                        <p className="text-[10px] font-black uppercase tracking-widest leading-none">A4 출력</p>
-                                        <p className="text-[7px] text-slate-400 mt-0.5 font-bold">흰 배경 PNG</p>
-                                    </div>
-                                </button>
-                                <button onClick={downloadPNG}
-                                    className="flex-1 flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all text-white rounded-xl py-3 px-3 border border-slate-500 shadow-md group min-w-[120px]">
-                                    <i data-lucide="smartphone" className="w-4 h-4 text-emerald-400 group-hover:text-emerald-300"></i>
-                                    <div className="text-left">
-                                        <p className="text-[10px] font-black uppercase tracking-widest leading-none">모바일 출력</p>
-                                        <p className="text-[7px] text-slate-400 mt-0.5 font-bold">다크 카드 PNG</p>
-                                    </div>
-                                </button>
-                            </div>
-
-                            <div className="space-y-4">
-                                <div className="flex gap-3 items-end">
-                                    <div className="flex-1">
-                                        <label className="text-[10px] text-slate-500 mb-1 block font-bold uppercase tracking-wider">프로젝트명</label>
-                                        <input type="text" value={projectName} onChange={e=>setProjectName(e.target.value)} className="w-full input-field rounded-lg p-2.5 text-sm h-[42px] font-bold" />
-                                    </div>
-                                    <div className="w-[150px] bg-blue-900/30 border border-blue-500/40 rounded-lg flex flex-col items-center justify-center h-[42px]">
-                                        <span className="text-[8px] text-blue-400 font-black uppercase tracking-widest text-center px-1">법적 기준 (W/㎡K 이하)</span>
-                                        <span className="text-sm font-black text-white">{targetU ? targetU.toFixed(3) : '-'}</span>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 gap-2 bg-slate-800/40 p-3 rounded-xl border border-slate-700/50 text-[11px]">
-                                    <div><label className="text-slate-500 mb-1 block font-bold">지역</label>
-                                        <select value={region} onChange={e=>setRegion(e.target.value)} className="w-full input-field rounded p-1.5">
-                                            {Object.keys(U_STANDARDS).map(r=><option key={r} value={r}>{r}</option>)}
-                                        </select>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div><label className="text-slate-500 mb-1 block font-bold">부위</label>
-                                            <select value={part} onChange={e=>setPart(e.target.value)} className="w-full input-field rounded p-1.5">
-                                                {Object.keys(U_STANDARDS[region]||{}).map(p=><option key={p} value={p}>{p}</option>)}
-                                            </select>
-                                        </div>
-                                        <div><label className="text-slate-500 mb-1 block font-bold">외기조건</label>
-                                            <select value={exposure} onChange={e=>setExposure(e.target.value)} className="w-full input-field rounded p-1.5">
-                                                {Object.keys((U_STANDARDS[region]||{})[part]||{}).map(e=><option key={e} value={e}>{e}</option>)}
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div><label className="text-slate-500 mb-1 block font-bold">용도/난방 여부</label>
-                                        <select value={usage} onChange={e=>setUsage(e.target.value)} className="w-full input-field rounded p-1.5">
-                                            {Object.keys(((U_STANDARDS[region]||{})[part]||{})[exposure]||{}).map(u=><option key={u} value={u}>{u}</option>)}
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div className="bg-emerald-900/20 border border-emerald-500/30 rounded-xl p-3">
-                                    <h3 className="text-emerald-400 text-[9px] font-bold mb-2 flex items-center gap-1.5 uppercase tracking-widest">
-                                        <i data-lucide="info" className="w-3 h-3"></i> [별표 3] 단열재 최소 두께 기준 (mm)
-                                    </h3>
-                                    <div className="grid grid-cols-4 gap-2 text-center">
-                                        {['가','나','다','라'].map((grade,idx)=>(
-                                            <div key={grade} className="bg-slate-900/60 rounded p-1.5 border border-slate-700/50 text-center">
-                                                <span className="text-[8px] text-slate-500 font-bold block mb-1">{grade}급</span>
-                                                <span className="text-xs font-black text-emerald-400 font-mono tracking-tighter">{targetT[idx]||'-'}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="mt-8 flex flex-col">
-                                <div className="flex justify-between items-center mb-3 border-b border-slate-700 pb-2">
-                                    <h2 className="text-md font-bold text-white flex items-center gap-2 tracking-tight">
-                                        <i data-lucide="layers" className="w-4 h-4 text-emerald-400"></i> 단열 및 재료 구성
-                                        <span className="text-[10px] text-slate-400 font-normal ml-2">(실외 → 실내 방향)</span>
-                                    </h2>
-                                    <button onClick={()=>setLayers([...layers,{id:Date.now(),cat:"C_콘크리트계",group:"일반콘크리트",name:"철근콘크리트",t:10,lambda:1.6}])}
-                                        className="bg-emerald-600 text-white text-[9px] px-3 py-2 rounded-md font-bold active:scale-95 transition-all shadow-lg">
-                                        + 재료 추가
-                                    </button>
-                                </div>
-                                <div className="space-y-4">
-                                    {layers.map(layer=>(
-                                        <div key={layer.id} className="bg-[#0F172A] border border-slate-600 rounded-lg p-4 relative border-l-4 border-l-slate-500 hover:border-l-blue-500 transition-colors shadow-sm">
-                                            <button onClick={()=>setLayers(layers.filter(l=>l.id!==layer.id))} className="absolute right-2 top-2 text-slate-600 hover:text-red-400 transition-colors">
-                                                <i data-lucide="trash-2" className="w-4 h-4"></i>
-                                            </button>
-                                            <div className="space-y-3 mb-3">
-                                                <select value={layer.cat} onChange={e=>updateLayer(layer.id,'cat',e.target.value)} className="input-field rounded p-1.5 text-[11px] w-full">
-                                                    {Object.keys(DB_HIERARCHY).map(c=><option key={c} value={c}>{c.replace(/_/g,' ')}</option>)}
-                                                </select>
-                                                <div className="grid grid-cols-2 gap-3">
-                                                    <select value={layer.group} onChange={e=>updateLayer(layer.id,'group',e.target.value)} className="input-field rounded p-1.5 text-[11px] w-full">
-                                                        {Object.keys(DB_HIERARCHY[layer.cat]||{}).map(g=><option key={g} value={g}>{g.replace(/_/g,' ')}</option>)}
-                                                    </select>
-                                                    <select value={layer.name} onChange={e=>updateLayer(layer.id,'name',e.target.value)} className="input-field rounded p-1.5 text-[11px] w-full truncate">
-                                                        {Object.keys((DB_HIERARCHY[layer.cat]||{})[layer.group]||{}).map(m=><option key={m} value={m}>{m.replace(/_/g,' ')}</option>)}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div className="flex gap-4 items-end">
-                                                <div className="flex-1">
-                                                    <label className="text-[8px] text-slate-500 block mb-0.5 font-bold uppercase tracking-tighter font-mono">T (mm)</label>
-                                                    <input type="number" value={layer.t} onChange={e=>updateLayer(layer.id,'t',Number(e.target.value))} className="input-field rounded p-2 text-sm w-full text-[#FACC15] font-mono font-bold" />
-                                                </div>
-                                                <div className="flex-1">
-                                                    <label className="text-[8px] text-slate-500 block mb-0.5 font-bold uppercase tracking-tighter font-mono">λ (W/mK)</label>
-                                                    <input type="number" step="0.001" value={layer.lambda} disabled={layer.name?.includes('공기층')} onChange={e=>updateLayer(layer.id,'lambda',Number(e.target.value))} className="input-field rounded p-2 text-sm w-full font-mono opacity-70" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* ── RIGHT PANEL (화면 미리보기) ── */}
-                    <div className="w-full lg:w-1/2 flex flex-col items-center justify-start pb-10 lg:pb-20 sticky top-4">
-                        <div id="report-area" className="capture-bg w-full max-w-[680px] p-6 lg:p-10 relative shadow-2xl rounded-3xl border border-slate-700 overflow-hidden min-h-[950px] flex flex-col">
-                            <header className="mb-6 pb-5 border-b border-slate-700/60 relative z-10">
-                                <p className="text-blue-400 font-black text-[10px] lg:text-xs tracking-widest mb-1 uppercase">Heat Transfer Coefficient Report</p>
-                                <h1 className="text-2xl lg:text-3xl font-black text-white leading-tight mb-1">{projectName}</h1>
-                                <div className="text-slate-500 font-black uppercase tracking-tighter font-mono text-[9px] lg:text-[10px]">
-                                    <span>국토교통부 제2025-738호 적용</span>
-                                </div>
-                            </header>
-
-                            {/* 1. 조건 */}
-                            <div className="mb-6 relative z-10">
-                                <h2 className="text-slate-200 text-[13px] font-black mb-4 flex items-center gap-2 uppercase tracking-widest font-mono">
-                                    <i data-lucide="check-square" className="w-4 h-4 text-emerald-400"></i> 1. 열관류율 검토 조건
-                                </h2>
-                                <div className="grid grid-cols-4 gap-2 text-center font-bold">
-                                    {[{l:'대상지역',v:region},{l:'건축부위',v:part},{l:'외기조건',v:exposure},{l:'세부용도',v:usage}].map(x=>(
-                                        <div key={x.l} className="bg-slate-800/60 p-2 lg:p-3 rounded-xl border border-slate-700/50 shadow-inner flex flex-col justify-center min-h-[60px] lg:min-h-[70px]" style={{display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center',textAlign:'center'}}>
-                                            <span className="text-slate-400 text-[8px] lg:text-[9px] block mb-1 uppercase tracking-wider">{x.l}</span>
-                                            <span className="text-white text-[9px] lg:text-[11px] break-keep leading-snug font-black font-mono">{x.v}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* 2. 판정 */}
-                            <div className="blue-gradient-card p-4 lg:p-5 mb-8 shadow-2xl border border-blue-400/20 z-10 ring-1 ring-white/10">
-                                <h2 className="text-blue-100 text-[13px] font-black mb-4 flex items-center gap-2 uppercase tracking-[0.2em] font-mono">
-                                    <i data-lucide="shield-check" className="w-4 h-4 text-emerald-300"></i> 2. 단열조치 적합여부 최종 판정
-                                </h2>
-                                <div className="grid grid-cols-2 gap-4 mb-4 text-center">
-                                    <div className="bg-black/20 rounded-xl p-3 lg:p-4 border border-white/10 shadow-inner flex flex-col justify-center" style={{display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center'}}>
-                                        <p className="text-blue-200 text-[9px] mb-2 font-black uppercase tracking-widest leading-tight" style={{textAlign:'center'}}>법적 기준<br/>(W/㎡K 이하)</p>
-                                        <div className="flex items-end justify-center gap-1" style={{display:'flex',alignItems:'flex-end',justifyContent:'center'}}>
-                                            <span className="text-2xl lg:text-3xl font-black text-white tracking-tighter font-mono leading-none">{targetU?targetU.toFixed(3):'-'}</span>
-                                            <span className="text-white/60 text-[9px] font-bold mb-1 uppercase" style={{marginBottom:'4px',lineHeight:'1'}}>W/㎡K</span>
-                                        </div>
-                                    </div>
-                                    <div className="bg-black/20 rounded-xl p-3 lg:p-4 border border-white/10 shadow-inner flex flex-col justify-center" style={{display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center'}}>
-                                        <p className="text-blue-200 text-[9px] mb-2 font-black uppercase tracking-widest leading-tight" style={{textAlign:'center'}}>설계 산출값<br/>(U)</p>
-                                        <div className="flex items-end justify-center gap-1 relative z-10" style={{display:'flex',alignItems:'flex-end',justifyContent:'center'}}>
-                                            <span className="text-2xl lg:text-3xl font-black text-[#FACC15] font-mono drop-shadow-lg tracking-tighter leading-none">{currentU}</span>
-                                            <span className="text-white/60 text-[9px] font-bold uppercase" style={{marginBottom:'4px',lineHeight:'1'}}>W/㎡K</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="bg-[#0F172A]/60 backdrop-blur-xl rounded-xl p-3 lg:p-4 border border-white/20 flex justify-between items-center relative z-10 shadow-2xl">
-                                    <div>
-                                        <span className="text-white text-[11px] lg:text-[13px] font-black block mb-1 uppercase font-mono">Status</span>
-                                        <span className="text-blue-300 text-[7px] font-bold uppercase tracking-widest opacity-80 whitespace-nowrap">국토교통부고시 제6조 기준</span>
-                                    </div>
-                                    <div className={`flex items-center gap-2 lg:gap-3 px-6 lg:px-10 py-3 lg:py-4 rounded-xl shadow-lg border border-white/10 flex-nowrap shrink-0 ${isPass?'bg-emerald-500 text-slate-900':'bg-red-500 text-white animate-pulse'}`}>
-                                        <i data-lucide={isPass?'check-circle':'alert-circle'} className="w-5 lg:w-6 h-5 lg:h-6"></i>
-                                        <span className="text-2xl lg:text-3xl font-black tracking-[0.2em] uppercase leading-none font-mono whitespace-nowrap">{isPass?'적 합':'부적합'}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* 3. 산출 근거 */}
-                            <div className="data-grid relative z-10 p-4 lg:p-8 overflow-hidden shadow-2xl flex-1 w-full">
-                                <h2 className="text-slate-200 text-[13px] font-black mb-6 border-b border-slate-700/50 pb-4 flex items-center justify-between tracking-widest uppercase font-mono">
-                                    <span className="flex items-center gap-2"><i data-lucide="calculator" className="w-5 h-5 text-emerald-400"></i> 3. 부위별 상세 산출 근거</span>
-                                    <span className="text-[11px] text-slate-500 italic font-bold tracking-normal">U = 1 / ΣR</span>
-                                </h2>
-                                <table className="w-full text-[12px] lg:text-[13px] text-left border-collapse font-mono table-fixed">
-                                    <colgroup>
-                                        <col style={{width:'8%'}}/><col style={{width:'50%'}}/><col style={{width:'12%'}}/><col style={{width:'15%'}}/><col style={{width:'15%'}}/>
-                                    </colgroup>
-                                    <thead>
-                                        <tr className="text-slate-500 bg-slate-800/40 uppercase font-black tracking-tight border-b border-slate-700 text-[10px] lg:text-[12px]">
-                                            <th className="p-2 lg:p-3 text-center" style={{verticalAlign:'middle'}}>NO</th>
-                                            <th className="p-2 lg:p-3" style={{verticalAlign:'middle'}}>재료 및 사양</th>
-                                            <th className="p-2 lg:p-3 text-right" style={{verticalAlign:'middle'}}>T(mm)</th>
-                                            <th className="p-2 lg:p-3 text-right" style={{verticalAlign:'middle'}}>λ</th>
-                                            <th className="p-2 lg:p-3 text-right text-blue-300 font-bold" style={{verticalAlign:'middle'}}>Res.(R)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="text-slate-100 divide-y divide-slate-700/30 text-[11px] lg:text-[12px]">
-                                        <tr className="bg-slate-800/10">
-                                            <td className="p-2 lg:p-3 text-center text-slate-500 font-black italic" style={{verticalAlign:'middle'}}>실외</td>
-                                            <td colSpan="3" className="p-2 lg:p-3 text-slate-300 font-bold tracking-tight" style={{verticalAlign:'middle'}}>실외 표면열전달저항</td>
-                                            <td className="p-2 lg:p-3 text-right font-mono text-blue-400 font-black tracking-tight text-[13px] lg:text-[15px]" style={{verticalAlign:'middle'}}>{surfaceRes.ro.toFixed(3)}</td>
-                                        </tr>
-                                        {calculatedLayers.map((l,i)=>(
-                                            <tr key={l.id} className="hover:bg-white/5 transition-colors">
-                                                <td className="p-2 lg:p-3 text-center text-slate-400 font-mono font-black opacity-50" style={{verticalAlign:'middle'}}>{i+1}</td>
-                                                <td className="p-2 lg:p-3 font-black tracking-tight leading-tight break-keep py-3 overflow-visible whitespace-normal" style={{verticalAlign:'middle'}}>{l.name?.replace(/_/g,' ')}</td>
-                                                <td className="p-2 lg:p-3 text-right font-mono font-black text-[#FACC15] text-[13px] lg:text-[15px]" style={{verticalAlign:'middle'}}>{l.name?.includes('공기층')?'-':(l.t||0).toString().substring(0,3)}</td>
-                                                <td className="p-2 lg:p-3 text-right font-mono font-bold opacity-60 text-[11px] lg:text-[13px]" style={{verticalAlign:'middle'}}>{l.name?.includes('공기층')?'-':(l.lambda||0).toFixed(3)}</td>
-                                                <td className="p-2 lg:p-3 text-right font-mono text-blue-300 font-black tracking-tight text-[13px] lg:text-[15px]" style={{verticalAlign:'middle'}}>{l.r.toFixed(3)}</td>
-                                            </tr>
-                                        ))}
-                                        <tr className="bg-slate-800/10">
-                                            <td className="p-2 lg:p-3 text-center text-slate-500 font-black italic" style={{verticalAlign:'middle'}}>실내</td>
-                                            <td colSpan="3" className="p-2 lg:p-3 text-slate-300 font-bold tracking-tight" style={{verticalAlign:'middle'}}>실내 표면열전달저항</td>
-                                            <td className="p-2 lg:p-3 text-right font-mono text-blue-400 font-black tracking-tight text-[13px] lg:text-[15px]" style={{verticalAlign:'middle'}}>{surfaceRes.ri.toFixed(3)}</td>
-                                        </tr>
-                                    </tbody>
-                                    <tfoot className="border-t-2 border-slate-600 bg-blue-900/10 shadow-inner">
-                                        <tr>
-                                            <td colSpan="4" className="p-3 lg:p-5 text-right text-[12px] lg:text-[13px] font-black text-slate-200 uppercase tracking-widest italic" style={{verticalAlign:'middle'}}>Total Thermal Resistance (ΣR)</td>
-                                            <td className="p-3 lg:p-5 text-right font-mono text-emerald-400 text-[13px] lg:text-[15px] tracking-tighter font-black drop-shadow-lg" style={{verticalAlign:'middle'}}>{totalR.toFixed(3)}</td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-
-                                <div className="mt-8 bg-black/80 rounded-3xl p-4 lg:p-6 border border-white/10 text-center text-white font-mono shadow-2xl ring-1 ring-white/5 uppercase tracking-tighter">
-                                    <p className="text-sm lg:text-xl font-black flex items-center justify-center gap-2 lg:gap-3 whitespace-nowrap overflow-x-auto overflow-y-hidden">
-                                        <span className="opacity-40 italic">U = 1 / {totalR.toFixed(3)}</span>
-                                        <span className="text-blue-500 font-bold">=</span>
-                                        <span className="text-[#FACC15] text-3xl lg:text-4xl drop-shadow-[0_0_15px_rgba(250,204,21,0.4)] px-1 italic">{currentU}</span>
-                                        <span className="text-slate-500 text-[10px] lg:text-sm font-black tracking-widest">W/㎡K</span>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <footer className="mt-8 mb-0 relative z-10 flex flex-col items-end opacity-30 text-[11px] lg:text-[12px] text-slate-500 uppercase tracking-[0.4em] font-mono">
-                                <p className="font-black whitespace-nowrap">Developed MANMIN Ver-{SYSTEM_VERSION}</p>
-                            </footer>
-                        </div>
-
-                        {/* 하단 고정 PNG 저장 버튼 */}
-                        <div className="fixed bottom-6 right-6 z-50">
-                            <button onClick={downloadPNG} className="group flex items-center gap-3 lg:gap-4 bg-blue-600 hover:bg-blue-500 text-white px-8 lg:px-10 py-4 lg:py-5 rounded-[2rem] shadow-[0_20px_60px_rgba(37,99,235,0.6)] transition-all active:scale-95 border border-white/20 ring-4 ring-blue-500/20 hover:ring-blue-500/40">
-                                <i data-lucide="file-down" className="w-5 lg:w-6 h-5 lg:h-6"></i>
-                                <span className="font-black text-lg lg:text-xl tracking-[0.2em] font-mono uppercase">PNG 저장</span>
-                            </button>
-                        </div>
-                    </div>
+/* ══════════════════════ FAB MODAL ══════════════════════ */
+const FabModal=({onClose,onA4Print,onA4PNG,onMobilePNG})=>{
+  const [itab,setItab]=useState('formula');
+  return(
+    <div className="fml-overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+      <div className="fml-modal">
+        <div className="fml-hd">
+          <div className="fml-hd-row">
+            <div><div className="fml-hd-title">📐 계산식 안내</div><div className="fml-hd-sub">열관류율 산출 기준 · 국토교통부고시 제2025-738호</div></div>
+            <button className="fml-close" onClick={onClose}>✕</button>
+          </div>
+          <div className="fml-itabs">
+            {[['formula','📐 계산식'],['surface','🏗️ 표면저항'],['insul','🧱 단열등급'],['region','🗺️ 지역 구분']].map(([k,l])=>(
+              <button key={k} className={`fml-itab${itab===k?' on':''}`} onClick={()=>setItab(k)}>{l}</button>
+            ))}
+          </div>
+        </div>
+        <div className="fml-bd">
+          {/* ── 계산식 ── */}
+          <div className={`fml-panel${itab==='formula'?' on':''}`}>
+            <div className="fml-card" style={{textAlign:'center',background:'linear-gradient(135deg,#eff6ff,#f0fdf4)',border:'1px solid #bfdbfe'}}>
+              <div style={{fontSize:'11px',color:'#6b7a99',fontWeight:600,marginBottom:'8px'}}>열관류율 기본 산출식</div>
+              <div style={{fontSize:'28px',fontWeight:900,color:'#0c4da2',fontFamily:'JetBrains Mono,monospace'}}>U = 1 / ΣR</div>
+              <div style={{fontSize:'13px',color:'#475569',marginTop:'6px',fontFamily:'JetBrains Mono,monospace'}}>ΣR = Ro + R₁ + R₂ + ··· + Rₙ + Ri</div>
+            </div>
+            <div className="fml-sec" style={{color:'#0c4da2'}}>기호 설명</div>
+            <div className="fml-card">
+              {[['U','열관류율','W/㎡K','낮을수록 단열 성능 우수'],['ΣR','총 열저항','m²K/W','모든 층 저항의 합계'],['R=t/λ','재료 열저항','m²K/W','두께(m)÷열전도율(λ)'],['t','재료 두께','m','입력값(mm)÷1000'],['λ','열전도율','W/mK','재료 고유값 (DB 참조)'],['Ro','실외 표면저항','m²K/W','부위·외기조건별 상수'],['Ri','실내 표면저항','m²K/W','부위·외기조건별 상수']].map(([s,n,u,d])=>(
+                <div key={s} style={{display:'grid',gridTemplateColumns:'80px 100px 70px 1fr',gap:'5px',padding:'5px 0',borderBottom:'1px solid #eef1f6',fontSize:'11px',alignItems:'center'}}>
+                  <span style={{fontWeight:800,color:'#0c4da2',fontFamily:'JetBrains Mono,monospace'}}>{s}</span>
+                  <span style={{fontWeight:700,color:'#1a2744'}}>{n}</span>
+                  <span style={{color:'#94a3b8',fontSize:'10px',fontFamily:'JetBrains Mono,monospace'}}>{u}</span>
+                  <span style={{color:'#64748b',fontSize:'10px'}}>{d}</span>
                 </div>
-
-                {/* ── A4 숨김 캡처 영역: dom-to-image가 직접 캡처 ── */}
-                <div id="a4-capture-area" style={{
-                    position:'fixed', left:'-9999px', top:0,
-                    width:'794px',
-                    backgroundColor:'#FFFFFF',
-                    fontFamily:"'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif",
-                    color:'#1E293B',
-                    boxSizing:'border-box',
-                }}>
-                    {/* 헤더 바 */}
-                    <div style={{background:'linear-gradient(90deg,#1D4ED8 0%,#312E81 100%)',padding:'28px 48px 24px'}}>
-                        <div style={{color:'#93C5FD',fontSize:'10px',fontWeight:900,letterSpacing:'0.25em',textTransform:'uppercase',marginBottom:'8px'}}>
-                            Heat Transfer Coefficient Report · 국토교통부 제2025-738호 적용
-                        </div>
-                        <div style={{color:'#FFFFFF',fontSize:'28px',fontWeight:900,marginBottom:'6px'}}>
-                            {projectName}
-                        </div>
-                        <div style={{color:'#BFDBFE',fontSize:'10px',fontWeight:700}}>
-                            Developed MANMIN Ver-{SYSTEM_VERSION}
-                        </div>
-                    </div>
-
-                    <div style={{padding:'32px 48px 40px'}}>
-                        {/* 1. 검토 조건 */}
-                        <div style={{marginBottom:'28px'}}>
-                            <div style={{display:'flex',alignItems:'center',gap:'10px',flexWrap:'nowrap',marginBottom:'14px',paddingBottom:'10px',borderBottom:'2px solid #1D4ED8'}}>
-                                <div style={{width:'4px',height:'20px',background:'#1D4ED8',borderRadius:'2px',flexShrink:0}}></div>
-                                <span style={{fontSize:'13px',fontWeight:900,color:'#1E293B',letterSpacing:'0.12em',textTransform:'uppercase',whiteSpace:'nowrap'}}>1. 열관류율 검토 조건</span>
-                            </div>
-                            <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'10px'}}>
-                                {[{l:'대상지역',v:region},{l:'건축부위',v:part},{l:'외기조건',v:exposure},{l:'세부용도',v:usage}].map(x=>(
-                                    <div key={x.l} style={{background:'#F1F5F9',border:'1px solid #CBD5E1',borderRadius:'10px',padding:'14px 10px',textAlign:'center'}}>
-                                        <div style={{fontSize:'8px',color:'#64748B',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'8px'}}>{x.l}</div>
-                                        <div style={{fontSize:'12px',color:'#1E293B',fontWeight:900}}>{x.v}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* 2. 판정 */}
-                        <div style={{marginBottom:'28px'}}>
-                            <div style={{display:'flex',alignItems:'center',gap:'10px',flexWrap:'nowrap',marginBottom:'14px',paddingBottom:'10px',borderBottom:'2px solid #1D4ED8'}}>
-                                <div style={{width:'4px',height:'20px',background:'#1D4ED8',borderRadius:'2px',flexShrink:0}}></div>
-                                <span style={{fontSize:'13px',fontWeight:900,color:'#1E293B',letterSpacing:'0.12em',textTransform:'uppercase',whiteSpace:'nowrap'}}>2. 단열조치 적합여부 최종 판정</span>
-                            </div>
-                            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'12px'}}>
-                                <div style={{background:'#F8FAFC',border:'2px solid #CBD5E1',borderRadius:'12px',padding:'18px',textAlign:'center'}}>
-                                    <div style={{fontSize:'9px',color:'#64748B',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'10px'}}>법적 기준 (W/㎡K 이하)</div>
-                                    <div style={{fontSize:'30px',fontWeight:900,color:'#1E293B',fontFamily:'monospace'}}>{targetU?targetU.toFixed(3):'-'}</div>
-                                </div>
-                                <div style={{background:'#FEF9C3',border:'2px solid #FDE047',borderRadius:'12px',padding:'18px',textAlign:'center'}}>
-                                    <div style={{fontSize:'9px',color:'#92400E',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'10px'}}>설계 산출값 (U)</div>
-                                    <div style={{fontSize:'30px',fontWeight:900,color:'#92400E',fontFamily:'monospace'}}>{currentU}</div>
-                                </div>
-                                <div style={{background:isPass?'#DCFCE7':'#FEE2E2',border:`2px solid ${isPass?'#16A34A':'#DC2626'}`,borderRadius:'12px',padding:'18px',textAlign:'center'}}>
-                                    <div style={{fontSize:'9px',color:isPass?'#14532D':'#7F1D1D',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'10px'}}>STATUS · 국토교통부고시 제6조</div>
-                                    <div style={{fontSize:'28px',fontWeight:900,letterSpacing:'0.2em',color:isPass?'#15803D':'#DC2626',fontFamily:'monospace'}}>{isPass?'적  합':'부적합'}</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* 3. 산출 근거 */}
-                        <div style={{marginBottom:'24px'}}>
-                            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'nowrap',marginBottom:'14px',paddingBottom:'10px',borderBottom:'2px solid #1D4ED8'}}>
-                                <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-                                    <div style={{width:'4px',height:'20px',background:'#1D4ED8',borderRadius:'2px',flexShrink:0}}></div>
-                                    <span style={{fontSize:'13px',fontWeight:900,color:'#1E293B',letterSpacing:'0.12em',textTransform:'uppercase',whiteSpace:'nowrap'}}>3. 부위별 상세 산출 근거</span>
-                                </div>
-                                <span style={{fontSize:'11px',color:'#94A3B8',fontStyle:'italic',fontWeight:700}}>U = 1 / ΣR</span>
-                            </div>
-                            <table style={{width:'100%',borderCollapse:'collapse',fontSize:'12px',fontFamily:'monospace'}}>
-                                <colgroup>
-                                    <col style={{width:'7%'}}/><col style={{width:'48%'}}/><col style={{width:'13%'}}/><col style={{width:'16%'}}/><col style={{width:'16%'}}/>
-                                </colgroup>
-                                <thead>
-                                    <tr style={{background:'#1E293B',color:'#FFFFFF'}}>
-                                        {['NO','재료 및 사양','T(mm)','λ','Res.(R)'].map((h,i)=>(
-                                            <th key={h} style={{padding:'10px 8px',textAlign:i===0?'center':i>1?'right':'left',fontWeight:900,fontSize:'10px',letterSpacing:'0.1em'}}>{h}</th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr style={{background:'#F8FAFC',borderBottom:'1px solid #E2E8F0'}}>
-                                        <td style={{padding:'10px 8px',textAlign:'center',color:'#94A3B8',fontStyle:'italic',fontWeight:700,fontSize:'11px'}}>실외</td>
-                                        <td colSpan="3" style={{padding:'10px 8px',color:'#475569',fontWeight:600}}>실외 표면열전달저항</td>
-                                        <td style={{padding:'10px 8px',textAlign:'right',color:'#1D4ED8',fontWeight:900}}>{surfaceRes.ro.toFixed(3)}</td>
-                                    </tr>
-                                    {calculatedLayers.map((l,i)=>(
-                                        <tr key={l.id} style={{background:i%2===0?'#FFFFFF':'#F8FAFC',borderBottom:'1px solid #E2E8F0'}}>
-                                            <td style={{padding:'10px 8px',textAlign:'center',color:'#94A3B8',fontWeight:700}}>{i+1}</td>
-                                            <td style={{padding:'10px 8px',fontWeight:700,color:'#1E293B'}}>{l.name?.replace(/_/g,' ')}</td>
-                                            <td style={{padding:'10px 8px',textAlign:'right',color:'#B45309',fontWeight:900}}>{l.name?.includes('공기층')?'-':(l.t||0).toString().substring(0,3)}</td>
-                                            <td style={{padding:'10px 8px',textAlign:'right',color:'#475569',fontWeight:600,opacity:0.8}}>{l.name?.includes('공기층')?'-':(l.lambda||0).toFixed(3)}</td>
-                                            <td style={{padding:'10px 8px',textAlign:'right',color:'#1D4ED8',fontWeight:900}}>{l.r.toFixed(3)}</td>
-                                        </tr>
-                                    ))}
-                                    <tr style={{background:'#F8FAFC',borderBottom:'1px solid #E2E8F0'}}>
-                                        <td style={{padding:'10px 8px',textAlign:'center',color:'#94A3B8',fontStyle:'italic',fontWeight:700,fontSize:'11px'}}>실내</td>
-                                        <td colSpan="3" style={{padding:'10px 8px',color:'#475569',fontWeight:600}}>실내 표면열전달저항</td>
-                                        <td style={{padding:'10px 8px',textAlign:'right',color:'#1D4ED8',fontWeight:900}}>{surfaceRes.ri.toFixed(3)}</td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr style={{background:'#EFF6FF',borderTop:'2px solid #1D4ED8'}}>
-                                        <td colSpan="4" style={{padding:'12px 8px',textAlign:'right',fontWeight:900,fontSize:'11px',color:'#1E293B',letterSpacing:'0.1em',textTransform:'uppercase',fontStyle:'italic'}}>Total Thermal Resistance (ΣR)</td>
-                                        <td style={{padding:'12px 8px',textAlign:'right',fontWeight:900,color:'#059669',fontSize:'14px'}}>{totalR.toFixed(3)}</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-
-                        {/* U값 결과 */}
-                        <div style={{background:'#1E293B',borderRadius:'14px',padding:'20px 28px',display:'flex',alignItems:'center',justifyContent:'center',gap:'14px',flexWrap:'nowrap',marginBottom:'24px'}}>
-                            <span style={{color:'#64748B',fontSize:'14px',fontWeight:700,fontFamily:'monospace',fontStyle:'italic',whiteSpace:'nowrap'}}>U = 1 / {totalR.toFixed(3)}</span>
-                            <span style={{color:'#3B82F6',fontWeight:900,fontSize:'20px',whiteSpace:'nowrap'}}>=</span>
-                            <span style={{color:'#FACC15',fontWeight:900,fontSize:'34px',fontFamily:'monospace',letterSpacing:'-0.02em',whiteSpace:'nowrap'}}>{currentU}</span>
-                            <span style={{color:'#94A3B8',fontSize:'13px',fontWeight:700,letterSpacing:'0.1em',whiteSpace:'nowrap'}}>W/㎡K</span>
-                        </div>
-
-                        {/* 하단 서명 */}
-                        <div style={{borderTop:'1px solid #E2E8F0',paddingTop:'12px',display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'nowrap'}}>
-                            <span style={{fontSize:'9px',color:'#94A3B8',fontWeight:700,letterSpacing:'0.12em',textTransform:'uppercase',whiteSpace:'nowrap'}}>건축물 에너지절약설계기준 · 국토교통부고시 제2025-738호</span>
-                            <span style={{fontSize:'9px',color:'#CBD5E1',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',whiteSpace:'nowrap'}}>DEVELOPED MANMIN VER-{SYSTEM_VERSION}</span>
-                        </div>
-                    </div>
+              ))}
+            </div>
+            <div className="fml-hi amber">
+              <strong>💡 공기층 특수 처리</strong><br/>재료명에 '공기층' 포함 시: R = 0.086 × (d/10) m²K/W<br/>(단, d ≥ 10mm이면 최대 R = 0.086 적용)
+            </div>
+          </div>
+          {/* ── 표면저항 ── */}
+          <div className={`fml-panel${itab==='surface'?' on':''}`}>
+            <div className="fml-sec" style={{color:'#0c4da2'}}>부위별 표면 열전달저항</div>
+            <table className="fml-tbl">
+              <thead><tr><th style={{textAlign:'left',paddingLeft:'12px'}}>건축 부위</th><th>Ri 실내</th><th>Ro 직접</th><th>Ro 간접</th><th>단위</th></tr></thead>
+              <tbody>
+                {[['거실의 외벽','0.110','0.043','0.110'],['최상층 반자/지붕','0.086','0.043','0.086'],['최하층 바닥','0.086','0.043','0.150'],['층간바닥','0.086','0.086','0.086']].map(([nm,ri,rod,roi])=>(
+                  <tr key={nm}>
+                    <td>{nm}</td>
+                    <td style={{color:'#0c4da2',fontWeight:800,textAlign:'center',fontFamily:'JetBrains Mono,monospace'}}>{ri}</td>
+                    <td style={{color:'#059669',fontWeight:800,textAlign:'center',fontFamily:'JetBrains Mono,monospace'}}>{rod}</td>
+                    <td style={{color:'#b45309',fontWeight:800,textAlign:'center',fontFamily:'JetBrains Mono,monospace'}}>{roi}</td>
+                    <td style={{color:'#94a3b8',fontSize:'9px',textAlign:'center'}}>m²K/W</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="fml-hi" style={{marginTop:'10px'}}>
+              <strong>ℹ 적용 기준</strong><br/>
+              · 외기 직접: Ro = 0.043 (외풍이 있는 환경)<br/>
+              · 외기 간접: Ro = Ri (완충 공간이 있는 경우)<br/>
+              · 층간바닥: Ri = Ro = 0.086 (양측 모두 실내)<br/>
+              ※ 출처: 에너지절약설계기준 해설서(2025)
+            </div>
+          </div>
+          {/* ── 단열등급 ── */}
+          <div className={`fml-panel${itab==='insul'?' on':''}`}>
+            <div className="fml-sec" style={{color:'#0c4da2'}}>단열재 등급 분류 (λ 기준)</div>
+            <div className="fml-g2">
+              {[{g:'가급',bg:'#eff6ff',bc:'#bfdbfe',tc:'#1d4ed8',r:'λ ≤ 0.034 W/mK',ex:['PF보드 1종 (0.022~)','XPS 2종B-1 (0.026)','PUR 2종A (0.023)','분무식PUR 1종A (0.022)']},{g:'나급',bg:'#f0fdf4',bc:'#a7f3d0',tc:'#059669',r:'0.035 ~ 0.040 W/mK',ex:['EPS 3종A-1 (0.029)','그라스울 48K (0.035)','폴리에스테르 1급 (0.034)','미네랄울 보온판2호 (0.036)']},{g:'다급',bg:'#fefce8',bc:'#fde047',tc:'#854d0e',r:'0.041 ~ 0.046 W/mK',ex:['EPS 1종A-2 (0.039)','미네랄울 보온대 (0.040)','폴리에스테르 2급 (0.040)']},{g:'라급',bg:'#fff1f2',bc:'#fecdd3',tc:'#be123c',r:'0.047 ~ 0.052 W/mK',ex:['EPS 1종B/C (0.043)','폴리에스테르 3급 (0.045)']}].map(({g,bg,bc,tc,r,ex})=>(
+                <div key={g} style={{background:bg,border:`1.5px solid ${bc}`,borderRadius:'10px',padding:'13px'}}>
+                  <div style={{fontSize:'18px',fontWeight:900,color:tc,marginBottom:'4px'}}>{g}</div>
+                  <div style={{fontSize:'10px',fontWeight:700,color:'#1a2744',marginBottom:'7px',fontFamily:'JetBrains Mono,monospace'}}>{r}</div>
+                  {ex.map(e=><div key={e} style={{fontSize:'10px',color:'#475569',lineHeight:1.7}}>· {e}</div>)}
                 </div>
+              ))}
+            </div>
+            <div className="fml-hi amber">
+              <strong>⚠ 주의사항</strong><br/>
+              · 단열재 등급은 KS 인증 시험성적서상 λ값으로 확인<br/>
+              · 복합단열재는 구성 중 가장 낮은 등급 적용<br/>
+              · 현장 납품 시 로트별 시험성적서 보관 필요
+            </div>
+          </div>
+          {/* ── 지역 구분 ── */}
+          <div className={`fml-panel${itab==='region'?' on':''}`}>
+            <div className="fml-sec" style={{color:'#0c4da2'}}>별표1 — 지역 구분 기준 (국토교통부고시 제2025-738호)</div>
+            <div style={{display:'flex',flexDirection:'column',gap:'10px'}}>
 
-                {/* ═══ PWA 설치 배너 ═══ */}
-                {showInstallBanner && (
-                    <div className="fixed bottom-20 left-4 right-4 lg:left-auto lg:right-6 lg:bottom-24 lg:w-[380px] z-[60] pwa-install-banner rounded-2xl p-4 shadow-2xl">
-                        <div className="flex items-center gap-3">
-                            <img src="icons/icon-192.png" className="w-12 h-12 rounded-xl shadow-lg flex-shrink-0" alt="앱 아이콘" />
-                            <div className="flex-1 min-w-0">
-                                <p className="text-white text-[13px] font-black leading-tight">홈 화면에 설치하시겠습니까?</p>
-                                <p className="text-blue-200 text-[10px] mt-1 font-bold opacity-80">오프라인에서도 사용 가능한 앱으로 설치됩니다</p>
-                            </div>
-                            <div className="flex gap-2 flex-shrink-0">
-                                <button onClick={()=>setShowInstallBanner(false)}
-                                    className="text-white/60 hover:text-white text-[11px] font-bold px-3 py-2 rounded-lg transition-colors">
-                                    닫기
-                                </button>
-                                <button onClick={handleInstall}
-                                    className="bg-white text-blue-700 text-[11px] font-black px-4 py-2 rounded-lg shadow-md hover:bg-blue-50 active:scale-95 transition-all">
-                                    설치
-                                </button>
-                            </div>
-                        </div>
+              {/* 중부1지역 */}
+              <div style={{background:'#eff6ff',border:'1.5px solid #bfdbfe',borderRadius:'12px',overflow:'hidden'}}>
+                <div style={{background:'#1d4ed8',padding:'10px 14px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                    <span style={{background:'rgba(255,255,255,.2)',color:'#fff',borderRadius:'6px',padding:'2px 9px',fontSize:'11px',fontWeight:900}}>중부1지역</span>
+                    <span style={{color:'rgba(255,255,255,.7)',fontSize:'10px',fontWeight:600}}>가장 엄격한 단열 기준</span>
+                  </div>
+                  <span style={{color:'#bfdbfe',fontSize:'9px',fontWeight:700}}>최저 U값 적용</span>
+                </div>
+                <div style={{padding:'12px 14px'}}>
+                  <div style={{fontSize:'10px',fontWeight:700,color:'#1e40af',marginBottom:'7px',letterSpacing:'.04em'}}>▸ 강원특별자치도 산간 지역</div>
+                  <div style={{display:'flex',flexWrap:'wrap',gap:'5px',marginBottom:'8px'}}>
+                    {['태백시','정선군','평창군','홍천군(일부)','인제군','양구군','화천군','철원군','춘천시(일부)'].map(c=>(
+                      <span key={c} style={{background:'#dbeafe',color:'#1d4ed8',borderRadius:'5px',padding:'3px 8px',fontSize:'10px',fontWeight:700}}>{c}</span>
+                    ))}
+                  </div>
+                  <div style={{fontSize:'10px',fontWeight:700,color:'#1e40af',marginBottom:'7px',letterSpacing:'.04em'}}>▸ 경기도</div>
+                  <div style={{display:'flex',flexWrap:'wrap',gap:'5px'}}>
+                    {['연천군(일부)'].map(c=>(
+                      <span key={c} style={{background:'#dbeafe',color:'#1d4ed8',borderRadius:'5px',padding:'3px 8px',fontSize:'10px',fontWeight:700}}>{c}</span>
+                    ))}
+                  </div>
+                  <div style={{marginTop:'8px',fontSize:'9px',color:'#3b82f6',fontWeight:600}}>※ 해발고도 600m 이상 또는 별도 고시 지역 포함</div>
+                </div>
+              </div>
+
+              {/* 중부2지역 */}
+              <div style={{background:'#f0fdf4',border:'1.5px solid #a7f3d0',borderRadius:'12px',overflow:'hidden'}}>
+                <div style={{background:'#059669',padding:'10px 14px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                    <span style={{background:'rgba(255,255,255,.2)',color:'#fff',borderRadius:'6px',padding:'2px 9px',fontSize:'11px',fontWeight:900}}>중부2지역</span>
+                    <span style={{color:'rgba(255,255,255,.7)',fontSize:'10px',fontWeight:600}}>수도권·중부 대부분</span>
+                  </div>
+                </div>
+                <div style={{padding:'12px 14px'}}>
+                  {[
+                    {t:'서울·인천·경기', items:['서울특별시','인천광역시','경기도 전역(연천군 일부 제외)']},
+                    {t:'강원특별자치도 동해안', items:['강릉시','동해시','속초시','삼척시','고성군','양양군']},
+                    {t:'충청도', items:['충청북도 전역','충청남도 전역','세종특별자치시','대전광역시']},
+                    {t:'전북·경북 일부', items:['전북(고창·부안·정읍·남원·순창·임실·진안·무주 제외)','경북(봉화·영주·문경·예천·안동·의성·청송·영양·영덕·울진·울릉 제외)']},
+                  ].map(({t,items})=>(
+                    <div key={t} style={{marginBottom:'8px'}}>
+                      <div style={{fontSize:'10px',fontWeight:700,color:'#065f46',marginBottom:'5px',letterSpacing:'.04em'}}>▸ {t}</div>
+                      <div style={{display:'flex',flexWrap:'wrap',gap:'5px'}}>
+                        {items.map(c=><span key={c} style={{background:'#dcfce7',color:'#059669',borderRadius:'5px',padding:'3px 8px',fontSize:'10px',fontWeight:700}}>{c}</span>)}
+                      </div>
                     </div>
-                )}
+                  ))}
+                </div>
+              </div>
 
-                </>
-            );
-        };
+              {/* 남부지역 */}
+              <div style={{background:'#fefce8',border:'1.5px solid #fde047',borderRadius:'12px',overflow:'hidden'}}>
+                <div style={{background:'#d97706',padding:'10px 14px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                    <span style={{background:'rgba(255,255,255,.2)',color:'#fff',borderRadius:'6px',padding:'2px 9px',fontSize:'11px',fontWeight:900}}>남부지역</span>
+                    <span style={{color:'rgba(255,255,255,.7)',fontSize:'10px',fontWeight:600}}>남부·동남권</span>
+                  </div>
+                </div>
+                <div style={{padding:'12px 14px'}}>
+                  {[
+                    {t:'광역시', items:['부산광역시','대구광역시','광주광역시','울산광역시']},
+                    {t:'전라·경상', items:['전라남도 전역','경상남도 전역','전북(고창·부안·정읍·남원·순창·임실·진안·무주)','경북(봉화·영주·문경·예천·안동·의성·청송·영양·영덕·울진·울릉)']},
+                  ].map(({t,items})=>(
+                    <div key={t} style={{marginBottom:'8px'}}>
+                      <div style={{fontSize:'10px',fontWeight:700,color:'#78350f',marginBottom:'5px',letterSpacing:'.04em'}}>▸ {t}</div>
+                      <div style={{display:'flex',flexWrap:'wrap',gap:'5px'}}>
+                        {items.map(c=><span key={c} style={{background:'#fef9c3',color:'#b45309',borderRadius:'5px',padding:'3px 8px',fontSize:'10px',fontWeight:700}}>{c}</span>)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+              {/* 제주도 */}
+              <div style={{background:'#fff1f2',border:'1.5px solid #fecdd3',borderRadius:'12px',overflow:'hidden'}}>
+                <div style={{background:'#e11d48',padding:'10px 14px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                    <span style={{background:'rgba(255,255,255,.2)',color:'#fff',borderRadius:'6px',padding:'2px 9px',fontSize:'11px',fontWeight:900}}>제주도</span>
+                    <span style={{color:'rgba(255,255,255,.7)',fontSize:'10px',fontWeight:600}}>가장 완화된 기준</span>
+                  </div>
+                </div>
+                <div style={{padding:'12px 14px'}}>
+                  <div style={{display:'flex',flexWrap:'wrap',gap:'5px',marginBottom:'6px'}}>
+                    {['제주시','서귀포시','제주특별자치도 전 지역'].map(c=>(
+                      <span key={c} style={{background:'#ffe4e6',color:'#be123c',borderRadius:'5px',padding:'3px 8px',fontSize:'10px',fontWeight:700}}>{c}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
-    <!-- ═══ Service Worker 등록 ═══ -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('[PWA] SW 등록 완료 — scope:', reg.scope))
-                    .catch(err => console.warn('[PWA] SW 등록 실패:', err));
-            });
-        }
-    </script>
+              <div className="fml-hi" style={{marginTop:'2px'}}>
+                <strong>ℹ 적용 안내</strong><br/>
+                · 동일 시·군·구 내에서도 행정구역 일부만 해당 지역으로 지정되는 경우가 있음<br/>
+                · 경계 지역은 국토교통부 고시 [별표 1] 원문 또는 인허가 담당 행정청에 확인<br/>
+                · 지역 구분은 제2025-738호 시행일(2025년) 기준
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ══════════════════════ MAIN APP ══════════════════════ */
+const App=()=>{
+  const [tab,setTab]=useState('input');
+  const [showModal,setShowModal]=useState(false);
+  const [projectName,setProjectName]=useState('만민 건축사 신사옥 신축공사');
+  const [region,setRegion]=useState('중부2지역');
+  const [part,setPart]=useState('거실의 외벽');
+  const [exposure,setExposure]=useState('외기에 직접 면하는 경우');
+  const [usage,setUsage]=useState('공동주택 외');
+  const [layers,setLayers]=useState([
+    {id:1,cat:"D_미장재료계",group:"모르타르류",name:"시멘트몰탈",t:20,lambda:1.4},
+    {id:2,cat:"K_단열재계",group:"XPS_압출법",name:"1종_A-1",t:155,lambda:0.026},
+    {id:3,cat:"C_콘크리트계",group:"일반콘크리트",name:"철근콘크리트",t:200,lambda:1.6},
+    {id:4,cat:"D_미장재료계",group:"모르타르류",name:"시멘트몰탈",t:20,lambda:1.4}
+  ]);
+  const [installPrompt,setInstallPrompt]=useState(null);
+  const [showPWA,setShowPWA]=useState(false);
+
+  useEffect(()=>{const p=Object.keys(U_STD[region]||{});if(!p.includes(part))setPart(p[0]||'');},[region]);
+  useEffect(()=>{const e=Object.keys((U_STD[region]||{})[part]||{});if(!e.includes(exposure))setExposure(e[0]||'');},[region,part]);
+  useEffect(()=>{const u=Object.keys(((U_STD[region]||{})[part]||{})[exposure]||{});if(!u.includes(usage))setUsage(u[0]||'');},[region,part,exposure]);
+  useEffect(()=>{
+    const h=e=>{e.preventDefault();setInstallPrompt(e);if(!window.matchMedia('(display-mode:standalone)').matches)setShowPWA(true);};
+    window.addEventListener('beforeinstallprompt',h);return()=>window.removeEventListener('beforeinstallprompt',h);
+  },[]);
+
+  const targetU=useMemo(()=>{try{return U_STD[region]?.[part]?.[exposure]?.[usage]||0;}catch{return 0;}},[region,part,exposure,usage]);
+  const targetT=useMemo(()=>{try{return T_STD[region]?.[part]?.[exposure]?.[usage]||[0,0,0,0];}catch{return[0,0,0,0];}},[region,part,exposure,usage]);
+  const sr=useMemo(()=>{
+    let ri=0.11,ro=0.043;const d=exposure?.includes('직접')||false;
+    if(part==='거실의 외벽'){ri=0.11;ro=d?0.043:0.11;}
+    else if(part.includes('지붕')){ri=0.086;ro=d?0.043:0.086;}
+    else if(part.includes('바닥')){ri=0.086;ro=(part==='바닥난방인 층간바닥')?0.086:(d?0.043:0.15);}
+    return{ri,ro};
+  },[part,exposure]);
+  const cl=useMemo(()=>layers.map(l=>{
+    let r=0;if(l.name?.includes('공기층')){const da=(l.t||0)/10;r=da<=1?0.086*da:0.086;}
+    else{r=(l.lambda||0)>0?((l.t||0)/1000/l.lambda):0;}
+    return{...l,r};
+  }),[layers]);
+  const totalR=useMemo(()=>(sr.ri||0)+(sr.ro||0)+cl.reduce((a,c)=>a+(c.r||0),0),[sr,cl]);
+  const currentU=totalR>0?(Math.round((1/totalR)*1000)/1000).toFixed(3):'0.000';
+  const isPass=parseFloat(currentU)<=targetU;
+
+  const updateLayer=(id,field,val)=>{
+    setLayers(prev=>prev.map(l=>{
+      if(l.id!==id)return l;
+      const u={...l,[field]:val};
+      if(field==='cat'){const fg=Object.keys(DB_H[val]||{})[0]||'';u.group=fg;const fm=Object.keys((DB_H[val]||{})[fg]||{})[0]||'';u.name=fm;u.lambda=((DB_H[val]||{})[fg]||{})[fm]||0;}
+      else if(field==='group'){const fm=Object.keys((DB_H[l.cat]||{})[val]||{})[0]||'';u.name=fm;u.lambda=((DB_H[l.cat]||{})[val]||{})[fm]||0;}
+      else if(field==='name'){u.lambda=((DB_H[l.cat]||{})[l.group]||{})[val]||0;}
+      return u;
+    }));
+  };
+
+  const capturePng=async(elId,fname)=>{
+    const lib=window.domtoimage;const el=document.getElementById(elId);
+    if(!lib||!el){alert('캡처 실패: 요소를 찾을 수 없습니다.');return;}
+    // 오프스크린 요소를 임시로 화면 내로 이동
+    const origStyle=el.getAttribute('style')||'';
+    el.style.cssText=`position:fixed;left:0px;top:0px;z-index:-9999;visibility:visible;width:${el.style.width||'360px'};background:${el.style.background||'#1e3456'};border-radius:0;overflow:visible;`;
+    try{
+      await document.fonts.ready;
+      await new Promise(r=>setTimeout(r,300));
+      const sc=3,w=el.scrollWidth||el.offsetWidth,h=el.scrollHeight||el.offsetHeight;
+      if(!w||!h)throw new Error(`크기 오류 (${w}×${h})`);
+      const url=await lib.toPng(el,{width:w*sc,height:h*sc,style:{transform:`scale(${sc})`,transformOrigin:'top left',width:w+'px',height:h+'px',borderRadius:'20px',overflow:'hidden'}});
+      const a=document.createElement('a');a.href=url;a.download=fname+'_'+Date.now()+'.png';a.click();
+    }catch(e){console.error(e);alert('저장 오류: '+e);}
+    finally{el.setAttribute('style',origStyle);}
+  };
+  const onA4PNG=()=>capturePng('a4-hidden','열관류율_A4계산서');
+  const onMobilePNG=()=>capturePng('mob-hidden','열관류율_모바일카드');
+
+  useEffect(()=>{
+    const bp=()=>{const n=document.getElementById('a4-hidden');if(!n)return;n.dataset.o=n.getAttribute('style')||'';n.style.cssText='position:relative!important;left:0!important;top:0!important;z-index:9999!important;visibility:visible!important;';};
+    const ap=()=>{const n=document.getElementById('a4-hidden');if(!n||!n.dataset.o)return;n.setAttribute('style',n.dataset.o);delete n.dataset.o;};
+    window.addEventListener('beforeprint',bp);window.addEventListener('afterprint',ap);
+    return()=>{window.removeEventListener('beforeprint',bp);window.removeEventListener('afterprint',ap);};
+  },[]);
+
+  const calcProps={projectName,region,part,exposure,usage,sr,cl,totalR,currentU,targetU,isPass};
+
+  /* A4 preview: compute scale to fit panel width */
+  const a4WrapRef=useRef(null);
+  const [a4Scale,setA4Scale]=useState(0.55);
+  useEffect(()=>{
+    const update=()=>{if(a4WrapRef.current){const w=a4WrapRef.current.clientWidth-48;setA4Scale(Math.min(1,Math.max(0.3,w/794)));}};
+    update();const ro=window.ResizeObserver?new ResizeObserver(update):null;
+    if(ro&&a4WrapRef.current)ro.observe(a4WrapRef.current);
+    window.addEventListener('resize',update);
+    return()=>{if(ro)ro.disconnect();window.removeEventListener('resize',update);};
+  },[tab]);
+
+  const TABS=[
+    {k:'input',icon:<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,label:'검토 조건 입력'},
+    {k:'a4prev',icon:<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>,label:'A4 미리보기'},
+    {k:'mobprev',icon:<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>,label:'모바일 미리보기'},
+    {k:'material',icon:<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>,label:'재료별 열전도율'},
+  ];
+
+  const isFullTab=tab==='a4prev'||tab==='mobprev'||tab==='material';
+
+  return(
+    <>
+    {/* ═══ HEADER ═══ */}
+    <header className="app-header no-print">
+      <div className="header-inner">
+        <div className="brand-logo">
+          <div className="brand-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          </div>
+          <div className="brand-texts">
+            <div className="brand-title">열관류율 종합 검토 시스템 [MANMIN-Ver{VER}]</div>
+            <div className="brand-sub">건축물 에너지절약설계기준 · 국토교통부고시 제2025-738호 · 2026년 기준</div>
+          </div>
+        </div>
+        <div className="hdr-btns">
+          <button className="btn-mobpng" onClick={onMobilePNG}>
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="#fff" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            <span>PNG</span>
+          </button>
+          <button className="btn-print" onClick={()=>window.print()}>
+            <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            <span className="txt">산출서 인쇄 / PDF</span>
+          </button>
+        </div>
+      </div>
+      <div className="tab-bar">
+        <div className="tab-bar-inner">
+          {TABS.map(({k,icon,label})=>(
+            <button key={k} className={`tab-btn${tab===k?' active':''}`} onClick={()=>setTab(k)}>
+              {icon}{label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </header>
+
+    {/* ═══ MAIN ═══ */}
+    <div className="main-wrap">
+
+      {/* ── A4 미리보기 (전체폭) ── */}
+      {tab==='a4prev'&&(
+        <div className="full-panel">
+          <div className="card-head" style={{borderBottom:'none'}}>
+            <div className="card-icon"><svg viewBox="0 0 24 24" width="13" height="13" stroke="#1d4ed8" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <span className="card-title">A4 계산서 미리보기</span>
+          </div>
+          <div className="a4-preview-wrap" ref={a4WrapRef}>
+            <div className="a4-preview-inner" style={{width:794*a4Scale+'px',height:Math.round(1050*a4Scale)+'px',overflow:'hidden',flexShrink:0}}>
+              <div style={{width:'794px',transform:`scale(${a4Scale})`,transformOrigin:'top left',pointerEvents:'none'}}>
+                {/* inline A4 render (not the hidden one) */}
+                <div style={{fontFamily:"'Pretendard','Apple SD Gothic Neo',sans-serif",width:'794px',background:'#fff',color:'#1a1a1a',boxSizing:'border-box'}}>
+                  <div style={{background:'linear-gradient(90deg,#0c4da2,#1d4ed8)',padding:'24px 42px 20px'}}>
+
+                    <div style={{color:'#bfdbfe',fontSize:'9px',fontWeight:700,letterSpacing:'.2em',textTransform:'uppercase',marginBottom:'7px'}}>Heat Transfer Coefficient Report · 국토교통부 제2025-738호</div>
+                    <div style={{color:'#fff',fontSize:'22px',fontWeight:900,marginBottom:'5px'}}>{projectName}</div>
+                    <div style={{color:'#93c5fd',fontSize:'9px',fontWeight:600}}>MANMIN Ver-{VER}</div>
+                  </div>
+                  <div style={{padding:'26px 42px 32px'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'11px',paddingBottom:'9px',borderBottom:'2px solid #1d4ed8'}}><div style={{width:'3px',height:'16px',background:'#1d4ed8',borderRadius:'2px'}}></div><span style={{fontSize:'12px',fontWeight:900,color:'#1a2744',letterSpacing:'.08em',textTransform:'uppercase'}}>1. 열관류율 검토 조건</span></div>
+                    <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'8px',marginBottom:'20px'}}>
+                      {[{l:'대상지역',v:region},{l:'건축부위',v:part},{l:'외기조건',v:exposure},{l:'세부용도',v:usage}].map(x=>(
+                        <div key={x.l} style={{background:'#f0f6ff',border:'1px solid #bfdbfe',borderRadius:'8px',padding:'11px 8px',textAlign:'center'}}><div style={{fontSize:'8px',color:'#6b7a99',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:'5px'}}>{x.l}</div><div style={{fontSize:'12px',color:'#1a2744',fontWeight:800}}>{x.v}</div></div>
+                      ))}
+                    </div>
+                    <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'11px',paddingBottom:'9px',borderBottom:'2px solid #1d4ed8'}}><div style={{width:'3px',height:'16px',background:'#1d4ed8',borderRadius:'2px'}}></div><span style={{fontSize:'12px',fontWeight:900,color:'#1a2744',letterSpacing:'.08em',textTransform:'uppercase'}}>2. 단열조치 적합여부 최종 판정</span></div>
+                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px',marginBottom:'20px'}}>
+                      <div style={{background:'#f0f6ff',border:'1.5px solid #bfdbfe',borderRadius:'10px',padding:'14px',textAlign:'center'}}><div style={{fontSize:'9px',color:'#6b7a99',fontWeight:700,marginBottom:'7px',textTransform:'uppercase',letterSpacing:'.08em'}}>법적 기준 (W/㎡K 이하)</div><div style={{fontSize:'24px',fontWeight:900,color:'#1a2744',fontFamily:'JetBrains Mono,monospace'}}>{targetU?targetU.toFixed(3):'—'}</div></div>
+                      <div style={{background:'#fefce8',border:'1.5px solid #fde047',borderRadius:'10px',padding:'14px',textAlign:'center'}}><div style={{fontSize:'9px',color:'#854d0e',fontWeight:700,marginBottom:'7px',textTransform:'uppercase',letterSpacing:'.08em'}}>설계 산출값 (U)</div><div style={{fontSize:'24px',fontWeight:900,color:'#854d0e',fontFamily:'JetBrains Mono,monospace'}}>{currentU}</div></div>
+                      <div style={{background:isPass?'#f0fdf4':'#fff1f2',border:`1.5px solid ${isPass?'#86efac':'#fecdd3'}`,borderRadius:'10px',padding:'14px',textAlign:'center'}}><div style={{fontSize:'9px',color:isPass?'#065f46':'#881337',fontWeight:700,marginBottom:'7px',textTransform:'uppercase',letterSpacing:'.08em'}}>STATUS · 제6조</div><div style={{fontSize:'22px',fontWeight:900,color:isPass?'#059669':'#e11d48',fontFamily:'JetBrains Mono,monospace',letterSpacing:'.1em'}}>{isPass?'적  합':'부적합'}</div></div>
+                    </div>
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'11px',paddingBottom:'9px',borderBottom:'2px solid #1d4ed8'}}>
+                      <div style={{display:'flex',alignItems:'center',gap:'8px'}}><div style={{width:'3px',height:'16px',background:'#1d4ed8',borderRadius:'2px'}}></div><span style={{fontSize:'12px',fontWeight:900,color:'#1a2744',letterSpacing:'.08em',textTransform:'uppercase'}}>3. 부위별 상세 산출 근거</span></div>
+                      <span style={{fontSize:'10px',color:'#94a3b8',fontStyle:'italic',fontWeight:700,fontFamily:'JetBrains Mono,monospace'}}>U = 1 / ΣR</span>
+                    </div>
+                    <table style={{width:'100%',borderCollapse:'collapse',fontSize:'12px',fontFamily:'JetBrains Mono,monospace',marginBottom:'16px'}}>
+                      <colgroup><col style={{width:'7%'}}/><col style={{width:'47%'}}/><col style={{width:'14%'}}/><col style={{width:'16%'}}/><col style={{width:'16%'}}/></colgroup>
+                      <thead><tr style={{background:'#dbeafe'}}>{['NO','재료 및 사양','T(mm)','λ(W/mK)','R(m²K/W)'].map((h,i)=><th key={h} style={{padding:'10px 9px',textAlign:i===0?'center':i>1?'right':'left',fontWeight:800,fontSize:'11px',color:'#1e3a8a',letterSpacing:'.04em',borderBottom:'2px solid #93c5fd'}}>{h}</th>)}</tr></thead>
+                      <tbody>
+                        <tr style={{background:'#f0f6ff',borderBottom:'1px solid #dbeafe'}}><td style={{padding:'11px 9px',textAlign:'center',color:'#6b7a99',fontStyle:'italic',fontSize:'10px',fontWeight:700}}>실외</td><td colSpan={3} style={{padding:'11px 9px',color:'#475569',fontWeight:600,fontSize:'12px'}}>실외 표면열전달저항</td><td style={{padding:'11px 9px',textAlign:'right',color:'#1d4ed8',fontWeight:900,fontSize:'13px'}}>{sr.ro.toFixed(3)}</td></tr>
+                        {cl.map((l,i)=>(
+                          <tr key={l.id} style={{background:i%2===0?'#fff':'#f5f9ff',borderBottom:'1px solid #e8effc'}}>
+                            <td style={{padding:'12px 9px',textAlign:'center',color:'#94a3b8',fontWeight:700,fontSize:'11px'}}>{i+1}</td>
+                            <td style={{padding:'12px 9px',fontWeight:700,color:'#1a2744',fontSize:'12px',lineHeight:1.4}}>{(l.name||'').replace(/_/g,' ')}</td>
+                            <td style={{padding:'12px 9px',textAlign:'right',color:'#b45309',fontWeight:800,fontSize:'12px'}}>{l.name?.includes('공기층')?'—':(l.t||0)}</td>
+                            <td style={{padding:'12px 9px',textAlign:'right',color:'#475569',fontWeight:600,fontSize:'12px'}}>{l.name?.includes('공기층')?'—':(l.lambda||0).toFixed(3)}</td>
+                            <td style={{padding:'12px 9px',textAlign:'right',color:'#1d4ed8',fontWeight:900,fontSize:'13px'}}>{l.r.toFixed(3)}</td>
+                          </tr>
+                        ))}
+                        <tr style={{background:'#f0f6ff',borderBottom:'1px solid #dbeafe'}}><td style={{padding:'11px 9px',textAlign:'center',color:'#6b7a99',fontStyle:'italic',fontSize:'10px',fontWeight:700}}>실내</td><td colSpan={3} style={{padding:'11px 9px',color:'#475569',fontWeight:600,fontSize:'12px'}}>실내 표면열전달저항</td><td style={{padding:'11px 9px',textAlign:'right',color:'#1d4ed8',fontWeight:900,fontSize:'13px'}}>{sr.ri.toFixed(3)}</td></tr>
+                      </tbody>
+                      <tfoot><tr style={{background:'#e8f0fe',borderTop:'2px solid #93c5fd'}}><td colSpan={4} style={{padding:'11px 9px',textAlign:'right',fontWeight:800,fontSize:'11px',color:'#1e3a8a',fontStyle:'italic',textTransform:'uppercase',letterSpacing:'.06em'}}>Total Thermal Resistance (ΣR)</td><td style={{padding:'11px 9px',textAlign:'right',fontWeight:900,color:'#059669',fontSize:'16px'}}>{totalR.toFixed(3)}</td></tr></tfoot>
+                    </table>
+                    <div style={{background:'linear-gradient(135deg,#eff6ff,#e8f0fe)',border:'1px solid #bfdbfe',borderRadius:'12px',padding:'14px 22px',display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',flexWrap:'wrap',marginBottom:'16px'}}>
+                      <span style={{color:'#6b7a99',fontSize:'12px',fontFamily:'JetBrains Mono,monospace',fontStyle:'italic'}}>U = 1 / {totalR.toFixed(3)}</span>
+                      <span style={{color:'#1d4ed8',fontWeight:700,fontSize:'18px'}}>=</span>
+                      <span style={{color:'#b45309',fontWeight:900,fontSize:'28px',fontFamily:'JetBrains Mono,monospace'}}>{currentU}</span>
+                      <span style={{color:'#94a3b8',fontSize:'12px',fontWeight:700}}>W/㎡K</span>
+                    </div>
+                    <div style={{borderTop:'1px solid #e2e8f0',paddingTop:'9px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                      <span style={{fontSize:'8px',color:'#94a3b8',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase'}}>건축물 에너지절약설계기준 · 국토교통부고시 제2025-738호</span>
+                      <span style={{fontSize:'8px',color:'#94a3b8',fontWeight:700,fontFamily:'JetBrains Mono,monospace',letterSpacing:'.1em',textTransform:'uppercase'}}>MANMIN Ver-{VER}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 모바일 미리보기 (전체폭) ── */}
+      {tab==='mobprev'&&(
+        <div className="full-panel">
+          <div className="card-head" style={{borderBottom:'none'}}>
+            <div className="card-icon"><svg viewBox="0 0 24 24" width="13" height="13" stroke="#1d4ed8" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+            <span className="card-title">모바일 카드 미리보기</span>
+          </div>
+          <div className="mob-preview-wrap" style={{minHeight:'520px',alignItems:'flex-start',paddingTop:'24px'}}>
+            <div style={{width:'360px',transform:'scale(0.88)',transformOrigin:'top center',background:'#1e3456',borderRadius:'20px',overflow:'hidden',fontFamily:"'Pretendard','Apple SD Gothic Neo',sans-serif",pointerEvents:'none',boxShadow:'0 16px 48px rgba(0,0,0,.35)'}}>
+              {/* Header */}
+              <div style={{background:'#162a4a',padding:'20px 18px 16px',borderBottom:'1px solid rgba(255,255,255,.08)'}}>
+                <div style={{fontSize:'8px',fontWeight:700,color:'#7da8d8',letterSpacing:'.18em',textTransform:'uppercase',marginBottom:'6px'}}>열관류율 종합 검토 시스템</div>
+                <div style={{fontSize:'15px',fontWeight:900,color:'#e8f1fb',marginBottom:'4px',lineHeight:1.3}}>{projectName}</div>
+                <div style={{fontSize:'8px',fontWeight:700,color:'#5b84b1',letterSpacing:'.08em',textTransform:'uppercase'}}>MANMIN Ver-{VER} · 국토교통부 제2025-738호</div>
+              </div>
+              <div style={{padding:'14px 16px',display:'flex',flexDirection:'column',gap:'12px'}}>
+                {/* 검토 조건 */}
+                <div style={{background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.1)',borderRadius:'10px',padding:'12px 14px'}}>
+                  <div style={{fontSize:'8px',fontWeight:800,color:'#7da8d8',letterSpacing:'.12em',textTransform:'uppercase',marginBottom:'9px'}}>검토 조건</div>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px'}}>
+                    {[{l:'지역',v:region},{l:'부위',v:part},{l:'외기조건',v:exposure},{l:'용도',v:usage}].map(x=>(
+                      <div key={x.l} style={{background:'rgba(255,255,255,.06)',borderRadius:'7px',padding:'8px 10px'}}>
+                        <div style={{fontSize:'8px',color:'#5b84b1',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:'3px'}}>{x.l}</div>
+                        <div style={{fontSize:'10px',color:'#c8ddf0',fontWeight:700,lineHeight:1.3}}>{x.v}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Verdict */}
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'9px'}}>
+                  <div style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:'12px',padding:'13px 10px',textAlign:'center'}}>
+                    <div style={{fontSize:'9px',fontWeight:700,color:'#5b84b1',letterSpacing:'.07em',marginBottom:'6px',textTransform:'uppercase'}}>법적 기준</div>
+                    <div style={{fontSize:'22px',fontWeight:900,color:'#c8ddf0',fontFamily:'JetBrains Mono,monospace',lineHeight:1}}>{targetU?targetU.toFixed(3):'—'}</div>
+                    <div style={{fontSize:'8px',color:'#3d6080',marginTop:'5px',fontWeight:600}}>W/㎡K 이하</div>
+                  </div>
+                  <div style={{background:isPass?'rgba(16,185,129,.18)':'rgba(225,29,72,.18)',border:`1.5px solid ${isPass?'rgba(52,211,153,.4)':'rgba(251,113,133,.4)'}`,borderRadius:'12px',padding:'13px 10px',textAlign:'center'}}>
+                    <div style={{fontSize:'9px',fontWeight:700,color:isPass?'#34d399':'#fb7185',letterSpacing:'.07em',marginBottom:'6px',textTransform:'uppercase'}}>설계값 · 판정</div>
+                    <div style={{fontSize:'22px',fontWeight:900,color:isPass?'#10b981':'#f43f5e',fontFamily:'JetBrains Mono,monospace',lineHeight:1}}>{currentU}</div>
+                    <div style={{fontSize:'11px',fontWeight:900,color:isPass?'#059669':'#e11d48',marginTop:'5px',letterSpacing:'.06em'}}>{isPass?'✓ 적합':'✗ 부적합'}</div>
+                  </div>
+                </div>
+                {/* U formula */}
+                <div style={{background:'rgba(0,0,0,.25)',borderRadius:'12px',padding:'12px 14px',textAlign:'center',lineHeight:1.5}}>
+                  <div style={{color:'#4a6d8c',fontSize:'10px',fontFamily:'JetBrains Mono,monospace',fontStyle:'italic',marginBottom:'4px'}}>U = 1 / {totalR.toFixed(3)}</div>
+                  <div><span style={{color:'#f59e0b',fontSize:'26px',fontWeight:900,fontFamily:'JetBrains Mono,monospace'}}>{currentU}</span><span style={{color:'#4a6d8c',fontSize:'11px',marginLeft:'6px',fontWeight:600}}>W/㎡K</span></div>
+                </div>
+                {/* Table */}
+                <div style={{background:'rgba(255,255,255,.04)',borderRadius:'10px',padding:'10px 12px'}}>
+                  <div style={{fontSize:'8px',fontWeight:800,color:'#7da8d8',letterSpacing:'.12em',textTransform:'uppercase',marginBottom:'8px'}}>부위별 산출 근거</div>
+                  <table style={{width:'100%',borderCollapse:'collapse',fontSize:'10px',fontFamily:'JetBrains Mono,monospace'}}>
+                    <thead><tr style={{borderBottom:'1.5px solid rgba(255,255,255,.1)'}}>{['재료 및 사양','T','λ','R'].map((h,i)=><th key={h} style={{padding:'5px 4px 7px',textAlign:i===0?'left':'right',color:'#4a6d8c',fontWeight:700,fontSize:'8px',letterSpacing:'.07em',textTransform:'uppercase'}}>{h}</th>)}</tr></thead>
+                    <tbody>
+                      <tr><td style={{padding:'5px 4px',color:'#4a6d8c',fontStyle:'italic',fontSize:'9px'}}>실외</td><td colSpan={2}></td><td style={{padding:'5px 4px',textAlign:'right',color:'#7da8d8',fontWeight:700}}>{sr.ro.toFixed(3)}</td></tr>
+                      {cl.map((l,i)=>(
+                        <tr key={l.id} style={{borderBottom:'1px solid rgba(255,255,255,.05)'}}>
+                          <td style={{padding:'6px 4px',color:'#b8cfe6',fontWeight:600,maxWidth:'140px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:'10px'}}>{(l.name||'').replace(/_/g,' ')}</td>
+                          <td style={{padding:'6px 4px',textAlign:'right',color:'#fcd34d',fontSize:'10px'}}>{l.name?.includes('공기층')?'—':(l.t||0)}</td>
+                          <td style={{padding:'6px 4px',textAlign:'right',color:'#6b8aab',fontSize:'10px'}}>{l.name?.includes('공기층')?'—':(l.lambda||0).toFixed(3)}</td>
+                          <td style={{padding:'6px 4px',textAlign:'right',color:'#7da8d8',fontWeight:700}}>{l.r.toFixed(3)}</td>
+                        </tr>
+                      ))}
+                      <tr style={{borderBottom:'1px solid rgba(255,255,255,.1)'}}><td style={{padding:'5px 4px',color:'#4a6d8c',fontStyle:'italic',fontSize:'9px'}}>실내</td><td colSpan={2}></td><td style={{padding:'5px 4px',textAlign:'right',color:'#7da8d8',fontWeight:700}}>{sr.ri.toFixed(3)}</td></tr>
+                      <tr><td colSpan={3} style={{padding:'8px 4px 4px',textAlign:'right',color:'#4a6d8c',fontSize:'8px',fontStyle:'italic',fontWeight:600}}>Total Thermal Resistance (ΣR)</td><td style={{padding:'8px 4px 4px',textAlign:'right',color:'#34d399',fontWeight:900,fontSize:'14px'}}>{totalR.toFixed(3)}</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                {/* Footer */}
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingTop:'4px',borderTop:'1px solid rgba(255,255,255,.07)'}}>
+                  <span style={{fontSize:'7.5px',color:'#2d4a6a',fontWeight:600,textTransform:'uppercase',letterSpacing:'.07em'}}>국토교통부 제2025-738호</span>
+                  <span style={{fontSize:'7.5px',color:'#2d4a6a',fontWeight:700,fontFamily:'JetBrains Mono,monospace'}}>MANMIN Ver-{VER}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 재료별 열전도율 (전체폭) ── */}
+      {tab==='material'&&(
+        <div className="full-panel">
+          <div className="card-head">
+            <div className="card-icon"><svg viewBox="0 0 24 24" width="13" height="13" stroke="#1d4ed8" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+            <span className="card-title">재료별 열전도율 데이터베이스</span>
+            <span className="card-badge" style={{marginLeft:'8px'}}>대·중·소 분류</span>
+          </div>
+          <MaterialTab/>
+        </div>
+      )}
+
+      {/* ── 검토 조건 입력 (50:50) ── */}
+      {tab==='input'&&(
+        <div className="two-col">
+          {/* LEFT — 입력 */}
+          <div style={{display:'flex',flexDirection:'column',gap:'14px'}}>
+
+            {/* 법령 안내 */}
+            <div className="info-strip">
+              <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <p><strong>건축물 에너지절약설계기준 제6조</strong> — 건축물의 각 부위별 열관류율이 별표1의 기준을 초과하지 않도록 설계하여야 합니다. | 기준: 국토교통부고시 제2025-738호</p>
+            </div>
+
+            {/* 검토 조건 */}
+            <div className="card">
+              <div className="card-head">
+                <div className="card-icon"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+                <span className="card-title">검토 조건 설정</span>
+                <span className="card-badge">[제2025-738호 제6조]</span>
+              </div>
+              <div className="card-body" style={{display:'flex',flexDirection:'column',gap:'11px'}}>
+                {/* 프로젝트 + 기준 */}
+                <div style={{display:'flex',gap:'10px',alignItems:'flex-end'}}>
+                  <div style={{flex:1}}>
+                    <div className="flbl">프로젝트명</div>
+                    <input className="finput" type="text" value={projectName} onChange={e=>setProjectName(e.target.value)}/>
+                  </div>
+                  <div style={{width:'120px',background:'#eff6ff',border:'1.5px solid #bfdbfe',borderRadius:'9px',padding:'7px 10px',textAlign:'center',flexShrink:0}}>
+                    <div style={{fontSize:'8px',fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'#1d4ed8',marginBottom:'3px'}}>법적기준 (W/㎡K)</div>
+                    <div style={{fontSize:'16px',fontWeight:900,color:'#1d4ed8',fontFamily:'JetBrains Mono,monospace'}}>{targetU?targetU.toFixed(3):'—'}</div>
+                  </div>
+                </div>
+                {/* 지역 */}
+                <div>
+                  <div className="flbl">지역 구분</div>
+                  <select className="fselect" value={region} onChange={e=>setRegion(e.target.value)}>
+                    {Object.keys(U_STD).map(r=><option key={r} value={r}>{r}</option>)}
+                  </select>
+                </div>
+                {/* 부위 + 외기 */}
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}}>
+                  <div><div className="flbl">건축 부위</div><select className="fselect" value={part} onChange={e=>setPart(e.target.value)}>{Object.keys(U_STD[region]||{}).map(p=><option key={p} value={p}>{p}</option>)}</select></div>
+                  <div><div className="flbl">외기 조건</div><select className="fselect" value={exposure} onChange={e=>setExposure(e.target.value)}>{Object.keys((U_STD[region]||{})[part]||{}).map(e=><option key={e} value={e}>{e}</option>)}</select></div>
+                </div>
+                {/* 용도 */}
+                <div>
+                  <div className="flbl">용도 / 난방 여부</div>
+                  <select className="fselect" value={usage} onChange={e=>setUsage(e.target.value)}>
+                    {Object.keys(((U_STD[region]||{})[part]||{})[exposure]||{}).map(u=><option key={u} value={u}>{u}</option>)}
+                  </select>
+                </div>
+                {/* 두께 기준 */}
+                <div style={{background:'#f0fdf4',border:'1.5px solid #a7f3d0',borderRadius:'9px',padding:'11px 12px'}}>
+                  <div style={{fontSize:'9px',fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'#059669',marginBottom:'8px'}}>
+                    [별표3] 단열재 등급별 최소 두께 기준 (mm)
+                  </div>
+                  <div className="t-grid">
+                    {['가','나','다','라'].map((g,i)=>(
+                      <div key={g} className="t-badge">
+                        <div style={{fontSize:'9px',fontWeight:800,color:'#6b7a99',letterSpacing:'.1em',marginBottom:'4px'}}>{g}급</div>
+                        <div style={{fontSize:'15px',fontWeight:900,color:'#059669',fontFamily:'JetBrains Mono,monospace'}}>{targetT[i]||'—'}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 재료 구성 */}
+            <div className="card">
+              <div className="card-head">
+                <div className="card-icon"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+                <span className="card-title">단열·재료 구성</span>
+                <span style={{fontSize:'9px',color:'#94a3b8',fontStyle:'italic',marginLeft:'6px',fontWeight:600}}>실외 → 실내</span>
+                <button className="btn-add" style={{marginLeft:'auto'}} onClick={()=>setLayers([...layers,{id:Date.now(),cat:"C_콘크리트계",group:"일반콘크리트",name:"철근콘크리트",t:10,lambda:1.6}])}>+ 추가</button>
+              </div>
+              <div className="card-body" style={{display:'flex',flexDirection:'column',gap:'9px'}}>
+                {layers.map((layer,idx)=>(
+                  <div key={layer.id} className="layer-card">
+                    <div style={{position:'absolute',left:'-11px',top:'50%',transform:'translateY(-50%)',width:'18px',height:'18px',background:'#1d4ed8',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'8px',fontWeight:900,color:'#fff',zIndex:1,flexShrink:0}}>{idx+1}</div>
+                    <button onClick={()=>setLayers(layers.filter(l=>l.id!==layer.id))} style={{position:'absolute',right:'8px',top:'8px',background:'transparent',border:'none',cursor:'pointer',color:'#94a3b8',padding:'1px',fontSize:'13px',lineHeight:1,fontFamily:'inherit'}}>✕</button>
+                    <div style={{display:'flex',flexDirection:'column',gap:'7px'}}>
+                      <select className="fselect" value={layer.cat} onChange={e=>updateLayer(layer.id,'cat',e.target.value)}>{Object.keys(DB_H).map(c=><option key={c} value={c}>{c.replace(/_/g,' ')}</option>)}</select>
+                      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'7px'}}>
+                        <select className="fselect" value={layer.group} onChange={e=>updateLayer(layer.id,'group',e.target.value)}>{Object.keys(DB_H[layer.cat]||{}).map(g=><option key={g} value={g}>{g.replace(/_/g,' ')}</option>)}</select>
+                        <select className="fselect" value={layer.name} onChange={e=>updateLayer(layer.id,'name',e.target.value)}>{Object.keys((DB_H[layer.cat]||{})[layer.group]||{}).map(n=><option key={n} value={n}>{n.replace(/_/g,' ')}</option>)}</select>
+                      </div>
+                      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'7px'}}>
+                        <div><div className="flbl">두께 (mm)</div><input type="number" value={layer.t} onChange={e=>updateLayer(layer.id,'t',parseFloat(e.target.value)||0)} className="finput mono" style={{textAlign:'right',height:'36px'}}/></div>
+                        <div><div className="flbl">λ (W/mK)</div><input type="number" value={layer.lambda} step="0.001" onChange={e=>updateLayer(layer.id,'lambda',parseFloat(e.target.value)||0)} className="finput mono" style={{textAlign:'right',height:'36px'}}/></div>
+                        <div><div className="flbl">R (m²K/W)</div><div className="finput mono" style={{textAlign:'right',color:'#1d4ed8',fontWeight:700,height:'36px',display:'flex',alignItems:'center',justifyContent:'flex-end',background:'#eff6ff',border:'1.5px solid #bfdbfe'}}>{layer.lambda>0?((layer.t||0)/1000/layer.lambda).toFixed(3):'0.000'}</div></div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT — 결과 */}
+          <div style={{display:'flex',flexDirection:'column',gap:'14px'}}>
+            {/* 결과 카드 */}
+            <div className="card">
+              <div className="card-head">
+                <div className="card-icon" style={{background:'#fefce8'}}><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+                <span className="card-title">실시간 산출 결과</span>
+                <span className={isPass?'card-badge-em':'card-badge-fail'}>{isPass?'✓ 적합':'✗ 부적합'}</span>
+              </div>
+              <div className="card-body" style={{display:'flex',flexDirection:'column',gap:'12px'}}>
+                {/* 3 verdict */}
+                <div className="v3">
+                  <div className="vc vc-n"><div style={{fontSize:'8px',fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'#6b7a99',marginBottom:'5px'}}>법적 기준</div><div style={{fontSize:'20px',fontWeight:900,color:'#1a2744',fontFamily:'JetBrains Mono,monospace'}}>{targetU?targetU.toFixed(3):'—'}</div><div style={{fontSize:'8px',color:'#94a3b8',marginTop:'3px',fontWeight:600}}>W/㎡K 이하</div></div>
+                  <div className="vc vc-a"><div style={{fontSize:'8px',fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'#854d0e',marginBottom:'5px'}}>설계값</div><div style={{fontSize:'20px',fontWeight:900,color:'#854d0e',fontFamily:'JetBrains Mono,monospace'}}>{currentU}</div><div style={{fontSize:'8px',color:'#b45309',marginTop:'3px',fontWeight:600,opacity:.8}}>W/㎡K</div></div>
+                  <div className={`vc ${isPass?'vc-p':'vc-f'}`}><div style={{fontSize:'8px',fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:isPass?'#059669':'#e11d48',marginBottom:'5px'}}>판정</div><div style={{fontSize:'15px',fontWeight:900,color:isPass?'#059669':'#e11d48',letterSpacing:'.08em'}}>{isPass?'적 합':'부적합'}</div><div style={{fontSize:'8px',color:isPass?'#059669':'#e11d48',marginTop:'3px',fontWeight:600,opacity:.7}}>제6조 기준</div></div>
+                </div>
+                {/* 수식 */}
+                <div className="fml-box-lg">
+                  <div style={{fontSize:'9px',fontWeight:700,color:'rgba(255,255,255,.5)',letterSpacing:'.12em',textTransform:'uppercase',marginBottom:'7px'}}>열관류율 산출식</div>
+                  <div style={{display:'flex',alignItems:'baseline',justifyContent:'center',gap:'8px',flexWrap:'wrap'}}>
+                    <span style={{color:'rgba(255,255,255,.4)',fontSize:'11px',fontFamily:'JetBrains Mono,monospace'}}>U = 1 / {totalR.toFixed(3)}</span>
+                    <span style={{color:'#38bdf8',fontWeight:700,fontSize:'16px'}}>=</span>
+                    <span style={{color:'#fbbf24',fontSize:'32px',fontWeight:900,fontFamily:'JetBrains Mono,monospace',lineHeight:1}}>{currentU}</span>
+                    <span style={{color:'rgba(255,255,255,.4)',fontSize:'10px',fontWeight:700}}>W/㎡K</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 상세 산출표 */}
+            <div className="card">
+              <div className="card-head">
+                <div className="card-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg></div>
+                <span className="card-title">부위별 상세 산출 근거</span>
+                <span className="card-badge mono" style={{fontStyle:'italic',marginLeft:'8px',fontFamily:'JetBrains Mono,monospace',fontSize:'10px'}}>U = 1 / ΣR</span>
+              </div>
+              <div style={{overflowX:'auto'}}>
+                <table className="rtbl">
+                  <colgroup><col style={{width:'7%'}}/><col style={{width:'43%'}}/><col style={{width:'14%'}}/><col style={{width:'18%'}}/><col style={{width:'18%'}}/></colgroup>
+                  <thead><tr>{['NO','재료 및 사양','T(mm)','λ(W/mK)','R(m²K/W)'].map((h,i)=><th key={h} style={{textAlign:i===0?'center':i>1?'right':'left'}}>{h}</th>)}</tr></thead>
+                  <tbody>
+                    <tr><td style={{textAlign:'center',color:'#94a3b8',fontSize:'10px',fontStyle:'italic',fontWeight:700}}>실외</td><td style={{color:'#6b7a99',fontWeight:600}}>실외 표면열전달저항</td><td colSpan={2}></td><td style={{textAlign:'right',color:'#1d4ed8',fontWeight:800,fontFamily:'JetBrains Mono,monospace'}}>{sr.ro.toFixed(3)}</td></tr>
+                    {cl.map((l,i)=>(
+                      <tr key={l.id}>
+                        <td style={{textAlign:'center',color:'#94a3b8',fontWeight:700,fontFamily:'JetBrains Mono,monospace'}}>{i+1}</td>
+                        <td style={{fontWeight:600,color:'#1a2744',fontSize:'12px'}}>{(l.name||'').replace(/_/g,' ')}</td>
+                        <td style={{textAlign:'right',color:'#b45309',fontWeight:700,fontFamily:'JetBrains Mono,monospace'}}>{l.name?.includes('공기층')?'—':(l.t||0)}</td>
+                        <td style={{textAlign:'right',color:'#475569',fontWeight:600,fontFamily:'JetBrains Mono,monospace'}}>{l.name?.includes('공기층')?'—':(l.lambda||0).toFixed(3)}</td>
+                        <td style={{textAlign:'right',color:'#1d4ed8',fontWeight:800,fontFamily:'JetBrains Mono,monospace'}}>{l.r.toFixed(3)}</td>
+                      </tr>
+                    ))}
+                    <tr><td style={{textAlign:'center',color:'#94a3b8',fontSize:'10px',fontStyle:'italic',fontWeight:700}}>실내</td><td style={{color:'#6b7a99',fontWeight:600}}>실내 표면열전달저항</td><td colSpan={2}></td><td style={{textAlign:'right',color:'#1d4ed8',fontWeight:800,fontFamily:'JetBrains Mono,monospace'}}>{sr.ri.toFixed(3)}</td></tr>
+                  </tbody>
+                  <tfoot><tr><td colSpan={4} style={{textAlign:'right',fontWeight:800,fontSize:'10px',letterSpacing:'.08em',textTransform:'uppercase',color:'#6b7a99',fontStyle:'italic',paddingRight:'12px'}}>Total Thermal Resistance (ΣR)</td><td style={{textAlign:'right',fontWeight:900,color:'#059669',fontSize:'14px',fontFamily:'JetBrains Mono,monospace'}}>{totalR.toFixed(3)}</td></tr></tfoot>
+                </table>
+              </div>
+              <div style={{padding:'10px 14px 12px',display:'flex',justifyContent:'space-between',alignItems:'center',borderTop:'1px solid #eef1f6',opacity:.45,fontSize:'9px',fontWeight:600,letterSpacing:'.08em',textTransform:'uppercase',color:'#6b7a99'}}>
+                <span>건축물 에너지절약설계기준 · 제2025-738호</span>
+                <span className="mono">MANMIN Ver-{VER}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+
+    {/* ═══ FAB ═══ */}
+    <button className="fab-pill no-print" onClick={()=>setShowModal(true)}>
+      📐 계산식 안내
+    </button>
+
+    {/* ═══ MODAL ═══ */}
+    {showModal&&<FabModal onClose={()=>setShowModal(false)} onA4Print={()=>window.print()} onA4PNG={onA4PNG} onMobilePNG={onMobilePNG}/>}
+
+    {/* ═══ HIDDEN CAPTURE AREAS ═══ */}
+    <A4Report {...calcProps}/>
+    <MobileCard {...calcProps}/>
+
+    {/* ═══ PWA BANNER ═══ */}
+    {showPWA&&(
+      <div className="no-print" style={{position:'fixed',bottom:'80px',left:'50%',transform:'translateX(-50%)',width:'min(380px,calc(100vw - 32px))',background:'linear-gradient(135deg,#1e3a8a,#1e1b4b)',border:'1px solid rgba(147,197,253,.2)',borderRadius:'16px',padding:'13px 15px',boxShadow:'0 20px 60px rgba(0,0,0,.25)',zIndex:60}}>
+        <div style={{display:'flex',alignItems:'center',gap:'11px'}}>
+          <div style={{flex:1}}><p style={{color:'#fff',fontSize:'12px',fontWeight:800,margin:0,lineHeight:1.4}}>홈 화면에 설치하시겠습니까?</p><p style={{color:'#93c5fd',fontSize:'10px',margin:'3px 0 0',fontWeight:600}}>오프라인에서도 사용 가능한 앱으로 설치됩니다</p></div>
+          <button onClick={()=>setShowPWA(false)} style={{color:'rgba(255,255,255,.5)',background:'transparent',border:'none',fontSize:'12px',fontWeight:700,cursor:'pointer',padding:'3px 7px',fontFamily:'inherit'}}>닫기</button>
+          <button onClick={async()=>{if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;setInstallPrompt(null);}setShowPWA(false);}} style={{background:'#fff',color:'#1d4ed8',fontSize:'11px',fontWeight:800,border:'none',padding:'6px 13px',borderRadius:'8px',cursor:'pointer',fontFamily:'inherit'}}>설치</button>
+        </div>
+      </div>
+    )}
+    </>
+  );
+};
+
+const root=ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App/>);
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js')
+      .then(r=>console.log('[PWA] SW:',r.scope))
+      .catch(e=>console.warn('[PWA] 실패:',e));
+  });
+}
+</script>
 </body>
 </html>

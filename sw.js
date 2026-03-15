@@ -1,142 +1,127 @@
-// ═══════════════════════════════════════════════════════════════
-//  Service Worker — 열관류율 검토시스템 PWA
-//  캐시 버전을 올리면 자동으로 이전 캐시 삭제 + 새 파일 캐시
-// ═══════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   열관류율 종합 검토 시스템 — Service Worker
+   건축물 에너지절약설계기준 | ARCHITECT KIM MANMIN · Ver-3.0
+   전략: Cache-First (로컬 자산) + Network-First (외부 CDN)
+   ═══════════════════════════════════════════════════════════════ */
 
-const CACHE_VERSION = 'v2.0.1';
-const CACHE_NAME    = `u-value-app-${CACHE_VERSION}`;
+const CACHE_NAME   = 'thermal-manmin-v3.0';
+const CDN_CACHE    = 'thermal-manmin-cdn-v3.0';
+const OFFLINE_PAGE = './index.html';
 
-// ─── 반드시 오프라인에서도 필요한 로컬 파일 ───
-const LOCAL_FILES = [
-    './',
-    './index.html',
-    './manifest.json',
-    './icons/icon-192.png',
-    './icons/icon-512.png',
-    './icons/apple-touch-icon.png',
-    './icons/favicon-32.png',
-    './icons/favicon-16.png'
+/* ── 앱 셸: 설치 즉시 프리캐시 ─────────────────────────────── */
+const APP_SHELL = [
+  './index.html',
+  './manifest.json',
+  './icons/icon-72.png',
+  './icons/icon-96.png',
+  './icons/icon-128.png',
+  './icons/icon-144.png',
+  './icons/icon-152.png',
+  './icons/icon-192.png',
+  './icons/icon-384.png',
+  './icons/icon-512.png',
+  './icons/apple-touch-icon.png',
+  './icons/favicon-32.png',
+  './icons/favicon-16.png',
 ];
 
-// ─── 외부 CDN 라이브러리 (최초 접속 시 캐시) ───
-const CDN_FILES = [
-    'https://cdn.tailwindcss.com',
-    'https://unpkg.com/react@18/umd/react.production.min.js',
-    'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js',
-    'https://unpkg.com/@babel/standalone/babel.min.js',
-    'https://unpkg.com/lucide@latest',
-    'https://html2canvas.hertzen.com/dist/html2canvas.min.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js'
+/* ── CDN 오리진 (Network-First) ─────────────────────────────── */
+const CDN_ORIGINS = [
+  'https://fonts.googleapis.com',
+  'https://fonts.gstatic.com',
+  'https://cdn.jsdelivr.net',
+  'https://cdnjs.cloudflare.com',
+  'https://unpkg.com',
 ];
 
-// ═══════════════════════════════════════════════════════════════
-//  1. INSTALL — 파일을 캐시에 미리 저장
-// ═══════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════
+   INSTALL — 앱 셸 프리캐시
+   ══════════════════════════════════════════════════════════════ */
 self.addEventListener('install', (event) => {
-    console.log(`[SW] 설치 시작 (${CACHE_VERSION})`);
-
-    event.waitUntil(
-        caches.open(CACHE_NAME).then(async (cache) => {
-            // 로컬 파일: 반드시 캐시 (실패하면 설치 중단)
-            await cache.addAll(LOCAL_FILES);
-            console.log('[SW] 로컬 파일 캐시 완료');
-
-            // CDN 파일: 가능하면 캐시 (실패해도 설치 계속)
-            for (const url of CDN_FILES) {
-                try {
-                    await cache.add(url);
-                } catch (err) {
-                    console.warn('[SW] CDN 캐시 실패 (무시):', url, err.message);
-                }
-            }
-            console.log('[SW] CDN 파일 캐시 완료');
-        })
-    );
-
-    // 기존 SW 즉시 교체 (대기 없이)
-    self.skipWaiting();
+  console.log('[SW] Install — 프리캐시 시작');
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(APP_SHELL))
+      .then(() => { console.log('[SW] 프리캐시 완료'); return self.skipWaiting(); })
+      .catch((err) => { console.warn('[SW] 프리캐시 일부 실패:', err); return self.skipWaiting(); })
+  );
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  2. ACTIVATE — 이전 버전 캐시 정리
-// ═══════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════
+   ACTIVATE — 구버전 캐시 삭제
+   ══════════════════════════════════════════════════════════════ */
 self.addEventListener('activate', (event) => {
-    console.log(`[SW] 활성화 (${CACHE_VERSION})`);
-
-    event.waitUntil(
-        caches.keys().then((keyList) => {
-            return Promise.all(
-                keyList.map((key) => {
-                    if (key !== CACHE_NAME) {
-                        console.log('[SW] 이전 캐시 삭제:', key);
-                        return caches.delete(key);
-                    }
-                })
-            );
-        })
-    );
-
-    // 즉시 모든 탭에 적용
-    self.clients.claim();
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(
+        keys.filter((k) => ![CACHE_NAME, CDN_CACHE].includes(k))
+            .map((k) => { console.log('[SW] 구버전 삭제:', k); return caches.delete(k); })
+      ))
+      .then(() => self.clients.claim())
+  );
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  3. FETCH — 요청 가로채기
-//
-//  전략: Cache First + Network Fallback
-//  ① 캐시에 있으면 → 캐시에서 즉시 반환 (빠름)
-//  ② 캐시에 없으면 → 네트워크에서 가져오고 캐시에 저장
-//  ③ 네트워크도 실패 → 오프라인 안내
-// ═══════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════
+   FETCH — 요청 라우팅
+   ══════════════════════════════════════════════════════════════ */
 self.addEventListener('fetch', (event) => {
-    const request = event.request;
+  const { request } = event;
+  if (request.method !== 'GET') return;
+  if (!request.url.startsWith('http')) return;
 
-    // GET 요청만 캐시 (POST 등은 통과)
-    if (request.method !== 'GET') return;
+  const url = new URL(request.url);
+  const isCDN = CDN_ORIGINS.some(
+    (o) => url.origin === new URL(o).origin || request.url.startsWith(o)
+  );
 
-    // Google Fonts는 별도 처리 (Stale While Revalidate)
-    if (request.url.includes('fonts.googleapis.com') ||
-        request.url.includes('fonts.gstatic.com')) {
-        event.respondWith(
-            caches.open(CACHE_NAME).then(async (cache) => {
-                const cached = await cache.match(request);
-                const fetched = fetch(request).then((response) => {
-                    if (response.ok) cache.put(request, response.clone());
-                    return response;
-                }).catch(() => cached);
-                return cached || fetched;
-            })
-        );
-        return;
+  event.respondWith(isCDN ? networkFirstCDN(request) : cacheFirstLocal(request));
+});
+
+/* ── Cache-First (로컬 자산) ─────────────────────────────────── */
+async function cacheFirstLocal(request) {
+  const cached = await caches.match(request);
+  if (cached) return cached;
+  try {
+    const res = await fetch(request);
+    if (res && res.status === 200 && res.type !== 'opaque') {
+      (await caches.open(CACHE_NAME)).put(request, res.clone());
     }
+    return res;
+  } catch (_) {
+    if (request.headers.get('accept')?.includes('text/html')) {
+      const offline = await caches.match(OFFLINE_PAGE);
+      if (offline) return offline;
+    }
+    return new Response('오프라인 상태입니다. 앱을 먼저 온라인에서 한 번 열어주세요.',
+      { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+  }
+}
 
-    // 기본 전략: Cache First
-    event.respondWith(
-        caches.match(request).then((cachedResponse) => {
-            if (cachedResponse) {
-                return cachedResponse;
-            }
+/* ── Network-First (CDN 자산) ────────────────────────────────── */
+async function networkFirstCDN(request) {
+  try {
+    const res = await fetch(request);
+    if (res && res.status === 200) (await caches.open(CDN_CACHE)).put(request, res.clone());
+    return res;
+  } catch (_) {
+    return (await caches.match(request, { cacheName: CDN_CACHE })) || new Response('', { status: 503 });
+  }
+}
 
-            return fetch(request).then((networkResponse) => {
-                // 유효한 응답이면 캐시에 저장
-                if (networkResponse && networkResponse.ok) {
-                    const responseClone = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(request, responseClone);
-                    });
-                }
-                return networkResponse;
-            }).catch(() => {
-                // 오프라인 + 캐시 미스: HTML 요청이면 캐시된 index.html 반환
-                if (request.headers.get('accept')?.includes('text/html')) {
-                    return caches.match('./index.html');
-                }
-                // 그 외: 빈 응답
-                return new Response('오프라인 상태입니다.', {
-                    status: 503,
-                    statusText: 'Service Unavailable'
-                });
-            });
-        })
-    );
+/* ══════════════════════════════════════════════════════════════
+   MESSAGE / PUSH
+   ══════════════════════════════════════════════════════════════ */
+self.addEventListener('message', (event) => {
+  if (event.data?.action === 'SKIP_WAITING') self.skipWaiting();
+  if (event.data?.action === 'CLEAR_CACHE')
+    caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k))));
+});
+
+self.addEventListener('push', (event) => {
+  const data = event.data?.json() ?? { title: '열관류율 검토 시스템', body: '업데이트가 있습니다.' };
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body, icon: './icons/icon-192.png', badge: './icons/icon-72.png',
+    })
+  );
 });

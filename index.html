@@ -331,7 +331,7 @@ const A4Report=({projectName,region,part,exposure,usage,sr,cl,totalR,currentU,ta
         <div className="a4-sec-hd"><div className="a4-sec-bar"></div><span className="a4-sec-label" style={{fontSize:'12px'}}>2. 단열조치 적합여부 최종 판정</span></div>
         <div className="a4-verdict-grid">
           <div style={{background:'#f8fafd',border:'1.5px solid #e2e8f0',borderRadius:'10px',padding:'14px',textAlign:'center'}}>
-            <div style={{fontSize:'8px',color:'#94a3b8',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:'7px'}}>법적 기준 (W/㎡K 이하)</div>
+            <div style={{fontSize:'8px',color:'#94a3b8',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:'7px'}}>법적 기준 (W/m²K 이하)</div>
             <div style={{fontSize:'24px',fontWeight:900,color:'#1a2744',fontFamily:'JetBrains Mono,monospace'}}>{targetU?targetU.toFixed(3):'—'}</div>
           </div>
           <div style={{background:'#fefce8',border:'1.5px solid #fde047',borderRadius:'10px',padding:'14px',textAlign:'center'}}>
@@ -384,7 +384,7 @@ const A4Report=({projectName,region,part,exposure,usage,sr,cl,totalR,currentU,ta
         <span style={{color:'#6b7a99',fontSize:'12px',fontFamily:'JetBrains Mono,monospace',fontStyle:'italic'}}>U = 1 / {totalR.toFixed(3)}</span>
         <span style={{color:'#1d4ed8',fontWeight:700,fontSize:'18px'}}>=</span>
         <span style={{color:'#b45309',fontWeight:900,fontSize:'28px',fontFamily:'JetBrains Mono,monospace'}}>{currentU}</span>
-        <span style={{color:'#94a3b8',fontSize:'12px',fontWeight:700}}>W/㎡K</span>
+        <span style={{color:'#94a3b8',fontSize:'12px',fontWeight:700}}>W/m²K</span>
       </div>
       <div className="a4-footer">
         <span style={{fontSize:'8px',color:'#94a3b8',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase'}}>건축물 에너지절약설계기준 · 국토교통부고시 제2025-738호</span>
@@ -422,7 +422,7 @@ const MobileCard=({projectName,region,part,exposure,usage,sr,cl,totalR,currentU,
         <div style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:'12px',padding:'13px 10px',textAlign:'center'}}>
           <div style={{fontSize:'9px',fontWeight:700,color:'#5b84b1',letterSpacing:'.07em',marginBottom:'6px',textTransform:'uppercase'}}>법적 기준</div>
           <div style={{fontSize:'22px',fontWeight:900,color:'#c8ddf0',fontFamily:'JetBrains Mono,monospace',lineHeight:1}}>{targetU?targetU.toFixed(3):'—'}</div>
-          <div style={{fontSize:'8px',color:'#3d6080',marginTop:'5px',fontWeight:600}}>W/㎡K 이하</div>
+          <div style={{fontSize:'8px',color:'#3d6080',marginTop:'5px',fontWeight:600}}>W/m²K 이하</div>
         </div>
         <div style={{background:isPass?'rgba(16,185,129,.18)':'rgba(225,29,72,.18)',border:`1.5px solid ${isPass?'rgba(52,211,153,.4)':'rgba(251,113,133,.4)'}`,borderRadius:'12px',padding:'13px 10px',textAlign:'center'}}>
           <div style={{fontSize:'9px',fontWeight:700,color:isPass?'#34d399':'#fb7185',letterSpacing:'.07em',marginBottom:'6px',textTransform:'uppercase'}}>설계값 · 판정</div>
@@ -435,7 +435,7 @@ const MobileCard=({projectName,region,part,exposure,usage,sr,cl,totalR,currentU,
         <div style={{color:'#4a6d8c',fontSize:'10px',fontFamily:'JetBrains Mono,monospace',fontStyle:'italic',marginBottom:'4px'}}>U = 1 / {totalR.toFixed(3)}</div>
         <div>
           <span style={{color:'#f59e0b',fontSize:'26px',fontWeight:900,fontFamily:'JetBrains Mono,monospace'}}>{currentU}</span>
-          <span style={{color:'#4a6d8c',fontSize:'11px',marginLeft:'6px',fontWeight:600}}>W/㎡K</span>
+          <span style={{color:'#4a6d8c',fontSize:'11px',marginLeft:'6px',fontWeight:600}}>W/m²K</span>
         </div>
       </div>
       {/* ── 상세 테이블 ── */}
@@ -580,7 +580,7 @@ const FabModal=({onClose,onA4Print,onA4PNG,onMobilePNG})=>{
             </div>
             <div className="fml-sec" style={{color:'#0c4da2'}}>기호 설명</div>
             <div className="fml-card">
-              {[['U','열관류율','W/㎡K','낮을수록 단열 성능 우수'],['ΣR','총 열저항','m²K/W','모든 층 저항의 합계'],['R=t/λ','재료 열저항','m²K/W','두께(m)÷열전도율(λ)'],['t','재료 두께','m','입력값(mm)÷1000'],['λ','열전도율','W/mK','재료 고유값 (DB 참조)'],['Ro','실외 표면저항','m²K/W','부위·외기조건별 상수'],['Ri','실내 표면저항','m²K/W','부위·외기조건별 상수']].map(([s,n,u,d])=>(
+              {[['U','열관류율','W/m²K','낮을수록 단열 성능 우수'],['ΣR','총 열저항','m²K/W','모든 층 저항의 합계'],['R=t/λ','재료 열저항','m²K/W','두께(m)÷열전도율(λ)'],['t','재료 두께','m','입력값(mm)÷1000'],['λ','열전도율','W/mK','재료 고유값 (DB 참조)'],['Ro','실외 표면저항','m²K/W','부위·외기조건별 상수'],['Ri','실내 표면저항','m²K/W','부위·외기조건별 상수']].map(([s,n,u,d])=>(
                 <div key={s} style={{display:'grid',gridTemplateColumns:'80px 100px 70px 1fr',gap:'5px',padding:'5px 0',borderBottom:'1px solid #eef1f6',fontSize:'11px',alignItems:'center'}}>
                   <span style={{fontWeight:800,color:'#0c4da2',fontFamily:'JetBrains Mono,monospace'}}>{s}</span>
                   <span style={{fontWeight:700,color:'#1a2744'}}>{n}</span>
@@ -622,7 +622,7 @@ const FabModal=({onClose,onA4Print,onA4PNG,onMobilePNG})=>{
           <div className={`fml-panel${itab==='insul'?' on':''}`}>
             <div className="fml-sec" style={{color:'#0c4da2'}}>단열재 등급 분류 (λ 기준)</div>
             <div className="fml-g2">
-              {[{g:'가급',bg:'#eff6ff',bc:'#bfdbfe',tc:'#1d4ed8',r:'λ ≤ 0.034 W/mK',ex:['PF보드 1종 (0.022~)','XPS 2종B-1 (0.026)','PUR 2종A (0.023)','분무식PUR 1종A (0.022)']},{g:'나급',bg:'#f0fdf4',bc:'#a7f3d0',tc:'#059669',r:'0.035 ~ 0.040 W/mK',ex:['EPS 3종A-1 (0.029)','그라스울 48K (0.035)','폴리에스테르 1급 (0.034)','미네랄울 보온판2호 (0.036)']},{g:'다급',bg:'#fefce8',bc:'#fde047',tc:'#854d0e',r:'0.041 ~ 0.046 W/mK',ex:['EPS 1종A-2 (0.039)','미네랄울 보온대 (0.040)','폴리에스테르 2급 (0.040)']},{g:'라급',bg:'#fff1f2',bc:'#fecdd3',tc:'#be123c',r:'0.047 ~ 0.052 W/mK',ex:['EPS 1종B/C (0.043)','폴리에스테르 3급 (0.045)']}].map(({g,bg,bc,tc,r,ex})=>(
+              {[{g:'가급',bg:'#eff6ff',bc:'#bfdbfe',tc:'#1d4ed8',r:'λ ≤ 0.034 W/mK',ex:['PF보드 1종 (0.022~)','XPS 1·2종 (0.026~0.029)','EPS 3종A (0.029~0.031)','폴리에스테르 1급 (0.034)']},{g:'나급',bg:'#f0fdf4',bc:'#a7f3d0',tc:'#059669',r:'0.035 ~ 0.040 W/mK',ex:['그라스울 40K~48K (0.034~0.035)','미네랄울 보온판 (0.036~0.038)','EPS 1종A (0.033~0.039)','폴리에스테르 2급 (0.040)']},{g:'다급',bg:'#fefce8',bc:'#fde047',tc:'#854d0e',r:'0.041 ~ 0.046 W/mK',ex:['EPS 1종B/C (0.043)','비드법보호판 4호 (0.043)','폴리에스테르 3급 (0.045)']},{g:'라급',bg:'#fff1f2',bc:'#fecdd3',tc:'#be123c',r:'0.047 ~ 0.052 W/mK',ex:['그 외 열전도율 0.047 ~ 0.052 소재']}].map(({g,bg,bc,tc,r,ex})=>(
                 <div key={g} style={{background:bg,border:`1.5px solid ${bc}`,borderRadius:'10px',padding:'13px'}}>
                   <div style={{fontSize:'18px',fontWeight:900,color:tc,marginBottom:'4px'}}>{g}</div>
                   <div style={{fontSize:'10px',fontWeight:700,color:'#1a2744',marginBottom:'7px',fontFamily:'JetBrains Mono,monospace'}}>{r}</div>
@@ -916,7 +916,7 @@ const App=()=>{
                     </div>
                     <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'11px',paddingBottom:'9px',borderBottom:'2px solid #1d4ed8'}}><div style={{width:'3px',height:'16px',background:'#1d4ed8',borderRadius:'2px'}}></div><span style={{fontSize:'12px',fontWeight:900,color:'#1a2744',letterSpacing:'.08em',textTransform:'uppercase'}}>2. 단열조치 적합여부 최종 판정</span></div>
                     <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px',marginBottom:'20px'}}>
-                      <div style={{background:'#f0f6ff',border:'1.5px solid #bfdbfe',borderRadius:'10px',padding:'14px',textAlign:'center'}}><div style={{fontSize:'9px',color:'#6b7a99',fontWeight:700,marginBottom:'7px',textTransform:'uppercase',letterSpacing:'.08em'}}>법적 기준 (W/㎡K 이하)</div><div style={{fontSize:'24px',fontWeight:900,color:'#1a2744',fontFamily:'JetBrains Mono,monospace'}}>{targetU?targetU.toFixed(3):'—'}</div></div>
+                      <div style={{background:'#f0f6ff',border:'1.5px solid #bfdbfe',borderRadius:'10px',padding:'14px',textAlign:'center'}}><div style={{fontSize:'9px',color:'#6b7a99',fontWeight:700,marginBottom:'7px',textTransform:'uppercase',letterSpacing:'.08em'}}>법적 기준 (W/m²K 이하)</div><div style={{fontSize:'24px',fontWeight:900,color:'#1a2744',fontFamily:'JetBrains Mono,monospace'}}>{targetU?targetU.toFixed(3):'—'}</div></div>
                       <div style={{background:'#fefce8',border:'1.5px solid #fde047',borderRadius:'10px',padding:'14px',textAlign:'center'}}><div style={{fontSize:'9px',color:'#854d0e',fontWeight:700,marginBottom:'7px',textTransform:'uppercase',letterSpacing:'.08em'}}>설계 산출값 (U)</div><div style={{fontSize:'24px',fontWeight:900,color:'#854d0e',fontFamily:'JetBrains Mono,monospace'}}>{currentU}</div></div>
                       <div style={{background:isPass?'#f0fdf4':'#fff1f2',border:`1.5px solid ${isPass?'#86efac':'#fecdd3'}`,borderRadius:'10px',padding:'14px',textAlign:'center'}}><div style={{fontSize:'9px',color:isPass?'#065f46':'#881337',fontWeight:700,marginBottom:'7px',textTransform:'uppercase',letterSpacing:'.08em'}}>STATUS · 제6조</div><div style={{fontSize:'22px',fontWeight:900,color:isPass?'#059669':'#e11d48',fontFamily:'JetBrains Mono,monospace',letterSpacing:'.1em'}}>{isPass?'적  합':'부적합'}</div></div>
                     </div>
@@ -946,7 +946,7 @@ const App=()=>{
                       <span style={{color:'#6b7a99',fontSize:'12px',fontFamily:'JetBrains Mono,monospace',fontStyle:'italic'}}>U = 1 / {totalR.toFixed(3)}</span>
                       <span style={{color:'#1d4ed8',fontWeight:700,fontSize:'18px'}}>=</span>
                       <span style={{color:'#b45309',fontWeight:900,fontSize:'28px',fontFamily:'JetBrains Mono,monospace'}}>{currentU}</span>
-                      <span style={{color:'#94a3b8',fontSize:'12px',fontWeight:700}}>W/㎡K</span>
+                      <span style={{color:'#94a3b8',fontSize:'12px',fontWeight:700}}>W/m²K</span>
                     </div>
                     <div style={{borderTop:'1px solid #e2e8f0',paddingTop:'9px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                       <span style={{fontSize:'8px',color:'#94a3b8',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase'}}>건축물 에너지절약설계기준 · 국토교통부고시 제2025-738호</span>
@@ -999,7 +999,7 @@ const App=()=>{
                   <div style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:'12px',padding:'13px 10px',textAlign:'center'}}>
                     <div style={{fontSize:'9px',fontWeight:700,color:'#5b84b1',letterSpacing:'.07em',marginBottom:'6px',textTransform:'uppercase'}}>법적 기준</div>
                     <div style={{fontSize:'22px',fontWeight:900,color:'#c8ddf0',fontFamily:'JetBrains Mono,monospace',lineHeight:1}}>{targetU?targetU.toFixed(3):'—'}</div>
-                    <div style={{fontSize:'8px',color:'#3d6080',marginTop:'5px',fontWeight:600}}>W/㎡K 이하</div>
+                    <div style={{fontSize:'8px',color:'#3d6080',marginTop:'5px',fontWeight:600}}>W/m²K 이하</div>
                   </div>
                   <div style={{background:isPass?'rgba(16,185,129,.18)':'rgba(225,29,72,.18)',border:`1.5px solid ${isPass?'rgba(52,211,153,.4)':'rgba(251,113,133,.4)'}`,borderRadius:'12px',padding:'13px 10px',textAlign:'center'}}>
                     <div style={{fontSize:'9px',fontWeight:700,color:isPass?'#34d399':'#fb7185',letterSpacing:'.07em',marginBottom:'6px',textTransform:'uppercase'}}>설계값 · 판정</div>
@@ -1010,7 +1010,7 @@ const App=()=>{
                 {/* U formula */}
                 <div style={{background:'rgba(0,0,0,.25)',borderRadius:'12px',padding:'12px 14px',textAlign:'center',lineHeight:1.5}}>
                   <div style={{color:'#4a6d8c',fontSize:'10px',fontFamily:'JetBrains Mono,monospace',fontStyle:'italic',marginBottom:'4px'}}>U = 1 / {totalR.toFixed(3)}</div>
-                  <div><span style={{color:'#f59e0b',fontSize:'26px',fontWeight:900,fontFamily:'JetBrains Mono,monospace'}}>{currentU}</span><span style={{color:'#4a6d8c',fontSize:'11px',marginLeft:'6px',fontWeight:600}}>W/㎡K</span></div>
+                  <div><span style={{color:'#f59e0b',fontSize:'26px',fontWeight:900,fontFamily:'JetBrains Mono,monospace'}}>{currentU}</span><span style={{color:'#4a6d8c',fontSize:'11px',marginLeft:'6px',fontWeight:600}}>W/m²K</span></div>
                 </div>
                 {/* Table */}
                 <div style={{background:'rgba(255,255,255,.04)',borderRadius:'10px',padding:'10px 12px'}}>
@@ -1082,7 +1082,7 @@ const App=()=>{
                     <input className="finput" type="text" value={projectName} onChange={e=>setProjectName(e.target.value)}/>
                   </div>
                   <div style={{width:'120px',background:'#eff6ff',border:'1.5px solid #bfdbfe',borderRadius:'9px',padding:'7px 10px',textAlign:'center',flexShrink:0}}>
-                    <div style={{fontSize:'8px',fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'#1d4ed8',marginBottom:'3px'}}>법적기준 (W/㎡K)</div>
+                    <div style={{fontSize:'8px',fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'#1d4ed8',marginBottom:'3px'}}>법적기준 (W/m²K)</div>
                     <div style={{fontSize:'16px',fontWeight:900,color:'#1d4ed8',fontFamily:'JetBrains Mono,monospace'}}>{targetU?targetU.toFixed(3):'—'}</div>
                   </div>
                 </div>
@@ -1165,8 +1165,8 @@ const App=()=>{
               <div className="card-body" style={{display:'flex',flexDirection:'column',gap:'12px'}}>
                 {/* 3 verdict */}
                 <div className="v3">
-                  <div className="vc vc-n"><div style={{fontSize:'8px',fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'#6b7a99',marginBottom:'5px'}}>법적 기준</div><div style={{fontSize:'20px',fontWeight:900,color:'#1a2744',fontFamily:'JetBrains Mono,monospace'}}>{targetU?targetU.toFixed(3):'—'}</div><div style={{fontSize:'8px',color:'#94a3b8',marginTop:'3px',fontWeight:600}}>W/㎡K 이하</div></div>
-                  <div className="vc vc-a"><div style={{fontSize:'8px',fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'#854d0e',marginBottom:'5px'}}>설계값</div><div style={{fontSize:'20px',fontWeight:900,color:'#854d0e',fontFamily:'JetBrains Mono,monospace'}}>{currentU}</div><div style={{fontSize:'8px',color:'#b45309',marginTop:'3px',fontWeight:600,opacity:.8}}>W/㎡K</div></div>
+                  <div className="vc vc-n"><div style={{fontSize:'8px',fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'#6b7a99',marginBottom:'5px'}}>법적 기준</div><div style={{fontSize:'20px',fontWeight:900,color:'#1a2744',fontFamily:'JetBrains Mono,monospace'}}>{targetU?targetU.toFixed(3):'—'}</div><div style={{fontSize:'8px',color:'#94a3b8',marginTop:'3px',fontWeight:600}}>W/m²K 이하</div></div>
+                  <div className="vc vc-a"><div style={{fontSize:'8px',fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'#854d0e',marginBottom:'5px'}}>설계값</div><div style={{fontSize:'20px',fontWeight:900,color:'#854d0e',fontFamily:'JetBrains Mono,monospace'}}>{currentU}</div><div style={{fontSize:'8px',color:'#b45309',marginTop:'3px',fontWeight:600,opacity:.8}}>W/m²K</div></div>
                   <div className={`vc ${isPass?'vc-p':'vc-f'}`}><div style={{fontSize:'8px',fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:isPass?'#059669':'#e11d48',marginBottom:'5px'}}>판정</div><div style={{fontSize:'15px',fontWeight:900,color:isPass?'#059669':'#e11d48',letterSpacing:'.08em'}}>{isPass?'적 합':'부적합'}</div><div style={{fontSize:'8px',color:isPass?'#059669':'#e11d48',marginTop:'3px',fontWeight:600,opacity:.7}}>제6조 기준</div></div>
                 </div>
                 {/* 수식 */}
@@ -1176,7 +1176,7 @@ const App=()=>{
                     <span style={{color:'rgba(255,255,255,.4)',fontSize:'11px',fontFamily:'JetBrains Mono,monospace'}}>U = 1 / {totalR.toFixed(3)}</span>
                     <span style={{color:'#38bdf8',fontWeight:700,fontSize:'16px'}}>=</span>
                     <span style={{color:'#fbbf24',fontSize:'32px',fontWeight:900,fontFamily:'JetBrains Mono,monospace',lineHeight:1}}>{currentU}</span>
-                    <span style={{color:'rgba(255,255,255,.4)',fontSize:'10px',fontWeight:700}}>W/㎡K</span>
+                    <span style={{color:'rgba(255,255,255,.4)',fontSize:'10px',fontWeight:700}}>W/m²K</span>
                   </div>
                 </div>
               </div>

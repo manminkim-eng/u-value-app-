@@ -9,7 +9,7 @@
   "background_color": "#eff6ff",
   "theme_color": "#1d4ed8",
   "lang": "ko",
-  "categories": ["utilities", "productivity", "business"],
+  "categories": ["utilities", "productivity"],
   "icons": [
     { "src": "icons/icon-72.png",  "sizes": "72x72",   "type": "image/png", "purpose": "any maskable" },
     { "src": "icons/icon-96.png",  "sizes": "96x96",   "type": "image/png", "purpose": "any maskable" },

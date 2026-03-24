@@ -602,7 +602,7 @@ const MaterialTab=()=>{
 
 /* ══════════════════════ FAB MODAL ══════════════════════ */
 const FabModal=({onClose,onA4Print,onA4PNG,onMobileJPG})=>{
-  const [itab,setItab]=useState('formula');
+  const [itab,setItab]=useState('howto');
   return(
     <div className="fml-overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
       <div className="fml-modal">
@@ -612,12 +612,123 @@ const FabModal=({onClose,onA4Print,onA4PNG,onMobileJPG})=>{
             <button className="fml-close" onClick={onClose}>✕</button>
           </div>
           <div className="fml-itabs">
-            {[['formula','📐 계산식'],['surface','🏗️ 표면저항'],['insul','🧱 단열등급'],['region','🗺️ 지역 구분']].map(([k,l])=>(
+            {[['howto','🗺️ 이용방법'],['formula','📐 계산식'],['surface','🏗️ 표면저항'],['insul','🧱 단열등급'],['region','🗺️ 지역 구분']].map(([k,l])=>(
               <button key={k} className={`fml-itab${itab===k?' on':''}`} onClick={()=>setItab(k)}>{l}</button>
             ))}
           </div>
         </div>
         <div className="fml-bd">
+          {/* ── 이용방법 ── */}
+          <div className={`fml-panel${itab==='howto'?' on':''}`}>
+
+            {/* 상단 배너 */}
+            <div style={{background:'linear-gradient(135deg,#081e44,#0c4da2)',borderRadius:'13px',padding:'16px 18px',marginBottom:'16px'}}>
+              <div style={{fontSize:'13px',fontWeight:900,color:'#fbbf24',marginBottom:'5px',display:'flex',alignItems:'center',gap:'8px'}}>
+                <span style={{fontSize:'20px'}}>🌡️</span> 열관류율 종합 검토 시스템 이용방법
+              </div>
+              <div style={{fontSize:'10.5px',color:'rgba(255,255,255,.7)',lineHeight:1.65}}>국토교통부고시 제2025-738호 · 건축물 에너지절약설계기준<br/>아래 순서대로 입력하면 열관류율이 자동으로 산출됩니다.</div>
+            </div>
+
+            {/* STEP 1 */}
+            <div style={{display:'flex',gap:'11px',alignItems:'flex-start',background:'#f8fafc',border:'1.5px solid #e4e9f0',borderLeft:'4px solid #0c4da2',borderRadius:'10px',padding:'13px 14px',marginBottom:'9px'}}>
+              <div style={{minWidth:'30px',height:'30px',background:'linear-gradient(135deg,#0c4da2,#0a3270)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:900,color:'#fff',flexShrink:0,boxShadow:'0 2px 8px rgba(12,77,162,.35)'}}>1</div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:'12px',fontWeight:900,color:'#0c4da2',marginBottom:'5px'}}>🗺️ 지역 및 건물 조건 선택</div>
+                <div style={{fontSize:'10.5px',color:'#374151',lineHeight:1.85}}>
+                  ① <strong>지역 구분</strong>을 선택합니다 — 중부1 / 중부2 / 남부 / 제주 (국토부고시 별표1 기준).<br/>
+                  ② <strong>건물 용도</strong>(공동주택·비주거 등)와 <strong>검토 부위</strong>(외벽·지붕·바닥·창호 등)를 선택합니다.<br/>
+                  ③ 선택과 동시에 해당 부위의 <strong>법정 허용 U값 기준(W/m²K)</strong>이 자동으로 표시됩니다.
+                </div>
+              </div>
+            </div>
+
+            {/* STEP 2 */}
+            <div style={{display:'flex',gap:'11px',alignItems:'flex-start',background:'#fff7ed',border:'1.5px solid #fed7aa',borderLeft:'4px solid #f97316',borderRadius:'10px',padding:'13px 14px',marginBottom:'9px'}}>
+              <div style={{minWidth:'30px',height:'30px',background:'linear-gradient(135deg,#f97316,#ea580c)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:900,color:'#fff',flexShrink:0,boxShadow:'0 2px 8px rgba(249,115,22,.35)'}}>2</div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:'12px',fontWeight:900,color:'#c2410c',marginBottom:'5px'}}>🧱 단열 구조 레이어 입력</div>
+                <div style={{fontSize:'10.5px',color:'#374151',lineHeight:1.85}}>
+                  ① <strong>실외 표면저항(Ro)</strong>은 외기 직접(0.043) / 외기 간접(Ri와 동일) 중 선택합니다.<br/>
+                  ② <strong>+ 레이어 추가</strong> 버튼으로 구성 재료를 순서대로 입력합니다.<br/>
+                  ③ 재료별로 <strong>재료명 검색</strong>(DB 자동완성) → <strong>열전도율 λ(W/mK)</strong> → <strong>두께 t(mm)</strong>를 입력합니다.<br/>
+                  ④ '공기층' 포함 재료는 두께에 따라 <strong>R값이 자동 특수 처리</strong>됩니다(최대 0.086 m²K/W).
+                </div>
+              </div>
+            </div>
+
+            {/* STEP 3 */}
+            <div style={{display:'flex',gap:'11px',alignItems:'flex-start',background:'#f0fdf4',border:'1.5px solid #bbf7d0',borderLeft:'4px solid #16a34a',borderRadius:'10px',padding:'13px 14px',marginBottom:'9px'}}>
+              <div style={{minWidth:'30px',height:'30px',background:'linear-gradient(135deg,#16a34a,#15803d)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:900,color:'#fff',flexShrink:0,boxShadow:'0 2px 8px rgba(22,163,74,.35)'}}>3</div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:'12px',fontWeight:900,color:'#15803d',marginBottom:'5px'}}>📊 열관류율 산출 결과 확인</div>
+                <div style={{fontSize:'10.5px',color:'#374151',lineHeight:1.85}}>
+                  ① 레이어 입력 즉시 <strong>U = 1/ΣR</strong> 공식으로 열관류율이 실시간 자동 계산됩니다.<br/>
+                  ② 산출된 U값이 법정 기준 이하인지 <strong>적합(✅) / 부적합(❌)</strong> 판정이 즉시 표시됩니다.<br/>
+                  ③ 단열재 등급(가·나·다·라급)과 두께를 조정하며 <strong>최적 구성을 시뮬레이션</strong>할 수 있습니다.
+                </div>
+              </div>
+            </div>
+
+            {/* STEP 4 */}
+            <div style={{display:'flex',gap:'11px',alignItems:'flex-start',background:'#f5f3ff',border:'1.5px solid #ddd6fe',borderLeft:'4px solid #7c3aed',borderRadius:'10px',padding:'13px 14px',marginBottom:'9px'}}>
+              <div style={{minWidth:'30px',height:'30px',background:'linear-gradient(135deg,#7c3aed,#6d28d9)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:900,color:'#fff',flexShrink:0,boxShadow:'0 2px 8px rgba(124,58,237,.35)'}}>4</div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:'12px',fontWeight:900,color:'#6d28d9',marginBottom:'5px'}}>📋 다부위 종합 검토</div>
+                <div style={{fontSize:'10.5px',color:'#374151',lineHeight:1.85}}>
+                  ① <strong>외벽·지붕·바닥·창호</strong> 등 여러 부위를 각각 탭으로 전환하며 입력합니다.<br/>
+                  ② 모든 부위 입력 후 <strong>종합 판정표</strong>에서 전 부위 적합 여부를 한눈에 확인합니다.<br/>
+                  ③ 평균 열관류율(Um) 계산이 필요한 경우 면적 가중 평균 계산 기능을 활용합니다.
+                </div>
+              </div>
+            </div>
+
+            {/* STEP 5 */}
+            <div style={{display:'flex',gap:'11px',alignItems:'flex-start',background:'#eff6ff',border:'1.5px solid #bfdbfe',borderLeft:'4px solid #2563eb',borderRadius:'10px',padding:'13px 14px',marginBottom:'16px'}}>
+              <div style={{minWidth:'30px',height:'30px',background:'linear-gradient(135deg,#2563eb,#1d4ed8)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:900,color:'#fff',flexShrink:0,boxShadow:'0 2px 8px rgba(37,99,235,.35)'}}>5</div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:'12px',fontWeight:900,color:'#1d4ed8',marginBottom:'5px'}}>🖨️ 결과 출력 및 저장</div>
+                <div style={{fontSize:'10.5px',color:'#374151',lineHeight:1.85}}>
+                  ① 상단의 <strong>「A4 미리보기」 탭</strong>에서 보고서를 확인한 뒤 <strong>산출서 인쇄/PDF</strong>로 저장합니다.<br/>
+                  ② <strong>「모바일 미리보기」 탭</strong>에서 JPG 이미지로 저장하거나 공유할 수 있습니다.<br/>
+                  ③ <strong>「재료별 열전도율」 탭</strong>에서 DB에 없는 재료의 λ값을 조회할 수 있습니다.<br/>
+                  ④ PWA 설치: 브라우저 주소창 아이콘 또는 iOS Safari → 공유 → 홈 화면에 추가.
+                </div>
+              </div>
+            </div>
+
+            {/* 주요 기능 요약 */}
+            <div className="fml-sec" style={{color:'#0c4da2'}}>💡 주요 기능 안내</div>
+            <div className="fml-g2">
+              <div className="fml-card" style={{borderLeft:'3px solid #0c4da2'}}>
+                <div className="fml-card-ttl" style={{color:'#0c4da2'}}>📐 계산식 안내 버튼</div>
+                <div className="fml-note">오른쪽 하단 플로팅 버튼(FAB)을 클릭하면 이 창이 열립니다. 탭을 전환하여 열관류율 계산식·표면저항·단열등급·지역 구분을 확인하세요.</div>
+              </div>
+              <div className="fml-card" style={{borderLeft:'3px solid #f97316'}}>
+                <div className="fml-card-ttl" style={{color:'#f97316'}}>⚡ 실시간 자동 계산</div>
+                <div className="fml-note">레이어 추가·λ·두께 변경 즉시 U값이 실시간 갱신됩니다. 별도 계산 버튼 없이 입력값만 변경하면 됩니다.</div>
+              </div>
+              <div className="fml-card" style={{borderLeft:'3px solid #16a34a'}}>
+                <div className="fml-card-ttl" style={{color:'#16a34a'}}>🧱 재료 DB 검색</div>
+                <div className="fml-note">재료명 입력 시 내장 DB에서 자동완성됩니다. 「재료별 열전도율」 탭에서 전체 목록을 조회하거나 직접 λ값을 입력할 수 있습니다.</div>
+              </div>
+              <div className="fml-card" style={{borderLeft:'3px solid #7c3aed'}}>
+                <div className="fml-card-ttl" style={{color:'#7c3aed'}}>🌡️ 공기층 자동 처리</div>
+                <div className="fml-note">재료명에 '공기층'을 입력하면 두께에 따라 R = 0.086×(d/10) 공식이 자동 적용됩니다. d ≥ 10mm이면 최대 R = 0.086으로 고정됩니다.</div>
+              </div>
+            </div>
+
+            {/* 법적 근거 */}
+            <div className="fml-hi" style={{marginTop:'4px'}}>
+              <div className="fml-card-ttl" style={{color:'#0c4da2'}}>📌 주요 법적 근거</div>
+              <div className="fml-note" style={{fontSize:'10.5px',lineHeight:2.1}}>
+                <strong>국토교통부고시 제2025-738호</strong> — 건축물의 에너지절약설계기준 (별표1 지역 구분, 별표3 허용 U값)<br/>
+                <strong>KS L 9102 / KS M 3808</strong> — 단열재 열전도율 시험 기준<br/>
+                <strong>에너지절약설계기준 해설서(2025)</strong> — 표면 열전달저항 및 공기층 처리 기준<br/>
+                <strong>건축물 에너지 효율등급 인증 기준</strong> — 비주거 건물 평균 열관류율(Um) 산출
+              </div>
+            </div>
+
+          </div>
           {/* ── 계산식 ── */}
           <div className={`fml-panel${itab==='formula'?' on':''}`}>
             <div className="fml-card" style={{textAlign:'center',background:'linear-gradient(135deg,#eff6ff,#f0fdf4)',border:'1px solid #bfdbfe'}}>

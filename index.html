@@ -71,6 +71,101 @@ input[type="number"]{-moz-appearance:textfield;}
   50%{box-shadow:0 2px 20px rgba(249,115,22,.7);}
 }
 @media(max-width:520px){#pwa-install-btn .pwa-txt{display:none;}}
+/* ══ PWA 설치 버튼 강화 (열관류율 Edition) ══ */
+#pwa-install-btn{
+  display:none;align-items:center;gap:6px;
+  background:linear-gradient(135deg,#f97316,#1d4ed8) !important;
+  color:#fff !important;border:none;padding:9px 14px;border-radius:9px;
+  font-size:12px;font-weight:800;cursor:pointer;
+  font-family:inherit;white-space:nowrap;flex-shrink:0;
+  transition:all .2s;
+  box-shadow:0 2px 12px rgba(249,115,22,.45);
+  animation:heat-pwa-glow 2.5s ease-in-out infinite;
+}
+#pwa-install-btn.visible{display:flex !important;}
+#pwa-install-btn:hover{
+  background:linear-gradient(135deg,#ea580c,#1e40af) !important;
+  transform:translateY(-1px) !important;
+  box-shadow:0 4px 18px rgba(249,115,22,.65) !important;
+  animation:none !important;
+}
+@keyframes heat-pwa-glow{
+  0%,100%{box-shadow:0 2px 12px rgba(249,115,22,.45);}
+  50%{box-shadow:0 2px 22px rgba(249,115,22,.75),0 0 10px rgba(29,78,216,.25);}
+}
+
+/* ══ 배너 강화 ══ */
+#pwa-banner{
+  background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 60%,#1e40af 100%) !important;
+  border-top:2px solid rgba(191,219,254,.4) !important;
+  border-radius:20px 20px 0 0 !important;
+  box-shadow:0 -6px 32px rgba(29,78,216,.55) !important;
+  padding:14px 20px calc(14px + env(safe-area-inset-bottom,0px)) !important;
+  animation:heat-banner-up .35s cubic-bezier(.22,.61,.36,1) !important;
+}
+@keyframes heat-banner-up{from{transform:translateY(110%);opacity:0}to{transform:translateY(0);opacity:1}}
+.pwa-icon{
+  width:52px !important;height:52px !important;
+  border-radius:13px !important;
+  border:1.5px solid rgba(191,219,254,.4) !important;
+  box-shadow:0 2px 12px rgba(29,78,216,.35) !important;
+  overflow:hidden;flex-shrink:0;
+}
+.pwa-ok{
+  background:linear-gradient(135deg,#f97316,#ea580c) !important;
+  color:#fff !important;
+  padding:10px 18px !important;font-size:13px !important;font-weight:800 !important;
+  border-radius:10px !important;border:none;
+  box-shadow:0 2px 10px rgba(249,115,22,.4) !important;
+  cursor:pointer;font-family:inherit;white-space:nowrap;
+  transition:all .2s !important;
+}
+.pwa-ok:hover{transform:translateY(-1px) !important;}
+.pwa-no{
+  background:rgba(255,255,255,.12) !important;
+  color:#93c5fd !important;
+  border:1px solid rgba(191,219,254,.3) !important;
+  padding:10px 13px !important;border-radius:10px !important;
+  font-size:13px !important;font-weight:700 !important;
+  cursor:pointer;font-family:inherit;white-space:nowrap;
+  transition:all .15s !important;flex-shrink:0;
+}
+.pwa-no:hover{color:#eff6ff !important;}
+
+/* ══ iOS 안내 모달 ══ */
+#ios-modal-heat{
+  position:fixed;bottom:0;left:0;right:0;z-index:10000;
+  background:linear-gradient(135deg,#1e3a8a,#1d4ed8);
+  border-top:2px solid rgba(191,219,254,.5);
+  border-radius:20px 20px 0 0;
+  padding:22px 20px calc(18px + env(safe-area-inset-bottom,0px));
+  display:none;
+  box-shadow:0 -8px 40px rgba(29,78,216,.55);
+  animation:heat-banner-up .35s cubic-bezier(.22,.61,.36,1);
+}
+#ios-modal-heat.show{display:block;}
+.hm-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.hm-title{font-size:15px;font-weight:800;color:#fff;}
+.hm-cls{background:rgba(255,255,255,.12);border:none;color:#fff;
+  width:28px;height:28px;border-radius:50%;font-size:13px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;}
+.hm-step{display:flex;align-items:flex-start;gap:12px;
+  background:rgba(255,255,255,.07);border-radius:10px;padding:12px;margin-bottom:8px;}
+.hm-num{min-width:26px;height:26px;border-radius:50%;
+  background:rgba(249,115,22,.35);border:1px solid rgba(249,115,22,.6);
+  color:#fed7aa;font-size:11px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.hm-txt{font-size:13px;color:#bfdbfe;line-height:1.5;}
+.hm-txt strong{color:#fff;}
+.hm-foot{text-align:center;font-size:11px;color:#93c5fd;margin-top:12px;}
+
+@media(max-width:520px){
+  #pwa-install-btn .pwa-txt{display:none;}
+  #pwa-install-btn{padding:9px 11px;}
+  .pwa-icon{width:42px !important;height:42px !important;}
+}
+@media(max-width:360px){.pwa-desc{display:none;}}
+
 /* ── PWA 배너 ── */
 #pwa-banner{
   display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;
@@ -239,6 +334,9 @@ input[type="number"]{-moz-appearance:textfield;}
 .fml-tbl td:first-child{font-weight:700;color:#1a2744;text-align:left;padding-left:12px;}
 .fml-tbl td:last-child{font-weight:800;color:#1d4ed8;font-size:12px;text-align:right;}
 .exp-card{border:1px solid #e4e9f0;border-radius:12px;padding:15px;margin-bottom:10px;}
+
+/* ═══ MODAL CARD TITLE (fml-card-ttl) ═══ */
+.fml-card-ttl{font-size:11px;font-weight:800;color:#1a2744;margin-bottom:5px;letter-spacing:.02em;}
 
 /* ═══ A4 REPORT STYLES (used inside capture div) ═══ */
 .a4-rpt{font-family:'Pretendard','Apple SD Gothic Neo',sans-serif;width:794px;background:#fff;color:#1a1a1a;box-sizing:border-box;}
@@ -540,7 +638,8 @@ const MaterialTab=()=>{
     });
     return res;
   },[selCat,q,cat]);
-  useEffect(()=>{if(q){const o={};Object.keys(cat?.groups||{}).forEach(k=>{o[k]=true;});setOpenGrp(o);}else{setOpenGrp({});}},[(q?'q':'')]);
+  useEffect(()=>{if(q){const o={};Object.keys(cat?.groups||{}).forEach(k=>{o[k]=true;});setOpenGrp(o);}else{setOpenGrp({});}
+  },[q,selCat]);
   const toggleGrp=k=>setOpenGrp(p=>({...p,[k]:!p[k]}));
 
   return(
@@ -603,6 +702,11 @@ const MaterialTab=()=>{
 /* ══════════════════════ FAB MODAL ══════════════════════ */
 const FabModal=({onClose,onA4Print,onA4PNG,onMobileJPG})=>{
   const [itab,setItab]=useState('howto');
+  useEffect(()=>{
+    const onKey=e=>{if(e.key==='Escape')onClose();};
+    window.addEventListener('keydown',onKey);
+    return()=>window.removeEventListener('keydown',onKey);
+  },[onClose]);
   return(
     <div className="fml-overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
       <div className="fml-modal">
@@ -921,13 +1025,17 @@ const App=()=>{
     {id:4,cat:"D_미장재료계",group:"모르타르류",name:"시멘트몰탈",t:20,lambda:1.4}
   ]);
   const [installPrompt,setInstallPrompt]=useState(null);
-  const [showPWA,setShowPWA]=useState(false);
+
+  // React installPrompt를 vanilla pwaTriggerInstall에 동기화
+  useEffect(()=>{
+    window.__reactInstallPrompt=installPrompt;
+  },[installPrompt]);
 
   useEffect(()=>{const p=Object.keys(U_STD[region]||{});if(!p.includes(part))setPart(p[0]||'');},[region]);
   useEffect(()=>{const e=Object.keys((U_STD[region]||{})[part]||{});if(!e.includes(exposure))setExposure(e[0]||'');},[region,part]);
   useEffect(()=>{const u=Object.keys(((U_STD[region]||{})[part]||{})[exposure]||{});if(!u.includes(usage))setUsage(u[0]||'');},[region,part,exposure]);
   useEffect(()=>{
-    const h=e=>{e.preventDefault();setInstallPrompt(e);if(!window.matchMedia('(display-mode:standalone)').matches)setShowPWA(true);};
+    const h=e=>{e.preventDefault();setInstallPrompt(e);};
     window.addEventListener('beforeinstallprompt',h);return()=>window.removeEventListener('beforeinstallprompt',h);
   },[]);
 
@@ -947,7 +1055,7 @@ const App=()=>{
   }),[layers]);
   const totalR=useMemo(()=>(sr.ri||0)+(sr.ro||0)+cl.reduce((a,c)=>a+(c.r||0),0),[sr,cl]);
   const currentU=totalR>0?(Math.round((1/totalR)*1000)/1000).toFixed(3):'0.000';
-  const isPass=parseFloat(currentU)<=targetU;
+  const isPass=targetU>0&&parseFloat(currentU)<=targetU;
 
   const updateLayer=(id,field,val)=>{
     setLayers(prev=>prev.map(l=>{
@@ -973,8 +1081,10 @@ const App=()=>{
     setIsCapturing(true);
     setShowMobShare(false);
     const origStyle=el.getAttribute('style')||'';
+    const isMob=elId==='mob-hidden';
+    const captureBgColor=isMob?'#0d0d1a':'#ffffff';
     // S24 Ultra CSS 논리 해상도: 412×916px
-    el.style.cssText=`position:fixed;left:0px;top:0px;z-index:-9999;visibility:visible;width:412px;background:#0d0d1a;border-radius:0;overflow:visible;`;
+    el.style.cssText=`position:fixed;left:0px;top:0px;z-index:-9999;visibility:visible;width:${isMob?'412':'794'}px;background:${captureBgColor};border-radius:0;overflow:visible;`;
     try{
       await document.fonts.ready;
       await new Promise(r=>setTimeout(r,300));
@@ -985,7 +1095,7 @@ const App=()=>{
       // PNG→JPG: toJpeg 사용
       const url=await lib.toJpeg(el,{
         quality:0.95,
-        bgcolor:'#0d0d1a',
+        bgcolor:captureBgColor,
         width:w*sc,height:h*sc,
         style:{transform:`scale(${sc})`,transformOrigin:'top left',width:w+'px',height:h+'px',overflow:'hidden'}
       });
@@ -1036,10 +1146,34 @@ const App=()=>{
   const onMobileJPG=()=>captureJpg('mob-hidden','열관류율_모바일카드');
 
   useEffect(()=>{
-    const bp=()=>{const n=document.getElementById('a4-hidden');if(!n)return;n.dataset.o=n.getAttribute('style')||'';n.style.cssText='position:relative!important;left:0!important;top:0!important;z-index:9999!important;visibility:visible!important;';};
-    const ap=()=>{const n=document.getElementById('a4-hidden');if(!n||!n.dataset.o)return;n.setAttribute('style',n.dataset.o);delete n.dataset.o;};
-    window.addEventListener('beforeprint',bp);window.addEventListener('afterprint',ap);
-    return()=>{window.removeEventListener('beforeprint',bp);window.removeEventListener('afterprint',ap);};
+    const a4id='a4-hidden';
+    let mo=null;
+    const bp=()=>{
+      const n=document.getElementById(a4id);if(!n)return;
+      // MutationObserver로 React re-render에 의한 style 덮어쓰기 감지·복원
+      const printStyle='position:relative!important;left:0!important;top:0!important;z-index:9999!important;visibility:visible!important;';
+      n.dataset.o=n.getAttribute('style')||'';
+      n.setAttribute('style',printStyle);
+      mo=new MutationObserver(()=>{
+        if(n.getAttribute('style')!==printStyle)n.setAttribute('style',printStyle);
+      });
+      mo.observe(n,{attributes:true,attributeFilter:['style']});
+    };
+    const ap=()=>{
+      if(mo){mo.disconnect();mo=null;}
+      const n=document.getElementById(a4id);
+      if(!n)return;
+      const orig=n.dataset.o||'';
+      n.setAttribute('style',orig);
+      delete n.dataset.o;
+    };
+    window.addEventListener('beforeprint',bp);
+    window.addEventListener('afterprint',ap);
+    return()=>{
+      if(mo)mo.disconnect();
+      window.removeEventListener('beforeprint',bp);
+      window.removeEventListener('afterprint',ap);
+    };
   },[]);
 
   const calcProps={projectName,region,part,exposure,usage,sr,cl,totalR,currentU,targetU,isPass};
@@ -1048,7 +1182,7 @@ const App=()=>{
   const a4WrapRef=useRef(null);
   const [a4Scale,setA4Scale]=useState(0.55);
   useEffect(()=>{
-    const update=()=>{if(a4WrapRef.current){const w=a4WrapRef.current.clientWidth-48;setA4Scale(Math.min(1,Math.max(0.3,w/794)));}};
+    const update=()=>{if(a4WrapRef.current){const w=a4WrapRef.current.clientWidth-48;setA4Scale(Math.min(1,Math.max(0.22,w/794)));}};
     update();const ro=window.ResizeObserver?new ResizeObserver(update):null;
     if(ro&&a4WrapRef.current)ro.observe(a4WrapRef.current);
     window.addEventListener('resize',update);
@@ -1070,9 +1204,7 @@ const App=()=>{
     <header className="app-header no-print">
       <div className="header-inner">
         <div className="brand-logo">
-          <div className="brand-icon">
-            <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-          </div>
+          <div className="brand-icon" style={{background:"none",padding:0,overflow:"hidden",width:"42px",height:"42px",borderRadius:"10px",flexShrink:0,boxShadow:"0 2px 10px rgba(29,78,216,.38)"}}><img src="./icons/brand-icon.png" alt="열관류율 MANMIN" style={{width:"42px",height:"42px",objectFit:"cover",borderRadius:"10px",display:"block"}}/></div>
           <div className="brand-texts">
             <div className="brand-title">열관류율 종합 검토 시스템 [MANMIN-Ver{VER}]</div>
             <div className="brand-sub">건축물 에너지절약설계기준 · 국토교통부고시 제2025-738호 · 2026년 기준</div>
@@ -1521,16 +1653,7 @@ const App=()=>{
     <A4Report {...calcProps}/>
     <MobileCard {...calcProps}/>
 
-    {/* ═══ PWA BANNER ═══ */}
-    {showPWA&&(
-      <div className="no-print" style={{position:'fixed',bottom:'80px',left:'50%',transform:'translateX(-50%)',width:'min(380px,calc(100vw - 32px))',background:'linear-gradient(135deg,#1e3a8a,#1e1b4b)',border:'1px solid rgba(147,197,253,.2)',borderRadius:'16px',padding:'13px 15px',boxShadow:'0 20px 60px rgba(0,0,0,.25)',zIndex:60}}>
-        <div style={{display:'flex',alignItems:'center',gap:'11px'}}>
-          <div style={{flex:1}}><p style={{color:'#fff',fontSize:'12px',fontWeight:800,margin:0,lineHeight:1.4}}>홈 화면에 설치하시겠습니까?</p><p style={{color:'#93c5fd',fontSize:'10px',margin:'3px 0 0',fontWeight:600}}>오프라인에서도 사용 가능한 앱으로 설치됩니다</p></div>
-          <button onClick={()=>setShowPWA(false)} style={{color:'rgba(255,255,255,.5)',background:'transparent',border:'none',fontSize:'12px',fontWeight:700,cursor:'pointer',padding:'3px 7px',fontFamily:'inherit'}}>닫기</button>
-          <button onClick={async()=>{if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;setInstallPrompt(null);}setShowPWA(false);}} style={{background:'#fff',color:'#1d4ed8',fontSize:'11px',fontWeight:800,border:'none',padding:'6px 13px',borderRadius:'8px',cursor:'pointer',fontFamily:'inherit'}}>설치</button>
-        </div>
-      </div>
-    )}
+    {/* ═══ PWA 배너는 DOM(#pwa-banner)에서 단일 관리 ═══ */}
     </>
   );
 };
@@ -1538,12 +1661,43 @@ const App=()=>{
 const root=ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App/>);
 </script>
+<!-- ═══ iOS 홈화면 추가 안내 모달 ═══ -->
+<div id="ios-modal-heat">
+  <div class="hm-hdr">
+    <div class="hm-title">📱 홈 화면에 추가하기 (iOS)</div>
+    <button class="hm-cls" onclick="document.getElementById('ios-modal-heat').classList.remove('show')">✕</button>
+  </div>
+  <div class="hm-step"><div class="hm-num">1</div><div class="hm-txt">Safari 하단 <strong>공유 버튼</strong> (□↑) 을 탭하세요</div></div>
+  <div class="hm-step"><div class="hm-num">2</div><div class="hm-txt">스크롤해서 <strong>홈 화면에 추가</strong>를 탭하세요</div></div>
+  <div class="hm-step"><div class="hm-num">3</div><div class="hm-txt">오른쪽 상단 <strong>추가</strong>를 탭하면 완료!</div></div>
+  <div class="hm-foot">열관류율을 홈 화면에서 오프라인으로도 사용 가능합니다 ✓</div>
+</div>
+
 <script>
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('./sw.js')
-      .then(r=>console.log('[PWA] SW:',r.scope))
-      .catch(e=>console.warn('[PWA] 실패:',e));
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js', {scope:'./'})
+      .then(function(r){
+        console.log('[PWA] SW:', r.scope);
+        r.addEventListener('updatefound', function(){
+          var nw = r.installing; if(!nw) return;
+          nw.addEventListener('statechange', function(){
+            if(nw.state === 'installed' && navigator.serviceWorker.controller){
+              var b = document.createElement('div');
+              b.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:9999;background:#1d4ed8;color:#fff;padding:10px 20px;border-radius:12px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(29,78,216,.5);white-space:nowrap;font-family:inherit;';
+              b.innerHTML='<span>🔄 새 버전 준비됨</span>'
+                +'<button onclick="navigator.serviceWorker.ready.then(function(r){if(r.waiting)r.waiting.postMessage({type:\'SKIP_WAITING\'});});this.parentNode.remove();location.reload();" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:5px 12px;border-radius:7px;cursor:pointer;font-weight:800;font-family:inherit;">지금 적용</button>'
+                +'<button onclick="this.parentNode.remove()" style="background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:16px;padding:0 4px;">✕</button>';
+              document.body.appendChild(b);
+              setTimeout(function(){if(b.parentNode)b.remove();}, 8000);
+            }
+          });
+        });
+      })
+      .catch(function(e){ console.warn('[PWA] 실패:', e); });
+    navigator.serviceWorker.addEventListener('controllerchange', function(){
+      if(!window._pwaR){ window._pwaR=true; location.reload(); }
+    });
   });
 }
 </script>
@@ -1551,15 +1705,15 @@ if('serviceWorker' in navigator){
 <div id="pwa-banner">
   <div class="pwa-inner">
     <div class="pwa-icon">
-      <img src="./icons/icon-192x192.png" alt="열관류율 아이콘"/>
+      <img src="./icons/brand-icon.png" alt="열관류율 MANMIN" style="width:100%;height:100%;object-fit:cover;display:block;"/>
     </div>
     <div class="pwa-texts">
-      <div class="pwa-title">📲 열관류율 앱 설치</div>
-      <div class="pwa-desc">홈 화면에 추가하면 오프라인에서도 바로 사용 가능합니다</div>
+      <div class="pwa-title">📲 열관류율 앱으로 설치!</div>
+      <div class="pwa-desc">홈화면 추가 → 오프라인 열관류율 검토 가능 · 빠른 실행</div>
     </div>
     <div class="pwa-btns">
       <button class="pwa-ok" onclick="window.pwaTriggerInstall&&window.pwaTriggerInstall()">설치하기</button>
-      <button class="pwa-no" onclick="window.pwaDismiss&&window.pwaDismiss()">✕</button>
+      <button class="pwa-no" onclick="window.pwaDismiss&&window.pwaDismiss()">나중에</button>
     </div>
   </div>
 </div>
@@ -1568,13 +1722,16 @@ if('serviceWorker' in navigator){
 <script>
 (function(){
   var deferred = null;
+  var _isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var _isSA  = window.matchMedia('(display-mode:standalone)').matches || !!navigator.standalone;
 
+  /* ── 1. beforeinstallprompt (Android/PC) ── */
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
     deferred = e;
     var btn = document.getElementById('pwa-install-btn');
     if(btn) btn.classList.add('visible');
-    if(!sessionStorage.getItem('pwa-dismissed')){
+    if(!sessionStorage.getItem('pwa-dismissed') && !_isSA){
       setTimeout(function(){
         var b = document.getElementById('pwa-banner');
         if(b) b.classList.add('visible');
@@ -1582,43 +1739,73 @@ if('serviceWorker' in navigator){
     }
   });
 
+  /* ── 2. iOS: 헤더 버튼 표시 + 2초 후 안내 모달 ── */
+  document.addEventListener('DOMContentLoaded', function(){
+    if(_isIOS && !_isSA){
+      var btn = document.getElementById('pwa-install-btn');
+      if(btn) btn.classList.add('visible');
+      if(!sessionStorage.getItem('pwa-dismissed')){
+        setTimeout(function(){
+          var m = document.getElementById('ios-modal-heat');
+          if(m) m.classList.add('show');
+        }, 2000);
+      }
+    }
+    if(_isSA){
+      var btn = document.getElementById('pwa-install-btn');
+      if(btn) btn.style.display = 'none';
+    }
+  });
+
+  /* ── 3. 설치 실행 (전역) ── */
   window.pwaTriggerInstall = function(){
     var b = document.getElementById('pwa-banner');
     if(b) b.classList.remove('visible');
-    if(!deferred){
-      alert('이미 설치되어 있거나 자동 설치를 지원하지 않는 브라우저입니다.\n\n📱 iOS Safari: 공유(□↑) → "홈 화면에 추가"\n💻 Chrome/Edge: 주소창 우측 ⊕ 아이콘');
+    /* iOS → 안내 모달 */
+    if(_isIOS && !_isSA){
+      var m = document.getElementById('ios-modal-heat');
+      if(m) m.classList.add('show');
       return;
     }
-    deferred.prompt();
-    deferred.userChoice.then(function(r){
+    var reactPrompt = window.__reactInstallPrompt;
+    var prompt = reactPrompt || deferred;
+    if(!prompt){
+      if(_isSA){ alert('✅ 이미 앱으로 설치되어 있습니다.'); return; }
+      alert('📱 브라우저 메뉴 → 앱 설치 / 홈 화면에 추가');
+      return;
+    }
+    prompt.prompt();
+    prompt.userChoice.then(function(r){
       if(r.outcome === 'accepted'){
         var btn = document.getElementById('pwa-install-btn');
         if(btn) btn.classList.remove('visible');
       }
       deferred = null;
+      window.__reactInstallPrompt = null;
     });
   };
 
+  /* ── 4. 배너 닫기 ── */
   window.pwaDismiss = function(){
     var b = document.getElementById('pwa-banner');
-    if(b) b.classList.remove('visible');
+    if(b){
+      b.style.transition='transform .3s,opacity .25s';
+      b.style.transform='translateY(110%)';
+      b.style.opacity='0';
+      setTimeout(function(){b.classList.remove('visible');b.style='';}, 330);
+    }
     try{ sessionStorage.setItem('pwa-dismissed','1'); }catch(e){}
   };
 
+  /* ── 5. 설치 완료 ── */
   window.addEventListener('appinstalled', function(){
     var btn = document.getElementById('pwa-install-btn');
     var b   = document.getElementById('pwa-banner');
     if(btn) btn.classList.remove('visible');
     if(b)   b.classList.remove('visible');
     deferred = null;
+    window.__reactInstallPrompt = null;
   });
-
-  if(window.matchMedia('(display-mode:standalone)').matches || window.navigator.standalone===true){
-    document.addEventListener('DOMContentLoaded', function(){
-      var btn = document.getElementById('pwa-install-btn');
-      if(btn) btn.style.display = 'none';
-    });
-  }
 })();
 </script>
 

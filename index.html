@@ -21,97 +21,217 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin>
 /* ══════════════════════════════════════════════════════
-   sendToRTS(data)
-   열관류율 WAP → localStorage → RTS 부하계산서 전송
-   데이터 포맷: 성락교회 PDF 계산서 부위별 레이어 형식
+   sendToRTS(data)  ·  MANMIN Ver3.1 — 개선판
+   ─────────────────────────────────────────────────────
+   전송 흐름:
+     ① payload 생성 → localStorage 저장 (동일 origin: manminkim-eng.github.io)
+     ② 사용자 클릭 제스처 직후 window.open() → 팝업 차단 방지
+     ③ RTS 앱 로드 완료 시 postMessage({type:'RTS_READY'}) 수신
+     ④ 수신 확인 후 postMessage({type:'UVAL_PAYLOAD', ...}) 전송
+     ⑤ RTS 앱에서 결과 산출 후 postMessage({type:'RTS_RESULT'}) 역전송
+     ⑥ 역전송 수신 시 MANMIN_UVAL_LIST에 RTS 결과 merge 저장
+   ─────────────────────────────────────────────────────
+   NOTE: 두 앱 모두 manminkim-eng.github.io 동일 origin →
+         localStorage 공유 가능. postMessage는 타이밍 보장용.
 ══════════════════════════════════════════════════════ */
-function sendToRTS(data) {
-  const { projectName, designerName, region, part, exposure,
-          usage, sr, cl, totalR, currentU, targetU, isPass, layers } = data;
 
-  /* 재료 레이어 → 성락교회 PDF 포맷 (No/Code/Materials/THK/λ/R) */
-  const layerRows = cl.map((l, i) => {
-    const nameCleaned = (l.name || '').replace(/_/g,' ');
-    /* 재료 코드 추출: 카테고리 앞 알파벳 */
-    const catCode = (l.cat || '').replace(/[^A-Za-z]/g,'').substring(0,1).toUpperCase() || 'M';
-    return {
-      no:     i + 1,
-      code:   catCode + String(i + 1).padStart(2,'0'),
-      name:   nameCleaned,
-      thk:    l.t ?? 0,          /* mm */
-      lambda: l.lambda ?? 0,     /* W/mK */
-      R:      parseFloat((l.r ?? 0).toFixed(4)),
+(function () {
+  /* ── RTS 앱 URL (경로 끝 슬래시 통일) ── */
+  const RTS_ORIGIN = 'https://manminkim-eng.github.io';
+  const RTS_URL    = RTS_ORIGIN + '/Radiant-Time-Series-Method/';
+
+  /* ── postMessage 수신 리스너 (한 번만 등록) ── */
+  let _listenerReady = false;
+  function _ensureListener() {
+    if (_listenerReady) return;
+    _listenerReady = true;
+
+    window.addEventListener('message', function (e) {
+      /* 신뢰 origin 검증 */
+      if (e.origin !== RTS_ORIGIN) return;
+      const msg = e.data || {};
+
+      /* ③ RTS 앱 준비 완료 신호 → payload 전송 */
+      if (msg.type === 'RTS_READY' && e.source) {
+        const latest = _getLatest();
+        if (latest) {
+          e.source.postMessage({ type: 'UVAL_PAYLOAD', payload: latest }, RTS_ORIGIN);
+        }
+      }
+
+      /* ⑤ RTS 결과 역수신 → UVAL_LIST에 merge 저장 */
+      if (msg.type === 'RTS_RESULT' && msg.payload) {
+        _mergeRtsResult(msg.payload);
+      }
+    });
+  }
+
+  /* ── localStorage 헬퍼 ── */
+  function _getList()   { try { return JSON.parse(localStorage.getItem('MANMIN_UVAL_LIST')   || '[]'); } catch(_){ return []; } }
+  function _getLatest() { try { return JSON.parse(localStorage.getItem('MANMIN_UVAL_LATEST') || 'null'); } catch(_){ return null; } }
+
+  function _mergeRtsResult(rtsResult) {
+    /* rtsResult: { part, exposure, rtsLoad, rtsDetail, ts } */
+    const list = _getList();
+    const idx  = list.findIndex(d => d.part === rtsResult.part && d.exposure === rtsResult.exposure);
+    if (idx >= 0) {
+      list[idx] = Object.assign({}, list[idx], {
+        rtsLoad:   rtsResult.rtsLoad   || null,
+        rtsDetail: rtsResult.rtsDetail || null,
+        rtsSyncTs: rtsResult.ts        || new Date().toISOString(),
+      });
+      localStorage.setItem('MANMIN_UVAL_LIST', JSON.stringify(list));
+    }
+  }
+
+  /* ── 핵심 공개 함수 ── */
+  window.sendToRTS = function sendToRTS(data) {
+    const { projectName, designerName, region, part, exposure,
+            usage, sr, cl, totalR, currentU, targetU, isPass } = data;
+
+    /* 재료 레이어 → 성락교회 PDF 포맷 (No/Code/Materials/THK/λ/R) */
+    const layerRows = cl.map((l, i) => {
+      const nameCleaned = (l.name || '').replace(/_/g, ' ');
+      const catCode = (l.cat || '').replace(/[^A-Za-z]/g, '').substring(0, 1).toUpperCase() || 'M';
+      return {
+        no:     i + 1,
+        code:   catCode + String(i + 1).padStart(2, '0'),
+        name:   nameCleaned,
+        thk:    l.t      ?? 0,
+        lambda: l.lambda ?? 0,
+        R:      parseFloat((l.r ?? 0).toFixed(4)),
+      };
+    });
+
+    /* 표면저항 포함 전체 레이어 */
+    const isDirectExp = (exposure || '').includes('직접');
+    const isRoof      = (part || '').includes('지붕') || (part || '').includes('반자');
+    const roLabel     = isDirectExp
+      ? `외부저항-${isRoof ? '지붕' : '벽체'}(직접)`
+      : `외부저항-${isRoof ? '지붕' : '벽체'}(간접)`;
+    const riLabel     = `내부저항-${isRoof ? '지붕/바닥' : '벽체'}`;
+
+    const fullLayers = [
+      { no: '외', code: 'A03', name: roLabel, thk: '-', lambda: '-', R: parseFloat((sr.ro || 0.043).toFixed(4)) },
+      ...layerRows,
+      { no: '내', code: 'A01', name: riLabel, thk: '-', lambda: '-', R: parseFloat((sr.ri || 0.110).toFixed(4)) },
+    ];
+
+    /* 부위 타입 분류 */
+    let compType = 'wall';
+    if (isRoof) compType = 'roof';
+    else if ((part || '').includes('바닥')) compType = 'floor';
+    else if ((part || '').includes('창') || (part || '').includes('문')) compType = 'glass';
+
+    /* 부위 단축명 */
+    const partShort = (part || '')
+      .replace('거실의 외벽', '외벽')
+      .replace('최상층에 있는 거실의 반자 또는 지붕', '지붕')
+      .replace('최하층에 있는 거실의 바닥', '바닥')
+      .replace('외기에 직접 면하는 경우', '직접')
+      .replace('외기에 간접 면하는 경우', '간접');
+
+    const payload = {
+      ts:          new Date().toISOString(),
+      projectName, designerName, region, part, partShort, exposure, usage,
+      currentU:    parseFloat(currentU),
+      targetU:     targetU || 0,
+      isPass,
+      totalR:      parseFloat(totalR.toFixed(4)),
+      ro: sr.ro, ri: sr.ri,
+      compType,
+      layerRows,
+      fullLayers,
     };
-  });
 
-  /* 표면저항 포함 전체 레이어 (성락교회 PDF: A03/A01 코드) */
-  const isDirectExp = (exposure || '').includes('직접');
-  const isRoof      = (part || '').includes('지붕') || (part || '').includes('반자');
-  const roSuffix    = isRoof  ? '지붕' : '벽체';
-  const riSuffix    = isRoof  ? '지붕/바닥' : '벽체';
-  const roLabel     = isDirectExp ? `외부저항-${roSuffix}(직접)` : `외부저항-${roSuffix}(간접)`;
-  const riLabel     = `내부저항-${riSuffix}`;
+    /* ① localStorage 저장 (동일 origin 공유) */
+    try {
+      const list = _getList();
+      const si   = list.findIndex(d => d.part === part && d.exposure === exposure);
+      if (si >= 0) list[si] = payload; else list.push(payload);
+      localStorage.setItem('MANMIN_UVAL_LIST',   JSON.stringify(list));
+      localStorage.setItem('MANMIN_UVAL_LATEST', JSON.stringify(payload));
+    } catch (e) {
+      console.warn('[sendToRTS] localStorage 저장 실패:', e);
+    }
 
-  const fullLayers = [
-    { no:'외', code:'A03', name: roLabel, thk:'-', lambda:'-', R: parseFloat((sr.ro||0.043).toFixed(4)) },
-    ...layerRows,
-    { no:'내', code:'A01', name: riLabel, thk:'-', lambda:'-', R: parseFloat((sr.ri||0.110).toFixed(4)) },
-  ];
+    /* ③ postMessage 리스너 등록 (타이밍 보장용) */
+    _ensureListener();
 
-  /* 부위 타입 분류 (RTS 계산용) */
-  let compType = 'wall';
-  if (isRoof) compType = 'roof';
-  else if ((part||'').includes('바닥')) compType = 'floor';
-  else if ((part||'').includes('창') || (part||'').includes('문')) compType = 'glass';
-
-  /* 부위 단축명 */
-  const partShort = (part||'')
-    .replace('거실의 외벽','외벽')
-    .replace('최상층에 있는 거실의 반자 또는 지붕','지붕')
-    .replace('최하층에 있는 거실의 바닥','바닥')
-    .replace('외기에 직접 면하는 경우','직접')
-    .replace('외기에 간접 면하는 경우','간접');
-
-  const payload = {
-    ts:          new Date().toISOString(),
-    projectName, designerName, region, part, partShort, exposure, usage,
-    currentU:    parseFloat(currentU),
-    targetU:     targetU || 0,
-    isPass,
-    totalR:      parseFloat(totalR.toFixed(4)),
-    ro: sr.ro, ri: sr.ri,
-    compType,
-    layerRows,    /* 재료 레이어만 */
-    fullLayers,   /* 표면저항 포함 전체 */
+    /* ② 팝업 차단 방지: 사용자 클릭 직후 바로 open → 이후 postMessage로 데이터 전달 */
+    /* 인라인 confirm 제거 → 커스텀 토스트 배너로 교체 */
+    _showSendToast(partShort, currentU, isPass, targetU, layerRows.length, RTS_URL);
   };
 
-  try {
-    /* 누적 저장 (부위별로 쌓임) */
-    let list = [];
-    try { list = JSON.parse(localStorage.getItem('MANMIN_UVAL_LIST') || '[]'); } catch(_){}
-    const si = list.findIndex(d => d.part === part && d.exposure === exposure);
-    if (si >= 0) list[si] = payload; else list.push(payload);
-    localStorage.setItem('MANMIN_UVAL_LIST',   JSON.stringify(list));
-    localStorage.setItem('MANMIN_UVAL_LATEST', JSON.stringify(payload));
+  /* ── 커스텀 토스트 배너 (confirm 대체) ── */
+  function _showSendToast(partShort, currentU, isPass, targetU, layerCount, rtsUrl) {
+    /* 기존 토스트 제거 */
+    const old = document.getElementById('_rts-toast');
+    if (old) old.remove();
 
-    const passStr = isPass ? '✅ 적합' : '❌ 기준 초과';
-    if (confirm(
-      `📤 RTS 부하계산서로 전송합니다.\n\n` +
-      `부위: ${partShort}\n` +
-      `U = ${currentU} W/m²K  ${passStr}\n` +
-      `기준: ${targetU ? targetU.toFixed(3) : '—'} W/m²K\n` +
-      `재료 레이어: ${layerRows.length}개\n\n` +
-      `RTS 부하계산서를 새 탭으로 열겠습니까?`
-    )) {
-      window.open('https://manminkim-eng.github.io/Radiant-Time-Series-Method/', '_blank');
-    }
-  } catch(e) {
-    alert('전송 오류: ' + e.message);
-    window.open('https://manminkim-eng.github.io/Radiant-Time-Series-Method/', '_blank');
+    const passStr  = isPass ? '✅ 적합' : '❌ 기준 초과';
+    const stdStr   = targetU ? targetU.toFixed(3) : '—';
+    const toast    = document.createElement('div');
+    toast.id       = '_rts-toast';
+    toast.setAttribute('role', 'dialog');
+    toast.setAttribute('aria-modal', 'false');
+    toast.style.cssText = [
+      'position:fixed','bottom:86px','left:50%','transform:translateX(-50%)',
+      'z-index:9999','background:#0f172a','color:#e2e8f0',
+      'border:1.5px solid #1d4ed8','border-radius:14px',
+      'padding:16px 20px','box-shadow:0 8px 32px rgba(0,0,0,.55)',
+      'font-family:inherit','max-width:96vw','width:420px',
+      'display:flex','flex-direction:column','gap:10px',
+      'animation:_rts-in .22s cubic-bezier(.4,0,.2,1) both',
+    ].join(';');
+
+    toast.innerHTML = `
+<style>
+@keyframes _rts-in{from{opacity:0;transform:translateX(-50%) translateY(16px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+</style>
+<div style="display:flex;align-items:center;gap:10px">
+  <div style="background:linear-gradient(135deg,#1d4ed8,#7c3aed);width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📤</div>
+  <div style="flex:1;min-width:0">
+    <div style="font-size:12px;font-weight:900;color:#93c5fd;letter-spacing:.04em;margin-bottom:2px">RTS 부하계산서로 전송</div>
+    <div style="font-size:11px;color:#94a3b8">부위 <strong style="color:#e2e8f0">${partShort}</strong> · U = <strong style="color:#fbbf24;font-family:'JetBrains Mono',monospace">${currentU}</strong> W/m²K · ${passStr} · 기준 ${stdStr} · 레이어 ${layerCount}개</div>
+  </div>
+  <button id="_rts-toast-close" style="background:none;border:none;color:#475569;font-size:18px;cursor:pointer;padding:0;line-height:1;flex-shrink:0" aria-label="닫기">✕</button>
+</div>
+<div style="display:flex;gap:8px">
+  <a id="_rts-toast-open" href="${rtsUrl}" target="_blank" rel="noopener"
+     style="flex:1;background:linear-gradient(135deg,#065f46,#059669);color:#fff;text-decoration:none;border:none;border-radius:9px;padding:10px 14px;font-size:12px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;transition:all .15s;box-shadow:0 2px 10px rgba(5,150,105,.45)">
+    <svg width="13" height="13" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+    RTS 부하계산서 열기
+  </a>
+  <button id="_rts-toast-cancel" style="background:rgba(255,255,255,.07);color:#94a3b8;border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:10px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s">
+    나중에
+  </button>
+</div>`;
+
+    document.body.appendChild(toast);
+
+    /* 닫기 이벤트 */
+    const _close = () => {
+      toast.style.transition = 'opacity .18s,transform .18s';
+      toast.style.opacity    = '0';
+      toast.style.transform  = 'translateX(-50%) translateY(12px)';
+      setTimeout(() => toast.remove(), 200);
+    };
+
+    document.getElementById('_rts-toast-close').addEventListener('click', _close);
+    document.getElementById('_rts-toast-cancel').addEventListener('click', _close);
+
+    /* 링크 클릭 시 토스트 닫기 (팝업 열린 후 정리) */
+    document.getElementById('_rts-toast-open').addEventListener('click', function () {
+      setTimeout(_close, 300);
+    });
+
+    /* 10초 자동 닫기 */
+    setTimeout(_close, 10000);
   }
-}
-window.sendToRTS = sendToRTS;
 
+})();
+/* window.sendToRTS 는 위 IIFE 내부에서 등록됨 */
 </script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>

@@ -3,8 +3,7 @@
    열관류율 종합 검토 시스템 · 오프라인 지원
 ══════════════════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'manmin-uval-v3.1';
-const CACHE_ASSETS = [
+const CACHE_NAME = 'manmin-uval-v3.2';const CACHE_ASSETS = [
   './',
   './index.html',
   './manifest.json',

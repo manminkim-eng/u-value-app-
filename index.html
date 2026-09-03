@@ -4,9 +4,9 @@
    <script defer src="/manmin-blog-report/web/assets/manmin-analytics.js"></script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-<title>열관류율 종합 검토 시스템 [MANMIN-Ver3.1] | 만민 건축사 신사옥 신축공사 설계용역</title>
+<title>열관류율 종합 검토 시스템 · MANMIN Ver-5.0</title>
 <link rel="manifest" href="manifest.json"/>
-<meta name="theme-color" content="#1d4ed8"/>
+<meta name="theme-color" content="#15803d"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="열관류율"/>
@@ -16,10 +16,11 @@
 <link rel="icon" type="image/x-icon" href="./favicon.ico"/>
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png"/>
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png"/>
-<meta name="msapplication-TileColor" content="#1d4ed8"/>
+<meta name="msapplication-TileColor" content="#15803d"/>
 <meta name="msapplication-TileImage" content="icons/icon-144x144.png"/>
+<link rel="stylesheet" href="./assets/fonts/manmin-fonts.css"/><!-- v5.0 로컬 폴백 폰트 — CDN 차단·오프라인 대비 (§3-7) -->
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"/>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
 <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin>
 /* ══════════════════════════════════════════════════════
    sendToRTS(data)  ·  MANMIN Ver3.1 — 개선판
@@ -236,84 +237,78 @@
 </script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.7/babel.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script><!-- v5.0 JPG 엔진 (dom-to-image 제거) -->
 
 <style>
 /* ═══ RESET ═══ */
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f0f4f9;color:#1a2744;min-height:100vh;}
+body{font-family:'Pretendard','Apple SD Gothic Neo','Noto Sans KR Local','Malgun Gothic',sans-serif;background:#f0f4f9;color:#1a2744;min-height:100vh;}   /* v5.0 §3-7 로컬 폴백 */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 input[type="number"]{-moz-appearance:textfield;}
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:#f0f4f9;}
-::-webkit-scrollbar-thumb{background:#bfdbfe;border-radius:10px;}
+::-webkit-scrollbar-thumb{background:#bbf7d0;border-radius:10px;}
 .mono{font-family:'JetBrains Mono','Courier New',monospace!important;}
 
-/* ═══ HEADER — 참고파일 컨셉 ═══ */
-.app-header{background:#dbeafe;position:sticky;top:0;z-index:40;box-shadow:0 2px 16px rgba(147,197,253,.45);}
-.header-inner{max-width:1280px;margin:0 auto;padding:0 20px;height:62px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.brand-logo{display:flex;align-items:center;gap:12px;min-width:0;flex:1;}
-.brand-icon{width:40px;height:40px;background:#1d4ed8;border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(29,78,216,.38);flex-shrink:0;}
-.brand-icon svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+/* ═══ HEADER (v5.0 §3-1 · §18-1 — 탭이 <header> 안이라 래퍼 불필요 · sticky 금지) ═══ */
+.app-header{background:linear-gradient(135deg,#052e16 0%,#15803d 50%,#16a34a 100%);color:#fff;
+  box-shadow:0 2px 20px rgba(21,128,61,.35);position:relative;z-index:40;}
+.header-inner{max-width:1300px;margin:0 auto;padding:20px 24px 16px;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.brand-logo{display:flex;align-items:flex-start;min-width:0;}
 .brand-texts{min-width:0;}
-.brand-title{font-size:16px;font-weight:900;color:#1e3a8a;letter-spacing:-.02em;line-height:1.25;white-space:nowrap;}
-.brand-sub{font-size:10px;color:#3b82f6;margin-top:2px;white-space:nowrap;font-weight:600;}
-.hdr-btns{display:flex;gap:8px;flex-shrink:0;}
-.btn-print{background:#e63312;color:#fff;border:none;padding:9px 16px;border-radius:9px;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;transition:all .15s;box-shadow:0 2px 10px rgba(230,51,18,.35);white-space:nowrap;}
-.btn-print:hover{background:#c62a0c;}
-.btn-print:active{transform:scale(.97);}
-.btn-print svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-.btn-mobpng{background:#1d4ed8;color:#fff;border:none;padding:9px 14px;border-radius:9px;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;transition:all .15s;box-shadow:0 2px 10px rgba(29,78,216,.3);white-space:nowrap;}
-.btn-mobpng:hover{background:#1e40af;}
-.btn-mobpng:active{transform:scale(.97);}
+.hdr-eyebrow{font-size:11px;font-weight:600;opacity:.7;color:#fff;letter-spacing:.15em;line-height:16px;
+  text-transform:uppercase;margin-bottom:6px;}
+.hdr-h1{font-size:26px;font-weight:900;color:#fff;letter-spacing:.04em;line-height:1.2;margin:0;}
+.hdr-sub{font-size:11px;margin-top:8px;color:#fff;opacity:.85;letter-spacing:.02em;line-height:17px;}
+.hdr-manmin{font-family:'Orbitron',sans-serif!important;font-weight:900;font-size:12px;
+  color:#86efac;letter-spacing:.08em;text-shadow:0 0 8px rgba(134,239,172,.6);
+  white-space:nowrap;display:inline-block;line-height:17px;vertical-align:top;}
+.hdr-right-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:6px;
+  padding-bottom:2px;flex-shrink:0;}
+.hdr-right{text-align:right;opacity:.75;color:#fff;font-size:11px;line-height:16px;}   /* 4줄 13/11/11/10 = 70px ≤ 78.2 */
+.hdr-right strong{font-size:13px;font-weight:700;line-height:19px;}
+.hdr-right em{font-size:10px;color:#86efac;font-style:normal;display:block;margin-top:4px;line-height:15px;}
+@media(max-width:768px){ .hdr-right{display:none;} .hdr-right-wrap{gap:0;} }
+@media(max-width:640px){
+  .hdr-h1{font-size:18px;}
+  .header-inner{padding:20px 14px 16px;row-gap:0;}
+  .hdr-right-wrap{padding-bottom:0;}
+  .tab-bar-inner{padding:4px 14px 0;}
+}
 
-/* ── PWA 설치 버튼 ── */
-#pwa-install-btn{
-  display:none;align-items:center;gap:6px;
-  background:linear-gradient(135deg,#f97316,#ea580c);
-  color:#fff;border:none;padding:8px 13px;border-radius:9px;
-  font-size:12px;font-weight:800;cursor:pointer;
-  font-family:inherit;white-space:nowrap;flex-shrink:0;
-  transition:all .15s;
-  animation:pwa-pulse 2.2s ease-in-out infinite;
-}
-#pwa-install-btn.visible{display:flex;}
-#pwa-install-btn:hover{background:linear-gradient(135deg,#ea580c,#c2410c);transform:translateY(-1px);}
-@keyframes pwa-pulse{
-  0%,100%{box-shadow:0 2px 10px rgba(249,115,22,.4);}
-  50%{box-shadow:0 2px 20px rgba(249,115,22,.7);}
-}
-@media(max-width:520px){#pwa-install-btn .pwa-txt{display:none;}}
-/* ══ PWA 설치 버튼 강화 (열관류율 Edition) ══ */
-#pwa-install-btn{
-  display:none;align-items:center;gap:6px;
-  background:linear-gradient(135deg,#f97316,#1d4ed8) !important;
-  color:#fff !important;border:none;padding:9px 14px;border-radius:9px;
-  font-size:12px;font-weight:800;cursor:pointer;
-  font-family:inherit;white-space:nowrap;flex-shrink:0;
-  transition:all .2s;
-  box-shadow:0 2px 12px rgba(249,115,22,.45);
-  animation:heat-pwa-glow 2.5s ease-in-out infinite;
-}
-#pwa-install-btn.visible{display:flex !important;}
-#pwa-install-btn:hover{
-  background:linear-gradient(135deg,#ea580c,#1e40af) !important;
-  transform:translateY(-1px) !important;
-  box-shadow:0 4px 18px rgba(249,115,22,.65) !important;
-  animation:none !important;
-}
-@keyframes heat-pwa-glow{
-  0%,100%{box-shadow:0 2px 12px rgba(249,115,22,.45);}
-  50%{box-shadow:0 2px 22px rgba(249,115,22,.75),0 0 10px rgba(29,78,216,.25);}
-}
+/* ═══ TAB BAR (v5.0 §3-2 · §18-1) ═══ */
+.tab-bar{background:transparent;overflow-x:auto;scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-bar-inner{max-width:1300px;margin:0 auto;padding:4px 24px 0;display:flex;}
+.tb{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.75);font-family:inherit;
+  padding:11px 16px;font-size:13px;font-weight:700;letter-spacing:.02em;line-height:19px;
+  border-bottom:3px solid transparent;   /* 11+19+11+3 = 44px */
+  transition:all .15s;display:flex;align-items:center;gap:5px;
+  white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+.tb svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.tb:hover{color:#fff;background:rgba(255,255,255,.09);}
+.tb.active{color:#fff;background:#15803d;border-bottom-color:#86efac;}
+.tab-panel{display:none;width:100%;}
+.tab-panel.active{display:block;}
+/* v5.0-HDR — 요약 스트립 (헤더 3층) */
+.sum-bar-wrap{background:#0f172a;padding:10px 0;}
+.sum-bar{max-width:1300px;margin:0 auto;padding:0 24px;display:flex;flex-wrap:wrap;gap:14px;}
+.sum-item{font-size:12px;color:#94a3b8;line-height:18px;}
+.sum-item b{font-family:'JetBrains Mono','Noto Sans KR',monospace;font-weight:700;color:#86efac;}
+.sum-item b.ng{color:#fca5a5;}
+@media(max-width:640px){.sum-bar{padding:0 14px;}.sum-item{font-size:11px;}}
+/* RTS 전송 버튼 — 헤더에서 본문(연계 탭·결과 카드)으로 이설 (MIN 2026-09-03) */
+.btn-rts{background:linear-gradient(135deg,#065f46,#059669);color:#fff;border:none;padding:9px 16px;border-radius:9px;font-size:12px;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;font-family:inherit;box-shadow:0 2px 10px rgba(5,150,105,.45);transition:all .15s;}
+.btn-rts:hover{box-shadow:0 4px 16px rgba(5,150,105,.7);transform:translateY(-1px);}
 
 /* ══ 배너 강화 ══ */
 #pwa-banner{
-  background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 60%,#1e40af 100%) !important;
+  background:linear-gradient(135deg,#14532d 0%,#15803d 60%,#166534 100%) !important;
   border-top:2px solid rgba(191,219,254,.4) !important;
   border-radius:20px 20px 0 0 !important;
-  box-shadow:0 -6px 32px rgba(29,78,216,.55) !important;
+  box-shadow:0 -6px 32px rgba(21,128,61,.55) !important;
   padding:14px 20px calc(14px + env(safe-area-inset-bottom,0px)) !important;
   animation:heat-banner-up .35s cubic-bezier(.22,.61,.36,1) !important;
 }
@@ -322,7 +317,7 @@ input[type="number"]{-moz-appearance:textfield;}
   width:52px !important;height:52px !important;
   border-radius:13px !important;
   border:1.5px solid rgba(191,219,254,.4) !important;
-  box-shadow:0 2px 12px rgba(29,78,216,.35) !important;
+  box-shadow:0 2px 12px rgba(21,128,61,.35) !important;
   overflow:hidden;flex-shrink:0;
 }
 .pwa-ok{
@@ -337,24 +332,24 @@ input[type="number"]{-moz-appearance:textfield;}
 .pwa-ok:hover{transform:translateY(-1px) !important;}
 .pwa-no{
   background:rgba(255,255,255,.12) !important;
-  color:#93c5fd !important;
+  color:#86efac !important;
   border:1px solid rgba(191,219,254,.3) !important;
   padding:10px 13px !important;border-radius:10px !important;
   font-size:13px !important;font-weight:700 !important;
   cursor:pointer;font-family:inherit;white-space:nowrap;
   transition:all .15s !important;flex-shrink:0;
 }
-.pwa-no:hover{color:#eff6ff !important;}
+.pwa-no:hover{color:#f0fdf4 !important;}
 
 /* ══ iOS 안내 모달 ══ */
 #ios-modal-heat{
   position:fixed;bottom:0;left:0;right:0;z-index:10000;
-  background:linear-gradient(135deg,#1e3a8a,#1d4ed8);
+  background:linear-gradient(135deg,#14532d,#15803d);
   border-top:2px solid rgba(191,219,254,.5);
   border-radius:20px 20px 0 0;
   padding:22px 20px calc(18px + env(safe-area-inset-bottom,0px));
   display:none;
-  box-shadow:0 -8px 40px rgba(29,78,216,.55);
+  box-shadow:0 -8px 40px rgba(21,128,61,.55);
   animation:heat-banner-up .35s cubic-bezier(.22,.61,.36,1);
 }
 #ios-modal-heat.show{display:block;}
@@ -369,50 +364,38 @@ input[type="number"]{-moz-appearance:textfield;}
   background:rgba(249,115,22,.35);border:1px solid rgba(249,115,22,.6);
   color:#fed7aa;font-size:11px;font-weight:800;
   display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.hm-txt{font-size:13px;color:#bfdbfe;line-height:1.5;}
+.hm-txt{font-size:13px;color:#bbf7d0;line-height:1.5;}
 .hm-txt strong{color:#fff;}
-.hm-foot{text-align:center;font-size:11px;color:#93c5fd;margin-top:12px;}
+.hm-foot{text-align:center;font-size:11px;color:#86efac;margin-top:12px;}
 
-@media(max-width:520px){
-  #pwa-install-btn .pwa-txt{display:none;}
-  #pwa-install-btn{padding:9px 11px;}
+@media(max-width:480px){
   .pwa-icon{width:42px !important;height:42px !important;}
 }
-@media(max-width:360px){.pwa-desc{display:none;}}
+@media(max-width:420px){.pwa-desc{display:none;}}
 
 /* ── PWA 배너 ── */
 #pwa-banner{
   display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;
-  background:linear-gradient(135deg,#1e3a8a,#1d4ed8);
-  border-top:1px solid rgba(147,197,253,.3);
+  background:linear-gradient(135deg,#14532d,#15803d);
+  border-top:1px solid rgba(134,239,172,.3);
   padding:14px 20px;border-radius:16px 16px 0 0;
-  box-shadow:0 -6px 28px rgba(29,78,216,.45);
+  box-shadow:0 -6px 28px rgba(21,128,61,.45);
   animation:banner-up .35s cubic-bezier(.16,1,.3,1);
 }
 #pwa-banner.visible{display:block;}
 @keyframes banner-up{from{transform:translateY(100%);}to{transform:translateY(0);}}
 .pwa-inner{max-width:540px;margin:0 auto;display:flex;align-items:center;gap:12px;}
-.pwa-icon{width:50px;height:50px;border-radius:12px;overflow:hidden;flex-shrink:0;border:1.5px solid rgba(147,197,253,.4);}
+.pwa-icon{width:50px;height:50px;border-radius:12px;overflow:hidden;flex-shrink:0;border:1.5px solid rgba(134,239,172,.4);}
 .pwa-icon img{width:100%;height:100%;object-fit:cover;}
 .pwa-texts{flex:1;min-width:0;}
-.pwa-title{font-size:.9rem;font-weight:900;color:#eff6ff;margin-bottom:2px;}
-.pwa-desc{font-size:.72rem;color:#93c5fd;line-height:1.5;}
+.pwa-title{font-size:.9rem;font-weight:900;color:#f0fdf4;margin-bottom:2px;}
+.pwa-desc{font-size:.72rem;color:#86efac;line-height:1.5;}
 .pwa-btns{display:flex;gap:7px;flex-shrink:0;}
 .pwa-ok{background:#f97316;color:#fff;border:none;padding:9px 16px;border-radius:7px;font-size:.8rem;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s;}
 .pwa-ok:hover{background:#ea580c;}
-.pwa-no{background:rgba(255,255,255,.1);color:#93c5fd;border:1px solid rgba(147,197,253,.3);padding:9px 11px;border-radius:7px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;}
-.pwa-no:hover{color:#eff6ff;}
-@media(max-width:460px){.pwa-desc{display:none;}}
-
-/* ═══ TAB BAR — 참고파일 스타일 ═══ */
-.tab-bar{background:#bfdbfe;border-top:1px solid rgba(147,197,253,.35);overflow-x:auto;scrollbar-width:none;}
-.tab-bar::-webkit-scrollbar{display:none;}
-.tab-bar-inner{max-width:1280px;margin:0 auto;padding:0 8px;display:flex;}
-.tab-btn{background:none;border:none;cursor:pointer;color:#1e40af;font-family:inherit;padding:11px 16px;font-size:12px;font-weight:700;position:relative;transition:color .15s,background .15s;display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;letter-spacing:.02em;}
-.tab-btn:hover{color:#1e3a8a;background:rgba(30,58,138,.07);}
-.tab-btn.active{color:#1e3a8a;}
-.tab-btn.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:#f97316;border-radius:2px 2px 0 0;}
-.tab-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.pwa-no{background:rgba(255,255,255,.1);color:#86efac;border:1px solid rgba(134,239,172,.3);padding:9px 11px;border-radius:7px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;}
+.pwa-no:hover{color:#f0fdf4;}
+@media(max-width:480px){.pwa-desc{display:none;}}
 
 /* ═══ MAIN ═══ */
 .main-wrap{max-width:1280px;margin:0 auto;padding:18px 16px 90px;}
@@ -423,10 +406,10 @@ input[type="number"]{-moz-appearance:textfield;}
 /* ═══ CARD ═══ */
 .card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 1px 4px rgba(15,23,42,.06);overflow:hidden;}
 .card-head{display:flex;align-items:center;gap:9px;padding:14px 16px 13px;border-bottom:1px solid #eef1f6;}
-.card-icon{width:28px;height:28px;border-radius:7px;background:#eff6ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.card-icon svg{width:13px;height:13px;stroke:#1d4ed8;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.card-icon{width:28px;height:28px;border-radius:7px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.card-icon svg{width:13px;height:13px;stroke:#15803d;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .card-title{font-size:12px;font-weight:800;color:#1a2744;letter-spacing:.04em;}
-.card-badge{margin-left:auto;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;white-space:nowrap;}
+.card-badge{margin-left:auto;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;white-space:nowrap;}
 .card-badge-em{margin-left:auto;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:#ecfdf5;color:#059669;border:1px solid #a7f3d0;white-space:nowrap;}
 .card-badge-fail{margin-left:auto;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:#fff1f2;color:#e11d48;border:1px solid #fecdd3;white-space:nowrap;}
 .card-body{padding:14px 16px;}
@@ -434,13 +417,13 @@ input[type="number"]{-moz-appearance:textfield;}
 /* ═══ FIELDS ═══ */
 .flbl{font-size:10px;font-weight:700;color:#6b7a99;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px;}
 .finput{width:100%;padding:8px 11px;background:#f8fafd;border:1.5px solid #dde3ed;border-radius:8px;color:#1a2744;font-size:12px;font-weight:600;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s;}
-.finput:focus{border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.1);background:#fff;}
+.finput:focus{border-color:#15803d;box-shadow:0 0 0 3px rgba(21,128,61,.1);background:#fff;}
 .fselect{width:100%;padding:8px 28px 8px 10px;background:#f8fafd;border:1.5px solid #dde3ed;border-radius:8px;color:#1a2744;font-size:11px;font-weight:700;font-family:inherit;outline:none;cursor:pointer;transition:border-color .15s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231d4ed8' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
-.fselect:focus{border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.1);background-color:#fff;}
+.fselect:focus{border-color:#15803d;box-shadow:0 0 0 3px rgba(21,128,61,.1);background-color:#fff;}
 
 /* ═══ LAYER CARD ═══ */
-.layer-card{background:#f8fafd;border:1.5px solid #e2e8f0;border-left:3px solid #1d4ed8;border-radius:10px;padding:12px;position:relative;transition:all .15s;}
-.layer-card:hover{border-left-color:#0284c7;box-shadow:0 2px 8px rgba(29,78,216,.1);}
+.layer-card{background:#f8fafd;border:1.5px solid #e2e8f0;border-left:3px solid #15803d;border-radius:10px;padding:12px;position:relative;transition:all .15s;}
+.layer-card:hover{border-left-color:#0284c7;box-shadow:0 2px 8px rgba(21,128,61,.1);}
 
 /* ═══ VERDICT CARDS ═══ */
 .v3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
@@ -452,21 +435,21 @@ input[type="number"]{-moz-appearance:textfield;}
 
 /* ═══ RESULT TABLE ═══ */
 .rtbl{width:100%;border-collapse:collapse;}
-.rtbl th{background:#eff6ff;color:#1e40af;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:8px 10px;border-bottom:2px solid #bfdbfe;border-top:1px solid #e2e8f0;}
+.rtbl th{background:#f0fdf4;color:#166534;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:8px 10px;border-bottom:2px solid #bbf7d0;border-top:1px solid #e2e8f0;}
 .rtbl td{padding:8px 10px;border-bottom:1px solid #e2e8f0;font-size:12px;vertical-align:middle!important;line-height:1!important;}
-.rtbl tfoot td{background:#eff6ff;border-top:2px solid #93c5fd;font-weight:800;}
+.rtbl tfoot td{background:#f0fdf4;border-top:2px solid #86efac;font-weight:800;}
 
 /* ═══ FORMULA BOX ═══ */
-.fml-box-lg{background:linear-gradient(135deg,#1e3a8a,#1d4ed8);border-radius:12px;padding:16px 22px;text-align:center;}
+.fml-box-lg{background:linear-gradient(135deg,#14532d,#15803d);border-radius:12px;padding:16px 22px;text-align:center;}
 
 /* ═══ THICKNESS BADGES ═══ */
 .t-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
 .t-badge{background:#fff;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 4px;text-align:center;}
 
 /* ═══ INFO CARD ═══ */
-.info-strip{background:#eff6ff;border:1px solid #bfdbfe;border-radius:9px;padding:10px 13px;margin-bottom:14px;display:flex;align-items:flex-start;gap:8px;}
-.info-strip svg{width:13px;height:13px;stroke:#1d4ed8;fill:none;stroke-width:2;flex-shrink:0;margin-top:2px;}
-.info-strip p{font-size:10.5px;color:#1e40af;font-weight:600;line-height:1.7;}
+.info-strip{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:9px;padding:10px 13px;margin-bottom:14px;display:flex;align-items:flex-start;gap:8px;}
+.info-strip svg{width:13px;height:13px;stroke:#15803d;fill:none;stroke-width:2;flex-shrink:0;margin-top:2px;}
+.info-strip p{font-size:10.5px;color:#166534;font-weight:600;line-height:1.7;}
 
 /* ═══ BTN-ADD ═══ */
 .btn-add{background:#ecfdf5;color:#059669;border:1px solid #a7f3d0;border-radius:7px;padding:5px 11px;font-size:10px;font-weight:800;cursor:pointer;transition:all .15s;font-family:inherit;}
@@ -475,35 +458,41 @@ input[type="number"]{-moz-appearance:textfield;}
 /* ═══ FULL-WIDTH PANEL (A4/mobile/material) ═══ */
 .full-panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 1px 4px rgba(15,23,42,.06);}
 
-/* ═══ A4 PREVIEW ═══ */
-.a4-preview-wrap{background:#e2e8f0;border-radius:0 0 14px 14px;padding:24px;display:flex;justify-content:center;overflow-x:auto;min-height:400px;}
-.a4-preview-inner{background:#fff;box-shadow:0 6px 40px rgba(0,0,0,.18);border:1px solid #c8d0dc;border-radius:2px;}
-
-/* ═══ MOBILE PREVIEW ═══ */
-.mob-preview-wrap{background:#e2e8f0;border-radius:0 0 14px 14px;padding:28px;display:flex;justify-content:center;align-items:flex-start;overflow-x:auto;min-height:400px;}
-
 /* ═══ MATERIAL TAB ═══ */
 .mat-wrap{padding:16px;}
 .mat-cat-bar{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
 .mat-cat-btn{padding:6px 13px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid #dde3ed;color:#6b7a99;transition:all .15s;background:#fff;font-family:inherit;}
-.mat-cat-btn.active{background:#1d4ed8;color:#fff;border-color:#1d4ed8;}
-.mat-cat-btn:hover:not(.active){border-color:#1d4ed8;color:#1d4ed8;background:#eff6ff;}
+.mat-cat-btn.active{background:#15803d;color:#fff;border-color:#15803d;}
+.mat-cat-btn:hover:not(.active){border-color:#15803d;color:#15803d;background:#f0fdf4;}
 .mat-group-hd{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#f8fafd;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;margin-bottom:4px;transition:background .15s;font-family:inherit;width:100%;}
-.mat-group-hd:hover{background:#eff6ff;}
+.mat-group-hd:hover{background:#f0fdf4;}
 .mat-tbl{width:100%;border-collapse:collapse;font-size:11px;}
-.mat-tbl th{background:#1d4ed8;color:#fff;padding:7px 10px;text-align:left;font-weight:700;font-size:10px;border-bottom:1px solid rgba(255,255,255,.1);}
+.mat-tbl th{background:#15803d;color:#fff;padding:7px 10px;text-align:left;font-weight:700;font-size:10px;border-bottom:1px solid rgba(255,255,255,.1);}
 .mat-tbl td{padding:7px 10px;border-bottom:1px solid #eef1f6;color:#374151;}
 .mat-tbl tr:last-child td{border-bottom:none;}
 .mat-tbl tr:nth-child(even) td{background:#f8fafd;}
-.ga-pill{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:800;}
+.ga-pill{background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:800;}
 .gb-pill{background:#f0fdf4;border:1px solid #a7f3d0;color:#059669;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:800;}
 .gc-pill{background:#fefce8;border:1px solid #fde047;color:#854d0e;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:800;}
 .gd-pill{background:#fff1f2;border:1px solid #fecdd3;color:#be123c;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:800;}
 
-/* ═══ FAB ═══ */
-.fab-pill{position:fixed;bottom:22px;right:18px;z-index:50;background:linear-gradient(135deg,#0c4da2,#1d4ed8);color:#fff;border:none;border-radius:16px;padding:11px 18px;cursor:pointer;box-shadow:0 4px 22px rgba(12,77,162,.55);display:flex;align-items:center;gap:7px;font-size:13px;font-weight:800;font-family:inherit;line-height:1.3;transition:transform .15s,box-shadow .15s;white-space:nowrap;}
-.fab-pill:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(12,77,162,.72);}
-.fab-pill:active{transform:translateY(0) scale(.97);}
+/* ═══ FAB (v5.0 §18-11 — 3줄 72×72.7 · 초기화 위 · 계산식 아래 · 건축 토큰) ═══ */
+#fab-group{position:fixed;bottom:18px;right:18px;z-index:1200;display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+.help-fab{position:relative;z-index:auto;
+  background:linear-gradient(135deg,#052e16 0%,#15803d 55%,#16a34a 100%);
+  border:1px solid rgba(134,239,172,.3);
+  color:#fff;border-radius:16px;padding:11px 8px;width:72px;min-width:72px;cursor:pointer;font-family:inherit;
+  box-shadow:0 4px 20px rgba(21,128,61,.65);
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  line-height:1.3;transition:transform .15s,box-shadow .15s;
+  animation:fabIn .55s cubic-bezier(.34,1.56,.64,1) forwards;}
+@keyframes fabIn{from{opacity:0;transform:scale(.3) rotate(-20deg);}to{opacity:1;transform:scale(1) rotate(0);}}
+.help-fab:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(21,128,61,.65);}
+.help-fab:active{transform:translateY(0);}
+.help-fab .fab-icon{font-size:20px;line-height:1;}
+.help-fab .fab-lbl{font-size:10px;font-weight:800;letter-spacing:.04em;color:#fff;}
+.help-fab .fab-sub{font-size:9px;opacity:.8;}
+@media(max-width:540px){ #fab-group{bottom:16px;right:12px;} .help-fab{padding:10px 8px;} }
 
 /* ═══ MODAL ═══ */
 .fml-overlay{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;animation:fmlFadeIn .2s ease-out;}
@@ -511,7 +500,7 @@ input[type="number"]{-moz-appearance:textfield;}
 @keyframes fmlFadeIn{from{opacity:0}to{opacity:1}}
 .fml-modal{background:#fff;border-radius:20px;width:100%;max-width:820px;max-height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.35);animation:fmlUp .26s cubic-bezier(.34,1.5,.64,1);}
 @keyframes fmlUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
-.fml-hd{background:linear-gradient(135deg,#081e44,#0c4da2,#1565c0);color:#fff;padding:18px 20px 0;flex-shrink:0;}
+.fml-hd{background:linear-gradient(135deg,#052e16,#15803d,#16a34a);color:#fff;padding:18px 20px 0;flex-shrink:0;}
 .fml-hd-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:10px;}
 .fml-hd-title{font-size:17px;font-weight:900;letter-spacing:-.01em;}
 .fml-hd-sub{font-size:10px;color:rgba(255,255,255,.6);margin-top:3px;font-weight:600;}
@@ -524,87 +513,163 @@ input[type="number"]{-moz-appearance:textfield;}
 .fml-itab.on{color:#fff;border-bottom-color:#f97316;}
 .fml-bd{overflow-y:auto;padding:20px;flex:1;}
 .fml-bd::-webkit-scrollbar{width:4px;}
-.fml-bd::-webkit-scrollbar-thumb{background:#bfdbfe;border-radius:3px;}
+.fml-bd::-webkit-scrollbar-thumb{background:#bbf7d0;border-radius:3px;}
 .fml-panel{display:none;}
 .fml-panel.on{display:block;}
 
 /* modal content */
-.fml-sec{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin:16px 0 8px;display:flex;align-items:center;gap:7px;border-left:3px solid #1d4ed8;padding-left:9px;color:#1a2744;}
+.fml-sec{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin:16px 0 8px;display:flex;align-items:center;gap:7px;border-left:3px solid #15803d;padding-left:9px;color:#1a2744;}
 .fml-sec:first-child{margin-top:0;}
 .fml-card{background:#f8fafc;border:1px solid #e4e9f0;border-radius:10px;padding:12px 13px;margin-bottom:8px;}
-.fml-eq{display:block;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#1d4ed8;background:#eff6ff;border-radius:8px;padding:10px 13px;margin:6px 0;word-break:break-all;line-height:1.75;}
+.fml-eq{display:block;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#15803d;background:#f0fdf4;border-radius:8px;padding:10px 13px;margin:6px 0;word-break:break-all;line-height:1.75;}
 .fml-eq.amber{background:#fff7ed;color:#b45309;}
 .fml-eq.em{background:#f0fdf4;color:#059669;}
 .fml-note{font-size:10px;color:#64748b;margin-top:5px;line-height:1.8;}
-.fml-hi{border:1.5px solid #bfdbfe;background:#eff6ff;border-radius:10px;padding:12px 13px;margin-bottom:8px;font-size:11px;line-height:1.8;color:#1e3a8a;}
+.fml-hi{border:1.5px solid #bbf7d0;background:#f0fdf4;border-radius:10px;padding:12px 13px;margin-bottom:8px;font-size:11px;line-height:1.8;color:#14532d;}
 .fml-hi.amber{border-color:#fde68a;background:#fefce8;color:#854d0e;}
 .fml-hi.em{border-color:#a7f3d0;background:#f0fdf4;color:#065f46;}
 .fml-g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;}
 .fml-tbl{width:100%;border-collapse:collapse;font-size:11px;border-radius:8px;overflow:hidden;}
-.fml-tbl th{background:#0c4da2;color:#fff;padding:7px 10px;text-align:center;font-weight:700;font-size:10px;}
+.fml-tbl th{background:#15803d;color:#fff;padding:7px 10px;text-align:center;font-weight:700;font-size:10px;}
 .fml-tbl td{padding:7px 10px;border-bottom:1px solid #e4e9f0;}
 .fml-tbl tr:last-child td{border-bottom:none;}
 .fml-tbl tr:nth-child(even) td{background:#f8fafc;}
 .fml-tbl td:first-child{font-weight:700;color:#1a2744;text-align:left;padding-left:12px;}
-.fml-tbl td:last-child{font-weight:800;color:#1d4ed8;font-size:12px;text-align:right;}
+.fml-tbl td:last-child{font-weight:800;color:#15803d;font-size:12px;text-align:right;}
 .exp-card{border:1px solid #e4e9f0;border-radius:12px;padding:15px;margin-bottom:10px;}
 
 /* ═══ MODAL CARD TITLE (fml-card-ttl) ═══ */
 .fml-card-ttl{font-size:11px;font-weight:800;color:#1a2744;margin-bottom:5px;letter-spacing:.02em;}
 
-/* ═══ A4 REPORT STYLES (used inside capture div) ═══ */
-.a4-rpt{font-family:'Pretendard','Apple SD Gothic Neo',sans-serif;width:794px;background:#fff;color:#1a1a1a;box-sizing:border-box;}
-.a4-top{background:linear-gradient(90deg,#0c4da2,#1d4ed8);padding:24px 42px 20px;}
-.a4-bar{height:5px;background:#f97316;border-radius:2px;margin-bottom:14px;}
-.a4-body{padding:26px 42px 32px;}
-.a4-sec-hd{display:flex;align-items:center;gap:8px;margin-bottom:11px;padding-bottom:9px;border-bottom:2px solid #1d4ed8;}
-.a4-sec-bar{width:3px;height:15px;background:#1d4ed8;border-radius:2px;}
-.a4-sec-label{font-size:11px;font-weight:900;color:#1a2744;letter-spacing:.1em;text-transform:uppercase;}
-.a4-cond-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px;}
-.a4-cond-cell{background:#f8fafd;border:1px solid #e2e8f0;border-radius:8px;padding:11px 8px;text-align:center;}
-.a4-cond-lbl{font-size:8px;color:#94a3b8;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;}
-.a4-cond-val{font-size:11px;color:#1a2744;font-weight:800;}
-.a4-verdict-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;}
-.a4-vtbl{width:100%;border-collapse:collapse;font-size:11px;font-family:'JetBrains Mono',monospace;margin-bottom:18px;}
-.a4-vtbl th{background:#1e293b;color:#fff;padding:8px 7px;font-size:10px;font-weight:700;letter-spacing:.07em;}
-.a4-vtbl td{padding:8px 7px;border-bottom:1px solid #e2e8f0;}
-.a4-vtbl tfoot td{background:#eff6ff;border-top:2px solid #1d4ed8;font-weight:900;}
-.a4-u-bar{background:#1e293b;border-radius:12px;padding:14px 22px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
-.a4-footer{border-top:1px solid #e2e8f0;padding-top:9px;display:flex;justify-content:space-between;align-items:center;}
-
-/* ═══ PRINT ═══ */
-@page{size:A4 portrait;margin:0mm;}
-@media print{
-  *,*::before,*::after{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
-  .no-print{display:none!important;}
-  html,body{margin:0!important;padding:0!important;width:210mm!important;height:297mm!important;background:#fff!important;overflow:hidden!important;}
-  #a4-hidden{position:relative!important;left:0!important;top:0!important;display:block!important;visibility:visible!important;margin:0!important;background:#fff!important;box-shadow:none!important;border:none!important;}
-  #root>*:not(#a4-hidden){display:none!important;}
+/* ═══ A4 미리보기 (v5.0 §3-3 · §3-4 · §3-4-1 · §17-2) — 화면 = 인쇄 = JPG 동일 DOM ═══ */
+.a4-export-bar{background:#fff;border:1px solid #bbf7d0;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.bar-lbl{font-size:11px;font-weight:700;color:#166534;}
+.btn-export,.mm-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px 16px;border-radius:9px;font-size:12px;font-weight:800;cursor:pointer;
+  border:none;font-family:inherit;white-space:nowrap;line-height:1.2;min-height:38px;
+  transition:background .15s,box-shadow .15s,transform .1s;}
+.mm-btn-print{background:#15803d;color:#fff;}
+.mm-btn-print:hover{background:#166534;}
+.mm-btn-jpg{background:#7e22ce;color:#fff;}
+.mm-btn-jpg:hover{background:#6b21a8;}
+@media(max-width:480px){ .a4-export-bar{flex-direction:column;align-items:stretch;}
+  .a4-export-bar .btn-export,.a4-export-bar .mm-btn{width:100%;} }
+.a4-wrap{background:#64748b;padding:20px 20px 32px;min-height:300px;display:flex;justify-content:center;align-items:flex-start;border-radius:10px;overflow:hidden;}
+@media(max-width:640px){.a4-wrap{padding:8px 8px 24px;}}
+.a4-scale-wrap{display:block;transform-origin:top center;flex-shrink:0;}
+/* ⛔ .a4-page 는 언제나 794px 고정(§17-2). 화면 여백 = @page 여백 (53/45/83/53px) → 내용 696×986px */
+.a4-page{background:#fff;width:794px;min-height:1122px;margin:0;padding:53px 45px 83px 53px;box-shadow:0 8px 40px rgba(0,0,0,.28);font-size:11px;color:#111827;display:block;position:relative;line-height:1.5;
+  font-family:'Noto Sans KR Local','Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;}
+.a4-page .mono,.a4-page code{font-family:'JetBrains Mono','Noto Sans KR Local',monospace;}
+.a4-page table td,.a4-page table th{line-height:1.45!important;vertical-align:middle!important;}
+.a4-tit{font-size:22px;font-weight:900;color:#052e16;text-align:center;border-bottom:2.5px solid #15803d;padding-bottom:9px;margin-bottom:12px;letter-spacing:-.02em;}
+.a4-head2{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:12px;}
+.a4-head2 .a4-proj{font-size:12px;font-weight:800;color:#111827;}
+.a4-head2 .a4-meta{font-size:9px;color:#64748b;text-align:right;line-height:1.6;font-weight:600;}
+.a4-sub{font-size:13px;font-weight:800;color:#15803d;margin-bottom:4px;margin-top:9px;padding-left:7px;border-left:3px solid #15803d;text-align:left;}
+.a4-tbl,.a4-meta-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:7px;}
+.a4-tbl th,.a4-meta-table th{background:#dcfce7;padding:5px 6px;text-align:center;font-weight:700;font-size:11px;color:#14532d;border:1px solid #bbf7d0;}
+.a4-tbl td,.a4-meta-table td{padding:5px 7px;text-align:left;border:1px solid #e2e8f0;font-weight:600;color:#111827;vertical-align:top;}
+.a4-tbl td.c{text-align:center;} .a4-tbl td.r{text-align:right;font-family:'JetBrains Mono','Noto Sans KR Local',monospace;}
+.a4-meta-table td.k{background:#f0fdf4;font-weight:800;color:#14532d;width:110px;white-space:nowrap;}
+.a4-tbl tfoot td{background:#dcfce7!important;font-weight:900;}
+.a4-verdict{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;margin-bottom:8px;border:1.5px solid;}
+.a4-verdict.pass{background:#f0fdf4;border-color:#86efac;color:#15803d;}
+.a4-verdict.fail{background:#fef2f2;border-color:#fca5a5;color:#b91c1c;}
+.a4-verdict .v-main{font-size:16px;font-weight:900;letter-spacing:-.01em;}
+.a4-verdict .v-sub{font-size:10px;font-weight:600;opacity:.85;}
+.a4-ubar{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:7px;}
+.a4-ubar .u-eq{font-family:'JetBrains Mono',monospace;font-size:12px;color:#64748b;font-style:italic;}
+.a4-ubar .u-val{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:900;color:#15803d;}
+.a4-ubar .u-val.ng{color:#b91c1c;}
+.a4-tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:800;white-space:nowrap;}
+.a4-tag.pass{background:#dcfce7;color:#15803d;} .a4-tag.fail{background:#fee2e2;color:#b91c1c;} .a4-tag.info{background:#dcfce7;color:#14532d;}
+.a4-notice{font-size:10.5px;line-height:1.65;color:#374151;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 10px;margin-bottom:7px;}
+.a4-notice strong{color:#15803d;}
+.a4-footer{border-top:1px solid #e2e8f0;padding-top:8px;font-size:9px;color:#9ca3af;
+  margin-top:16px;line-height:1.6;font-weight:600;display:table;width:100%;table-layout:fixed;}
+.a4-footer>span{display:table-cell;width:33.33%;vertical-align:top;}
+.a4-footer>span:nth-child(2){text-align:center;}
+.a4-footer>span:nth-child(3){text-align:right;}
+/* JPG 저장 시트 (§3-5 · §3-5-3) */
+#mm-save-ov{display:none;position:fixed;inset:0;z-index:9999;background:rgba(12,26,46,.82);
+  align-items:center;justify-content:center;padding:18px;}
+#mm-save-ov.show{display:flex;}
+.mm-sheet{background:#fff;border:1px solid #bbf7d0;border-radius:14px;width:100%;max-width:720px;
+  max-height:88vh;display:flex;flex-direction:column;box-shadow:0 24px 70px rgba(0,0,0,.45);color:#111827;}
+.mm-sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 18px;border-bottom:1px solid #e2e8f0;}
+.mm-sheet-title{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:900;
+  letter-spacing:.12em;color:#15803d;text-transform:uppercase;}
+.mm-sheet-note{font-size:11px;color:#64748b;margin-top:4px;}
+.mm-sheet-body{padding:16px 18px;overflow-y:auto;display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+.mm-shot{background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:9px;display:flex;flex-direction:column;gap:8px;}
+.mm-shot img{width:100%;height:auto;border-radius:4px;background:#fff;display:block;border:1px solid #e2e8f0;}
+.mm-shot-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:7px 10px;
+  border-radius:7px;border:1px solid #c4b5fd;background:none;color:#7e22ce;
+  font-family:inherit;font-size:11.5px;font-weight:700;cursor:pointer;transition:background .15s;}
+.mm-shot-btn:hover{background:#f5f3ff;}
+.mm-sheet-foot{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding:13px 18px;border-top:1px solid #e2e8f0;}
+.mm-btn-close{background:#e2e8f0;color:#334155;}
+.mm-sheet-head > div:first-child{flex:1 1 auto;min-width:0;}
+.mm-sheet-head .btn-export{flex:0 0 auto;}
+@media(max-width:480px){
+  .mm-sheet-body{grid-template-columns:1fr;padding:12px;}
+  .mm-sheet-body.multi{grid-template-columns:repeat(2,1fr);}
+  .mm-sheet-foot{justify-content:stretch;} .mm-sheet-foot .btn-export{flex:1;}
+  .mm-sheet-head{padding:12px 14px;gap:8px;}
+  .mm-sheet-title{font-size:10px;}
+  .mm-sheet-note{font-size:10px;line-height:1.45;}
+  .mm-sheet-head .btn-export{padding:6px 9px!important;min-height:28px!important;font-size:10.5px!important;align-self:flex-start;}
+  .mm-shot{padding:7px;} .mm-shot-btn{padding:6px;font-size:11px;}
+  .mm-shot img{max-height:46vh;object-fit:contain;}
 }
+/* #dev-stamp 없음 — 인쇄 PDF 하단 각인은 전 종 적용하지 않는다 (지시서 §20-1) */
 
-/* ═══ RESPONSIVE ═══ */
-@media(min-width:769px){
-  .mob-only{display:none!important;}
-}
+/* ═══ RESPONSIVE (v5.0 §3-9 — 768 · 640 · 480 + 기능쿼리) ═══ */
 @media(max-width:768px){
   .two-col{grid-template-columns:1fr;}
   .desk-only{display:none!important;}
-  .brand-title{font-size:13px;}
-  .brand-sub{display:none;}
-  .btn-mobpng span{display:none;}
-  .btn-print span.txt{display:none;}
-  .tab-btn{padding:10px 11px;font-size:11px;}
   .main-wrap{padding:12px 10px 90px;}
   .fml-overlay{padding:0;align-items:flex-end;}
   .fml-modal{border-radius:20px 20px 0 0;max-height:92vh;}
   .fml-g2{grid-template-columns:1fr;}
   .v3{grid-template-columns:1fr 1fr 1fr;}
 }
+@media(min-width:769px){ .mob-only{display:none!important;} }
 @media(max-width:480px){
   .v3{grid-template-columns:1fr 1fr;}
-  .hdr-btns .btn-mobpng{display:none;}
 }
+@media screen and (max-width:768px){ .finput,.fselect{font-size:16px;} }   /* iOS 자동확대 방지 (§3-11) */
+@media(hover:none) and (pointer:coarse){ .finput,.fselect{min-height:40px;} .tb{min-height:44px;} .mm-btn,.btn-export,.btn-rts{min-height:38px;} }
 table td,table th{vertical-align:middle!important;line-height:1!important;}
+
+/* ═══ PRINT (v5.0 §3-3 · §16-13 · §16-15 · §17-3 · §20-1 각인 없음) ═══ */
+@media print{
+  *,*::before,*::after{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  html,body{background:#fff!important;margin:0;padding:0;}
+  .app-header,.sum-bar-wrap,.tab-panel:not(#tab-print),.two-col,.a4-export-bar,#tab-print .card-head,
+  .fml-overlay,#fab-group,#pwa-banner,#mm-save-ov,#rts-toast,.no-print{display:none!important;}
+  #tab-print{display:block!important;}
+  /* ⛔ 컨테이너 패딩·장식이 남으면 A4 가 밀린다(§16-15) */
+  #root{display:block!important;}
+  .main-wrap{padding:0!important;margin:0!important;max-width:none!important;width:auto!important;}
+  #tab-print .full-panel{border:none!important;box-shadow:none!important;border-radius:0!important;background:#fff!important;}
+  #tab-print .full-panel>div{padding:0!important;}   /* ⛔ 패널 안쪽 래퍼 padding 16px 이 인쇄 폭을 1368 로 줄였다 — 실측으로 발견(§16-15) */
+  .a4-wrap{background:#fff!important;padding:0!important;min-height:unset!important;border-radius:0!important;display:block!important;overflow:visible!important;}
+  .a4-scale-wrap{transform:none!important;margin:0!important;height:auto!important;width:auto!important;max-width:none!important;}
+  .a4-page{width:100%!important;max-width:100%!important;box-shadow:none!important;min-height:unset!important;
+    padding:0!important;margin:0!important;font-size:9.5px!important;}
+  .a4-tbl,.a4-meta-table{break-inside:avoid;page-break-inside:avoid;}
+  .a4-tbl.long,.a4-meta-table.long{break-inside:auto!important;page-break-inside:auto!important;}
+  .a4-tbl thead,.a4-meta-table thead{display:table-header-group;}
+  .a4-tbl tr,.a4-meta-table tr{page-break-inside:avoid;page-break-after:auto;}
+  .a4-sub{page-break-after:avoid;page-break-before:auto;}
+  .a4-sub + table,.a4-sub + .a4-verdict,.a4-sub + .a4-ubar{break-before:avoid;page-break-before:avoid;}
+  .a4-verdict,.a4-notice,.a4-ubar{break-inside:avoid;page-break-inside:avoid;}
+  @page{size:A4 portrait;margin:14mm 12mm 22mm 14mm;}
+}
 </style>
 </head>
 <body>
@@ -612,7 +677,7 @@ table td,table th{vertical-align:middle!important;line-height:1!important;}
 
 <script type="text/babel">
 const {useState,useEffect,useMemo,useRef}=React;
-const VER="3.1";
+const VER="5.0";
 
 /* ══════════════════════ DATA ══════════════════════ */
 const U_STD={
@@ -666,171 +731,75 @@ const lambdaPill=v=>{
   return <span className={cls}>{g}급</span>;
 };
 
-/* ══════════════════════ A4 REPORT ══════════════════════ */
-const A4Report=({projectName,region,part,exposure,usage,sr,cl,totalR,currentU,targetU,isPass})=>(
-  <div className="a4-rpt" id="a4-hidden" style={{position:'fixed',left:'-9999px',top:0,zIndex:-1}}>
-    <div className="a4-top">
-
-      <div style={{color:'#bfdbfe',fontSize:'9px',fontWeight:700,letterSpacing:'.2em',textTransform:'uppercase',marginBottom:'7px'}}>Heat Transfer Coefficient Report · 국토교통부 제2025-738호</div>
-      <div style={{color:'#fff',fontSize:'22px',fontWeight:900,marginBottom:'5px'}}>{projectName}</div>
-      <div style={{color:'#93c5fd',fontSize:'9px',fontWeight:600,letterSpacing:'.12em'}}>MANMIN Ver-{VER} · 건축물 에너지절약설계기준</div>
+/* ══════════════════════ A4 계산서 (v5.0 §3-4 서식 · 단일 DOM · 화면=인쇄=JPG) ══════════════════════ */
+const fmtDate=()=>{const n=new Date();return n.getFullYear()+'. '+(n.getMonth()+1)+'. '+n.getDate()+'.';};
+const A4Sheet=({projectName,designerName,region,part,exposure,usage,sr,cl,totalR,currentU,targetU,targetT,isPass})=>(
+  <div className="a4-page" id="a4Page">
+    <div className="a4-tit">열관류율 종합 검토 계산서</div>
+    <div className="a4-head2">
+      <div className="a4-proj">공사명 : {projectName||'—'}</div>
+      <div className="a4-meta">근거 : 건축물의 에너지절약설계기준 (국토교통부고시 제2025-738호) 별표1<br/>작성일 : {fmtDate()}<br/>작성자 : {designerName||'—'}</div>
     </div>
-    <div className="a4-body">
-      {/* 1 조건 */}
-      <div style={{marginBottom:'20px'}}>
-        <div className="a4-sec-hd"><div className="a4-sec-bar"></div><span className="a4-sec-label" style={{fontSize:'12px'}}>1. 열관류율 검토 조건</span></div>
-        <div className="a4-cond-grid">
-          {[{l:'대상지역',v:region},{l:'건축부위',v:part},{l:'외기조건',v:exposure},{l:'세부용도',v:usage}].map(x=>(
-            <div key={x.l} className="a4-cond-cell" style={{background:'#f0f6ff',border:'1px solid #bfdbfe'}}><div className="a4-cond-lbl">{x.l}</div><div className="a4-cond-val" style={{fontSize:'12px'}}>{x.v}</div></div>
-          ))}
-        </div>
-      </div>
-      {/* 2 판정 */}
-      <div style={{marginBottom:'20px'}}>
-        <div className="a4-sec-hd"><div className="a4-sec-bar"></div><span className="a4-sec-label" style={{fontSize:'12px'}}>2. 단열조치 적합여부 최종 판정</span></div>
-        <div className="a4-verdict-grid">
-          <div style={{background:'#f8fafd',border:'1.5px solid #e2e8f0',borderRadius:'10px',padding:'14px',textAlign:'center'}}>
-            <div style={{fontSize:'8px',color:'#94a3b8',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:'7px'}}>법적 기준 (W/m²K 이하)</div>
-            <div style={{fontSize:'24px',fontWeight:900,color:'#1a2744',fontFamily:'JetBrains Mono,monospace'}}>{targetU?targetU.toFixed(3):'—'}</div>
-          </div>
-          <div style={{background:'#fefce8',border:'1.5px solid #fde047',borderRadius:'10px',padding:'14px',textAlign:'center'}}>
-            <div style={{fontSize:'8px',color:'#854d0e',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:'7px'}}>설계 산출값 (U)</div>
-            <div style={{fontSize:'24px',fontWeight:900,color:'#854d0e',fontFamily:'JetBrains Mono,monospace'}}>{currentU}</div>
-          </div>
-          <div style={{background:isPass?'#f0fdf4':'#fff1f2',border:`1.5px solid ${isPass?'#86efac':'#fecdd3'}`,borderRadius:'10px',padding:'14px',textAlign:'center'}}>
-            <div style={{fontSize:'8px',color:isPass?'#065f46':'#881337',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:'7px'}}>STATUS · 제6조</div>
-            <div style={{fontSize:'22px',fontWeight:900,color:isPass?'#059669':'#e11d48',fontFamily:'JetBrains Mono,monospace',letterSpacing:'.1em'}}>{isPass?'적  합':'부적합'}</div>
-          </div>
-        </div>
-      </div>
-      {/* 3 산출 */}
-      <div style={{marginBottom:'16px'}}>
-        <div className="a4-sec-hd" style={{justifyContent:'space-between'}}>
-          <div style={{display:'flex',alignItems:'center',gap:'8px'}}><div className="a4-sec-bar"></div><span className="a4-sec-label" style={{fontSize:'12px'}}>3. 부위별 상세 산출 근거</span></div>
-          <span style={{fontSize:'10px',color:'#94a3b8',fontStyle:'italic',fontWeight:700,fontFamily:'JetBrains Mono,monospace'}}>U = 1 / ΣR</span>
-        </div>
-        <table className="a4-vtbl" style={{width:'100%',borderCollapse:'collapse',fontSize:'12px',fontFamily:'JetBrains Mono,monospace'}}>
-          <colgroup><col style={{width:'7%'}}/><col style={{width:'47%'}}/><col style={{width:'14%'}}/><col style={{width:'16%'}}/><col style={{width:'16%'}}/></colgroup>
-          <thead><tr style={{background:'#dbeafe'}}>{['NO','재료 및 사양','T(mm)','λ(W/mK)','R(m²K/W)'].map((h,i)=><th key={h} style={{padding:'10px 9px',textAlign:i===0?'center':i>1?'right':'left',fontWeight:800,fontSize:'11px',color:'#1e3a8a',letterSpacing:'.04em',borderBottom:'2px solid #93c5fd'}}>{h}</th>)}</tr></thead>
-          <tbody>
-            <tr style={{background:'#f0f6ff',borderBottom:'1px solid #dbeafe'}}>
-              <td style={{padding:'11px 9px',textAlign:'center',color:'#6b7a99',fontStyle:'italic',fontSize:'10px',fontWeight:700}}>실외</td>
-              <td colSpan={3} style={{padding:'11px 9px',color:'#475569',fontWeight:600,fontSize:'12px'}}>실외 표면열전달저항</td>
-              <td style={{padding:'11px 9px',textAlign:'right',color:'#1d4ed8',fontWeight:900,fontSize:'13px'}}>{sr.ro.toFixed(3)}</td>
-            </tr>
-            {cl.map((l,i)=>(
-              <tr key={l.id} style={{background:i%2===0?'#fff':'#f5f9ff',borderBottom:'1px solid #e8effc'}}>
-                <td style={{padding:'12px 9px',textAlign:'center',color:'#94a3b8',fontWeight:700,fontSize:'11px'}}>{i+1}</td>
-                <td style={{padding:'12px 9px',fontWeight:700,color:'#1a2744',fontSize:'12px',lineHeight:1.4}}>{(l.name||'').replace(/_/g,' ')}</td>
-                <td style={{padding:'12px 9px',textAlign:'right',color:'#b45309',fontWeight:800,fontSize:'12px'}}>{l.name?.includes('공기층')?'—':(l.t||0)}</td>
-                <td style={{padding:'12px 9px',textAlign:'right',color:'#475569',fontWeight:600,fontSize:'12px'}}>{l.name?.includes('공기층')?'—':(l.lambda||0).toFixed(3)}</td>
-                <td style={{padding:'12px 9px',textAlign:'right',color:'#1d4ed8',fontWeight:900,fontSize:'13px'}}>{l.r.toFixed(3)}</td>
-              </tr>
-            ))}
-            <tr style={{background:'#f0f6ff',borderBottom:'1px solid #dbeafe'}}>
-              <td style={{padding:'11px 9px',textAlign:'center',color:'#6b7a99',fontStyle:'italic',fontSize:'10px',fontWeight:700}}>실내</td>
-              <td colSpan={3} style={{padding:'11px 9px',color:'#475569',fontWeight:600,fontSize:'12px'}}>실내 표면열전달저항</td>
-              <td style={{padding:'11px 9px',textAlign:'right',color:'#1d4ed8',fontWeight:900,fontSize:'13px'}}>{sr.ri.toFixed(3)}</td>
-            </tr>
-          </tbody>
-          <tfoot><tr style={{background:'#e8f0fe',borderTop:'2px solid #93c5fd'}}>
-            <td colSpan={4} style={{padding:'11px 9px',textAlign:'right',fontWeight:800,fontSize:'11px',color:'#1e3a8a',letterSpacing:'.06em',textTransform:'uppercase',fontStyle:'italic'}}>Total Thermal Resistance (ΣR)</td>
-            <td style={{padding:'11px 9px',textAlign:'right',fontWeight:900,color:'#059669',fontSize:'16px'}}>{totalR.toFixed(3)}</td>
-          </tr></tfoot>
-        </table>
-      </div>
-      <div style={{background:'linear-gradient(135deg,#eff6ff,#e8f0fe)',border:'1px solid #bfdbfe',borderRadius:'12px',padding:'14px 22px',display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',flexWrap:'wrap',marginBottom:'16px'}}>
-        <span style={{color:'#6b7a99',fontSize:'12px',fontFamily:'JetBrains Mono,monospace',fontStyle:'italic'}}>U = 1 / {totalR.toFixed(3)}</span>
-        <span style={{color:'#1d4ed8',fontWeight:700,fontSize:'18px'}}>=</span>
-        <span style={{color:'#b45309',fontWeight:900,fontSize:'28px',fontFamily:'JetBrains Mono,monospace'}}>{currentU}</span>
-        <span style={{color:'#94a3b8',fontSize:'12px',fontWeight:700}}>W/m²K</span>
-      </div>
-      <div className="a4-footer">
-        <span style={{fontSize:'8px',color:'#94a3b8',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase'}}>건축물 에너지절약설계기준 · 국토교통부고시 제2025-738호</span>
-        <span style={{fontSize:'8px',color:'#94a3b8',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',fontFamily:'JetBrains Mono,monospace'}}>MANMIN Ver-{VER}</span>
+    <div className="a4-sub">1. 검토 조건</div>
+    <table className="a4-meta-table">
+      <tbody>
+        <tr><td className="k">대상 지역</td><td>{region}</td><td className="k">건축 부위</td><td>{part}</td></tr>
+        <tr><td className="k">외기 조건</td><td>{exposure}</td><td className="k">세부 용도</td><td>{usage}</td></tr>
+        <tr><td className="k">표면 열전달저항</td><td colSpan={3}>실내측 Ri = {sr.ri.toFixed(3)} m²K/W · 실외측 Ro = {sr.ro.toFixed(3)} m²K/W (별표5)</td></tr>
+      </tbody>
+    </table>
+    <div className="a4-sub">2. 판정 결과</div>
+    <div className={`a4-verdict ${isPass?'pass':'fail'}`}>
+      <div style={{fontSize:'22px',lineHeight:1}}>{isPass?'✅':'⚠️'}</div>
+      <div>
+        <div className="v-main">{isPass?'열관류율 기준 적합':'열관류율 기준 부적합'}</div>
+        <div className="v-sub">설계값 U = {currentU} W/m²K {isPass?'≤':'>'} 법정 기준 {targetU.toFixed(3)} W/m²K 이하 — 별표1 {region} · {part} · {exposure} · {usage}</div>
       </div>
     </div>
-  </div>
-);
-
-/* ══════════════════════ MOBILE CARD ══════════════════════ */
-/* Samsung Galaxy S24 Ultra · 412px CSS · DPR 3.5 · 6.8인치 QHD+ */
-const MobileCard=({projectName,region,part,exposure,usage,sr,cl,totalR,currentU,targetU,isPass})=>(
-  <div id="mob-hidden" style={{position:'fixed',left:'-9998px',top:0,zIndex:-1,width:'412px',background:'#0d0d1a',borderRadius:'44px',overflow:'hidden',fontFamily:"'Pretendard','Apple SD Gothic Neo',sans-serif"}}>
-    {/* ── 헤더 ── */}
-    <div style={{background:'#162a4a',padding:'20px 18px 16px',borderBottom:'1px solid rgba(255,255,255,.08)'}}>
-      <div style={{fontSize:'8px',fontWeight:700,color:'#7da8d8',letterSpacing:'.18em',textTransform:'uppercase',marginBottom:'6px'}}>열관류율 종합 검토 시스템</div>
-      <div style={{fontSize:'15px',fontWeight:900,color:'#e8f1fb',marginBottom:'4px',lineHeight:1.3}}>{projectName}</div>
-      <div style={{fontSize:'8px',fontWeight:700,color:'#5b84b1',letterSpacing:'.08em',textTransform:'uppercase'}}>MANMIN Ver-{VER} · 국토교통부 제2025-738호</div>
+    <table className="a4-meta-table">
+      <tbody>
+        <tr><td className="k">법정 기준값</td><td className="mono">{targetU.toFixed(3)} W/m²K 이하</td><td className="k">설계 산출값</td><td className="mono">{currentU} W/m²K</td></tr>
+        <tr><td className="k">단열재 허용두께</td><td colSpan={3}>별표3 등급별 최소 두께 — 가 {targetT[0]}mm · 나 {targetT[1]}mm · 다 {targetT[2]}mm · 라 {targetT[3]}mm</td></tr>
+      </tbody>
+    </table>
+    <div className="a4-sub">3. 부위별 산출 근거 (U = 1 / ΣR)</div>
+    <table className="a4-tbl">
+      <colgroup><col style={{width:'7%'}}/><col style={{width:'47%'}}/><col style={{width:'14%'}}/><col style={{width:'16%'}}/><col style={{width:'16%'}}/></colgroup>
+      <thead><tr><th>NO</th><th>재료 및 사양</th><th>T (mm)</th><th>λ (W/mK)</th><th>R (m²K/W)</th></tr></thead>
+      <tbody>
+        <tr><td className="c">실외</td><td>실외측 표면 열전달저항 Ro</td><td className="r">—</td><td className="r">—</td><td className="r">{sr.ro.toFixed(3)}</td></tr>
+        {cl.map((l,i)=>(
+          <tr key={l.id}>
+            <td className="c">{i+1}</td>
+            <td>{(l.name||'').replace(/_/g,' ')}</td>
+            <td className="r">{l.name?.includes('공기층')?'—':(l.t||0)}</td>
+            <td className="r">{l.name?.includes('공기층')?'—':(l.lambda||0).toFixed(3)}</td>
+            <td className="r">{l.r.toFixed(3)}</td>
+          </tr>
+        ))}
+        <tr><td className="c">실내</td><td>실내측 표면 열전달저항 Ri</td><td className="r">—</td><td className="r">—</td><td className="r">{sr.ri.toFixed(3)}</td></tr>
+      </tbody>
+      <tfoot><tr><td colSpan={4} style={{textAlign:'right'}}>총 열저항 ΣR</td><td className="r">{totalR.toFixed(3)}</td></tr></tfoot>
+    </table>
+    <div className="a4-ubar">
+      <span className="u-eq">U = 1 / ΣR = 1 / {totalR.toFixed(3)}</span>
+      <span style={{color:'#15803d',fontWeight:700,fontSize:'16px'}}>=</span>
+      <span className={`u-val${isPass?'':' ng'}`}>{currentU}</span>
+      <span style={{color:'#94a3b8',fontSize:'11px',fontWeight:700}}>W/m²K</span>
     </div>
-    <div style={{padding:'14px 16px',display:'flex',flexDirection:'column',gap:'12px'}}>
-      {/* ── 검토 조건 ── */}
-      <div style={{background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.1)',borderRadius:'10px',padding:'12px 14px'}}>
-        <div style={{fontSize:'8px',fontWeight:800,color:'#7da8d8',letterSpacing:'.12em',textTransform:'uppercase',marginBottom:'9px'}}>검토 조건</div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px'}}>
-          {[{l:'지역',v:region},{l:'부위',v:part},{l:'외기조건',v:exposure},{l:'용도',v:usage}].map(x=>(
-            <div key={x.l} style={{background:'rgba(255,255,255,.06)',borderRadius:'7px',padding:'8px 10px'}}>
-              <div style={{fontSize:'8px',color:'#5b84b1',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:'3px'}}>{x.l}</div>
-              <div style={{fontSize:'10px',color:'#c8ddf0',fontWeight:700,lineHeight:1.3}}>{x.v}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-      {/* ── 판정 카드 ── */}
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'9px'}}>
-        <div style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:'12px',padding:'13px 10px',textAlign:'center'}}>
-          <div style={{fontSize:'9px',fontWeight:700,color:'#5b84b1',letterSpacing:'.07em',marginBottom:'6px',textTransform:'uppercase'}}>법적 기준</div>
-          <div style={{fontSize:'22px',fontWeight:900,color:'#c8ddf0',fontFamily:'JetBrains Mono,monospace',lineHeight:1}}>{targetU?targetU.toFixed(3):'—'}</div>
-          <div style={{fontSize:'8px',color:'#3d6080',marginTop:'5px',fontWeight:600}}>W/m²K 이하</div>
-        </div>
-        <div style={{background:isPass?'rgba(16,185,129,.18)':'rgba(225,29,72,.18)',border:`1.5px solid ${isPass?'rgba(52,211,153,.4)':'rgba(251,113,133,.4)'}`,borderRadius:'12px',padding:'13px 10px',textAlign:'center'}}>
-          <div style={{fontSize:'9px',fontWeight:700,color:isPass?'#34d399':'#fb7185',letterSpacing:'.07em',marginBottom:'6px',textTransform:'uppercase'}}>설계값 · 판정</div>
-          <div style={{fontSize:'22px',fontWeight:900,color:isPass?'#10b981':'#f43f5e',fontFamily:'JetBrains Mono,monospace',lineHeight:1}}>{currentU}</div>
-          <div style={{fontSize:'11px',fontWeight:900,color:isPass?'#059669':'#e11d48',marginTop:'5px',letterSpacing:'.06em'}}>{isPass?'✓ 적합':'✗ 부적합'}</div>
-        </div>
-      </div>
-      {/* ── U 수식 ── */}
-      <div style={{background:'rgba(0,0,0,.25)',borderRadius:'12px',padding:'12px 14px',textAlign:'center',lineHeight:1.5}}>
-        <div style={{color:'#4a6d8c',fontSize:'10px',fontFamily:'JetBrains Mono,monospace',fontStyle:'italic',marginBottom:'4px'}}>U = 1 / {totalR.toFixed(3)}</div>
-        <div>
-          <span style={{color:'#f59e0b',fontSize:'26px',fontWeight:900,fontFamily:'JetBrains Mono,monospace'}}>{currentU}</span>
-          <span style={{color:'#4a6d8c',fontSize:'11px',marginLeft:'6px',fontWeight:600}}>W/m²K</span>
-        </div>
-      </div>
-      {/* ── 상세 테이블 ── */}
-      <div style={{background:'rgba(255,255,255,.04)',borderRadius:'10px',padding:'10px 12px'}}>
-        <div style={{fontSize:'8px',fontWeight:800,color:'#7da8d8',letterSpacing:'.12em',textTransform:'uppercase',marginBottom:'8px'}}>부위별 산출 근거</div>
-        <table style={{width:'100%',borderCollapse:'collapse',fontSize:'11px',fontFamily:'JetBrains Mono,monospace'}}>
-          <thead>
-            <tr style={{borderBottom:'1.5px solid rgba(255,255,255,.1)'}}>
-              {['재료 및 사양','T','λ','R'].map((h,i)=>(
-                <th key={h} style={{padding:'5px 4px 7px',textAlign:i===0?'left':'right',color:'#4a6d8c',fontWeight:700,fontSize:'8px',letterSpacing:'.07em',textTransform:'uppercase'}}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td style={{padding:'5px 4px',color:'#4a6d8c',fontStyle:'italic',fontSize:'9px'}}>실외</td><td colSpan={2}></td><td style={{padding:'5px 4px',textAlign:'right',color:'#7da8d8',fontWeight:700}}>{sr.ro.toFixed(3)}</td></tr>
-            {cl.map((l,i)=>(
-              <tr key={l.id} style={{borderBottom:'1px solid rgba(255,255,255,.05)'}}>
-                <td style={{padding:'6px 4px',color:'#b8cfe6',fontWeight:600,maxWidth:'140px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:'10px'}}>{(l.name||'').replace(/_/g,' ')}</td>
-                <td style={{padding:'6px 4px',textAlign:'right',color:'#fcd34d',fontSize:'10px'}}>{l.name?.includes('공기층')?'—':(l.t||0)}</td>
-                <td style={{padding:'6px 4px',textAlign:'right',color:'#6b8aab',fontSize:'10px'}}>{l.name?.includes('공기층')?'—':(l.lambda||0).toFixed(3)}</td>
-                <td style={{padding:'6px 4px',textAlign:'right',color:'#7da8d8',fontWeight:700,fontSize:'11px'}}>{l.r.toFixed(3)}</td>
-              </tr>
-            ))}
-            <tr style={{borderBottom:'1px solid rgba(255,255,255,.1)'}}><td style={{padding:'5px 4px',color:'#4a6d8c',fontStyle:'italic',fontSize:'9px'}}>실내</td><td colSpan={2}></td><td style={{padding:'5px 4px',textAlign:'right',color:'#7da8d8',fontWeight:700}}>{sr.ri.toFixed(3)}</td></tr>
-            <tr style={{borderTop:'1px solid rgba(255,255,255,.12)'}}>
-              <td colSpan={3} style={{padding:'8px 4px 4px',textAlign:'right',color:'#4a6d8c',fontSize:'8px',fontStyle:'italic',fontWeight:600,letterSpacing:'.04em'}}>Total Thermal Resistance (ΣR)</td>
-              <td style={{padding:'8px 4px 4px',textAlign:'right',color:'#34d399',fontWeight:900,fontSize:'14px'}}>{totalR.toFixed(3)}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      {/* ── 푸터 ── */}
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingTop:'4px',borderTop:'1px solid rgba(255,255,255,.07)'}}>
-        <span style={{fontSize:'7.5px',color:'#2d4a6a',fontWeight:600,textTransform:'uppercase',letterSpacing:'.03em',whiteSpace:'nowrap'}}>국토교통부 제2025-738호</span>
-        <span style={{fontSize:'7.5px',color:'#2d4a6a',fontWeight:700,fontFamily:'JetBrains Mono,monospace',whiteSpace:'nowrap'}}>MANMIN Ver-{VER}</span>
-      </div>
+    <div className="a4-sub">4. 적용 기준</div>
+    <table className="a4-meta-table">
+      <tbody>
+        <tr><td className="k">근거 고시</td><td>건축물의 에너지절약설계기준 — 국토교통부고시 제2025-738호(2025. 12. 31. 시행) · 제2026-360호 일부개정(2026. 7. 8.)</td></tr>
+        <tr><td className="k">별표1</td><td>지역별 건축물 부위의 열관류율표 — 중부1 · 중부2 · 남부 · 제주도</td></tr>
+        <tr><td className="k">별표3 · 별표5</td><td>단열재 등급별 허용 두께 · 열관류율 계산 시 표면 열전달저항 (실내 0.11 / 0.086 · 실외 0.043 / 0.11 / 0.15 m²K/W)</td></tr>
+        <tr><td className="k">판정 원칙</td><td>열관류율은 소수점 3자리로 맺음(4째 자리 반올림)하여 적합 여부 판정 — 제6조 제1호 다목 (5)</td></tr>
+      </tbody>
+    </table>
+    <div className="a4-footer">
+      <span>열관류율 종합 검토 시스템 [MANMIN-Ver5.0]</span>
+      <span>건축물의 에너지절약설계기준 · 국토교통부고시 제2025-738호 별표1</span>
+      <span>작성일: {fmtDate()}</span>
     </div>
   </div>
 );
@@ -1224,6 +1193,12 @@ const FabModal=({onClose,onA4Print,onA4PNG,onMobileJPG})=>{
 };
 
 /* ══════════════════════ MAIN APP ══════════════════════ */
+const INIT_LAYERS=[
+    {id:1,cat:"D_미장재료계",group:"모르타르류",name:"시멘트몰탈",t:20,lambda:1.4},
+    {id:2,cat:"K_단열재계",group:"XPS_압출법",name:"1종_A-1",t:155,lambda:0.026},
+    {id:3,cat:"C_콘크리트계",group:"일반콘크리트",name:"철근콘크리트",t:200,lambda:1.6},
+    {id:4,cat:"D_미장재료계",group:"모르타르류",name:"시멘트몰탈",t:20,lambda:1.4}
+];
 const App=()=>{
   const [tab,setTab]=useState('input');
   const [showModal,setShowModal]=useState(false);
@@ -1233,12 +1208,7 @@ const App=()=>{
   const [part,setPart]=useState('거실의 외벽');
   const [exposure,setExposure]=useState('외기에 직접 면하는 경우');
   const [usage,setUsage]=useState('공동주택 외');
-  const [layers,setLayers]=useState([
-    {id:1,cat:"D_미장재료계",group:"모르타르류",name:"시멘트몰탈",t:20,lambda:1.4},
-    {id:2,cat:"K_단열재계",group:"XPS_압출법",name:"1종_A-1",t:155,lambda:0.026},
-    {id:3,cat:"C_콘크리트계",group:"일반콘크리트",name:"철근콘크리트",t:200,lambda:1.6},
-    {id:4,cat:"D_미장재료계",group:"모르타르류",name:"시멘트몰탈",t:20,lambda:1.4}
-  ]);
+  const [layers,setLayers]=useState(INIT_LAYERS.map(l=>({...l})));
   const [installPrompt,setInstallPrompt]=useState(null);
 
   // React installPrompt를 vanilla pwaTriggerInstall에 동기화
@@ -1396,303 +1366,112 @@ const App=()=>{
   /* A4 preview: compute scale to fit panel width */
   const a4WrapRef=useRef(null);
   const [a4Scale,setA4Scale]=useState(0.55);
+  const [a4WrapH,setA4WrapH]=useState(0);
   useEffect(()=>{
-    const update=()=>{if(a4WrapRef.current){const w=a4WrapRef.current.clientWidth-48;setA4Scale(Math.min(1,Math.max(0.22,w/794)));}};
+    const update=()=>{
+      const o=a4WrapRef.current;if(!o)return;
+      if(window.matchMedia('print').matches){setA4Scale(1);setA4WrapH(0);return;}
+      const cs=getComputedStyle(o);
+      const availW=o.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0);
+      if(availW<=0)return;                                  /* ⛔ 음수 배율 방지(§17-4) */
+      const s=Math.max(0.05,Math.min(1,availW/794));
+      setA4Scale(s);
+      const pg=document.getElementById('a4Page');
+      setA4WrapH(pg?Math.round(pg.offsetHeight*s):0);
+    };
     update();const ro=window.ResizeObserver?new ResizeObserver(update):null;
     if(ro&&a4WrapRef.current)ro.observe(a4WrapRef.current);
     window.addEventListener('resize',update);
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(update);
     return()=>{if(ro)ro.disconnect();window.removeEventListener('resize',update);};
-  },[tab]);
+  },[tab,cl,region,part,exposure,usage]);
+  window._scaleA4=()=>{const o=a4WrapRef.current;if(o){window.dispatchEvent(new Event('resize'));}};
+  /* 출력 함수가 탭을 열 수 있도록 setTab 을 노출 — 계산 훅 무접촉 */
+  useEffect(()=>{window.__uvSetTab=setTab;return()=>{delete window.__uvSetTab;};},[]);
+  /* 초기화 — useState 초기값과 동일 (INIT_LAYERS 참조) */
+  const resetAll=()=>{
+    setProjectName('만민 건축사 신사옥 신축공사 설계용역');setDesignerName('김만민');
+    setRegion('중부2지역');setPart('거실의 외벽');setExposure('외기에 직접 면하는 경우');setUsage('공동주택 외');
+    setLayers(INIT_LAYERS.map(l=>({...l})));setTab('input');
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
 
   const TABS=[
     {k:'input',icon:<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,label:'검토 조건 입력'},
     {k:'a4prev',icon:<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>,label:'A4 미리보기'},
-    {k:'mobprev',icon:<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>,label:'모바일 미리보기'},
     {k:'material',icon:<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>,label:'재료별 열전도율'},
     {k:'rtslink',icon:<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>,label:'🌡️ RTS 부하계산 연계'},
   ];
 
-  const isFullTab=tab==='a4prev'||tab==='mobprev'||tab==='material'||tab==='rtslink';
+  const isFullTab=tab==='a4prev'||tab==='material'||tab==='rtslink';
 
   return(
     <>
-    {/* ═══ HEADER ═══ */}
+    {/* ═══ HEADER (v5.0 §3-1 · §18-1 — 3단 · 버튼 0개 · 탭은 헤더 안) ═══ */}
     <header className="app-header no-print">
       <div className="header-inner">
         <div className="brand-logo">
-          <div className="brand-icon" style={{background:"none",padding:0,overflow:"hidden",width:"42px",height:"42px",borderRadius:"10px",flexShrink:0,boxShadow:"0 2px 10px rgba(29,78,216,.38)"}}><img src="./icons/brand-icon.png" alt="열관류율 MANMIN" style={{width:"42px",height:"42px",objectFit:"cover",borderRadius:"10px",display:"block"}}/></div>
           <div className="brand-texts">
-            <div className="brand-title" style={{display:'flex',alignItems:'center',gap:'8px',flexWrap:'wrap'}}>
-              열관류율 종합 검토 시스템
-              <span style={{background:'linear-gradient(135deg,#1d4ed8,#7c3aed)',color:'#fff',fontSize:'10px',fontWeight:900,padding:'2px 9px',borderRadius:'5px',letterSpacing:'.08em',whiteSpace:'nowrap',boxShadow:'0 1px 8px rgba(124,58,237,.45)',fontFamily:"'JetBrains Mono',monospace"}}>MANMIN-Ver{VER}</span>
+            <div className="hdr-eyebrow">U-Value Check · 국토교통부고시 제2025-738호</div>
+            <h1 className="hdr-h1">열관류율 종합 검토 시스템</h1>
+            <div className="hdr-sub">
+              건축물의 에너지절약설계기준 별표1 · 부위별 열관류율 산출 · 법정 기준 판정 · RTS 부하계산 연계
+              <span className="hdr-manmin">MANMIN · Ver-5.0</span>
             </div>
-            <div className="brand-sub">건축물 에너지절약설계기준 · 국토교통부고시 제2025-738호 · 설계자: {designerName} &nbsp;|&nbsp; {projectName}</div>
           </div>
         </div>
-        <div className="hdr-btns">
-          <button id="pwa-install-btn" onClick={()=>window.pwaTriggerInstall&&window.pwaTriggerInstall()}>
-            📲 <span className="pwa-txt">설치</span>
-          </button>
-          <button
-            onClick={()=>sendToRTS({projectName,designerName,region,part,exposure,usage,sr,cl,totalR,currentU,targetU,isPass,layers})}
-            style={{background:'linear-gradient(135deg,#065f46,#059669)',color:'#fff',border:'none',padding:'9px 16px',borderRadius:'9px',fontSize:'12px',fontWeight:900,cursor:'pointer',display:'flex',alignItems:'center',gap:'7px',whiteSpace:'nowrap',transition:'all .2s',boxShadow:'0 2px 10px rgba(5,150,105,.45)',fontFamily:'inherit'}}
-            onMouseOver={e=>{e.currentTarget.style.boxShadow='0 4px 16px rgba(5,150,105,.7)';e.currentTarget.style.transform='translateY(-1px)';}}
-            onMouseOut={e=>{e.currentTarget.style.boxShadow='0 2px 10px rgba(5,150,105,.45)';e.currentTarget.style.transform='';}}
-            title="U값 + 재료 레이어 데이터를 RTS 부하계산서로 전송"
-          >
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
-            <span>📤 RTS 전송</span>
-          </button>
-          <button className="btn-mobpng" onClick={onMobileJPG} disabled={isCapturing}>
-            <svg viewBox="0 0 24 24" width="14" height="14" stroke="#fff" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-            <span>{isCapturing?'저장 중...':'JPG'}</span>
-          </button>
-          <button className="btn-print" onClick={()=>window.print()}>
-            <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            <span className="txt">산출서 인쇄 / PDF</span>
-          </button>
+        <div className="hdr-right-wrap">
+          <div className="hdr-right"><strong>건축물의 에너지절약설계기준</strong><br/>국토교통부고시 제2025-738호<br/>제2026-360호 일부개정 (2026. 7. 8.)<br/><em>[시행 2025. 12. 31.]</em></div>
         </div>
       </div>
-      <div className="tab-bar">
+      <nav className="tab-bar">
         <div className="tab-bar-inner">
           {TABS.map(({k,icon,label})=>(
-            <button key={k} className={`tab-btn${tab===k?' active':''}`} onClick={()=>setTab(k)}>
+            <button key={k} className={`tb${tab===k?' active':''}`} onClick={()=>setTab(k)}>
               {icon}{label}
             </button>
           ))}
         </div>
-      </div>
+      </nav>
     </header>
+    {/* v5.0-HDR : 요약 스트립 (헤더 3층) — 계산 훅 값을 읽기만 한다 */}
+    <div className="sum-bar-wrap no-print">
+      <div className="sum-bar">
+        <span className="sum-item">🗺️ 지역: <b>{region}</b></span>
+        <span className="sum-item">🧱 부위: <b>{part}</b></span>
+        <span className="sum-item">📏 기준: <b>{targetU.toFixed(3)}</b></span>
+        <span className="sum-item">🌡️ 설계 U: <b className={isPass?'':'ng'}>{currentU}</b></span>
+        <span className="sum-item">⚖️ 판정: <b className={isPass?'':'ng'}>{isPass?'적합':'부적합'}</b></span>
+        <span className="sum-item">📐 총두께: <b>{cl.reduce((a,c)=>a+(c.t||0),0)} mm</b></span>
+      </div>
+    </div>
 
     {/* ═══ MAIN ═══ */}
     <div className="main-wrap">
 
-      {/* ── A4 미리보기 (전체폭) ── */}
-      {tab==='a4prev'&&(
+      {/* ── A4 계산서 — 항상 렌더(인쇄 대상) · 활성 탭일 때만 표시 ── */}
+      <div className={`tab-panel${tab==='a4prev'?' active':''}`} id="tab-print">
         <div className="full-panel">
           <div className="card-head" style={{borderBottom:'none'}}>
-            <div className="card-icon"><svg viewBox="0 0 24 24" width="13" height="13" stroke="#1d4ed8" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-            <span className="card-title">A4 계산서 미리보기</span>
+            <div className="card-icon"><svg viewBox="0 0 24 24" width="13" height="13" stroke="#15803d" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <span className="card-title">A4 계산서 — 인쇄 · PDF · JPG</span>
           </div>
-          <div className="a4-preview-wrap" ref={a4WrapRef}>
-            <div className="a4-preview-inner" style={{width:794*a4Scale+'px',height:Math.round(1050*a4Scale)+'px',overflow:'hidden',flexShrink:0}}>
-              <div style={{width:'794px',transform:`scale(${a4Scale})`,transformOrigin:'top left',pointerEvents:'none'}}>
-                {/* inline A4 render (not the hidden one) */}
-                <div style={{fontFamily:"'Pretendard','Apple SD Gothic Neo',sans-serif",width:'794px',background:'#fff',color:'#1a1a1a',boxSizing:'border-box'}}>
-                  <div style={{background:'linear-gradient(90deg,#0c4da2,#1d4ed8)',padding:'24px 42px 20px'}}>
-
-                    <div style={{color:'#bfdbfe',fontSize:'9px',fontWeight:700,letterSpacing:'.2em',textTransform:'uppercase',marginBottom:'7px'}}>Heat Transfer Coefficient Report · 국토교통부 제2025-738호</div>
-                    <div style={{color:'#fff',fontSize:'22px',fontWeight:900,marginBottom:'5px'}}>{projectName}</div>
-                    <div style={{color:'#93c5fd',fontSize:'9px',fontWeight:600}}>MANMIN Ver-{VER} &nbsp;·&nbsp; 설계자: {designerName} 건축사</div>
-                  </div>
-                  <div style={{padding:'26px 42px 32px'}}>
-                    <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'11px',paddingBottom:'9px',borderBottom:'2px solid #1d4ed8'}}><div style={{width:'3px',height:'16px',background:'#1d4ed8',borderRadius:'2px'}}></div><span style={{fontSize:'12px',fontWeight:900,color:'#1a2744',letterSpacing:'.08em',textTransform:'uppercase'}}>1. 열관류율 검토 조건</span></div>
-                    <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'8px',marginBottom:'20px'}}>
-                      {[{l:'대상지역',v:region},{l:'건축부위',v:part},{l:'외기조건',v:exposure},{l:'세부용도',v:usage}].map(x=>(
-                        <div key={x.l} style={{background:'#f0f6ff',border:'1px solid #bfdbfe',borderRadius:'8px',padding:'11px 8px',textAlign:'center'}}><div style={{fontSize:'8px',color:'#6b7a99',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:'5px'}}>{x.l}</div><div style={{fontSize:'12px',color:'#1a2744',fontWeight:800}}>{x.v}</div></div>
-                      ))}
-                    </div>
-                    <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'11px',paddingBottom:'9px',borderBottom:'2px solid #1d4ed8'}}><div style={{width:'3px',height:'16px',background:'#1d4ed8',borderRadius:'2px'}}></div><span style={{fontSize:'12px',fontWeight:900,color:'#1a2744',letterSpacing:'.08em',textTransform:'uppercase'}}>2. 단열조치 적합여부 최종 판정</span></div>
-                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px',marginBottom:'20px'}}>
-                      <div style={{background:'#f0f6ff',border:'1.5px solid #bfdbfe',borderRadius:'10px',padding:'14px',textAlign:'center'}}><div style={{fontSize:'9px',color:'#6b7a99',fontWeight:700,marginBottom:'7px',textTransform:'uppercase',letterSpacing:'.08em'}}>법적 기준 (W/m²K 이하)</div><div style={{fontSize:'24px',fontWeight:900,color:'#1a2744',fontFamily:'JetBrains Mono,monospace'}}>{targetU?targetU.toFixed(3):'—'}</div></div>
-                      <div style={{background:'#fefce8',border:'1.5px solid #fde047',borderRadius:'10px',padding:'14px',textAlign:'center'}}><div style={{fontSize:'9px',color:'#854d0e',fontWeight:700,marginBottom:'7px',textTransform:'uppercase',letterSpacing:'.08em'}}>설계 산출값 (U)</div><div style={{fontSize:'24px',fontWeight:900,color:'#854d0e',fontFamily:'JetBrains Mono,monospace'}}>{currentU}</div></div>
-                      <div style={{background:isPass?'#f0fdf4':'#fff1f2',border:`1.5px solid ${isPass?'#86efac':'#fecdd3'}`,borderRadius:'10px',padding:'14px',textAlign:'center'}}><div style={{fontSize:'9px',color:isPass?'#065f46':'#881337',fontWeight:700,marginBottom:'7px',textTransform:'uppercase',letterSpacing:'.08em'}}>STATUS · 제6조</div><div style={{fontSize:'22px',fontWeight:900,color:isPass?'#059669':'#e11d48',fontFamily:'JetBrains Mono,monospace',letterSpacing:'.1em'}}>{isPass?'적  합':'부적합'}</div></div>
-                    </div>
-                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'11px',paddingBottom:'9px',borderBottom:'2px solid #1d4ed8'}}>
-                      <div style={{display:'flex',alignItems:'center',gap:'8px'}}><div style={{width:'3px',height:'16px',background:'#1d4ed8',borderRadius:'2px'}}></div><span style={{fontSize:'12px',fontWeight:900,color:'#1a2744',letterSpacing:'.08em',textTransform:'uppercase'}}>3. 부위별 상세 산출 근거</span></div>
-                      <span style={{fontSize:'10px',color:'#94a3b8',fontStyle:'italic',fontWeight:700,fontFamily:'JetBrains Mono,monospace'}}>U = 1 / ΣR</span>
-                    </div>
-                    <table style={{width:'100%',borderCollapse:'collapse',fontSize:'12px',fontFamily:'JetBrains Mono,monospace',marginBottom:'16px'}}>
-                      <colgroup><col style={{width:'7%'}}/><col style={{width:'47%'}}/><col style={{width:'14%'}}/><col style={{width:'16%'}}/><col style={{width:'16%'}}/></colgroup>
-                      <thead><tr style={{background:'#dbeafe'}}>{['NO','재료 및 사양','T(mm)','λ(W/mK)','R(m²K/W)'].map((h,i)=><th key={h} style={{padding:'10px 9px',textAlign:i===0?'center':i>1?'right':'left',fontWeight:800,fontSize:'11px',color:'#1e3a8a',letterSpacing:'.04em',borderBottom:'2px solid #93c5fd'}}>{h}</th>)}</tr></thead>
-                      <tbody>
-                        <tr style={{background:'#f0f6ff',borderBottom:'1px solid #dbeafe'}}><td style={{padding:'11px 9px',textAlign:'center',color:'#6b7a99',fontStyle:'italic',fontSize:'10px',fontWeight:700}}>실외</td><td colSpan={3} style={{padding:'11px 9px',color:'#475569',fontWeight:600,fontSize:'12px'}}>실외 표면열전달저항</td><td style={{padding:'11px 9px',textAlign:'right',color:'#1d4ed8',fontWeight:900,fontSize:'13px'}}>{sr.ro.toFixed(3)}</td></tr>
-                        {cl.map((l,i)=>(
-                          <tr key={l.id} style={{background:i%2===0?'#fff':'#f5f9ff',borderBottom:'1px solid #e8effc'}}>
-                            <td style={{padding:'12px 9px',textAlign:'center',color:'#94a3b8',fontWeight:700,fontSize:'11px'}}>{i+1}</td>
-                            <td style={{padding:'12px 9px',fontWeight:700,color:'#1a2744',fontSize:'12px',lineHeight:1.4}}>{(l.name||'').replace(/_/g,' ')}</td>
-                            <td style={{padding:'12px 9px',textAlign:'right',color:'#b45309',fontWeight:800,fontSize:'12px'}}>{l.name?.includes('공기층')?'—':(l.t||0)}</td>
-                            <td style={{padding:'12px 9px',textAlign:'right',color:'#475569',fontWeight:600,fontSize:'12px'}}>{l.name?.includes('공기층')?'—':(l.lambda||0).toFixed(3)}</td>
-                            <td style={{padding:'12px 9px',textAlign:'right',color:'#1d4ed8',fontWeight:900,fontSize:'13px'}}>{l.r.toFixed(3)}</td>
-                          </tr>
-                        ))}
-                        <tr style={{background:'#f0f6ff',borderBottom:'1px solid #dbeafe'}}><td style={{padding:'11px 9px',textAlign:'center',color:'#6b7a99',fontStyle:'italic',fontSize:'10px',fontWeight:700}}>실내</td><td colSpan={3} style={{padding:'11px 9px',color:'#475569',fontWeight:600,fontSize:'12px'}}>실내 표면열전달저항</td><td style={{padding:'11px 9px',textAlign:'right',color:'#1d4ed8',fontWeight:900,fontSize:'13px'}}>{sr.ri.toFixed(3)}</td></tr>
-                      </tbody>
-                      <tfoot><tr style={{background:'#e8f0fe',borderTop:'2px solid #93c5fd'}}><td colSpan={4} style={{padding:'11px 9px',textAlign:'right',fontWeight:800,fontSize:'11px',color:'#1e3a8a',fontStyle:'italic',textTransform:'uppercase',letterSpacing:'.06em'}}>Total Thermal Resistance (ΣR)</td><td style={{padding:'11px 9px',textAlign:'right',fontWeight:900,color:'#059669',fontSize:'16px'}}>{totalR.toFixed(3)}</td></tr></tfoot>
-                    </table>
-                    <div style={{background:'linear-gradient(135deg,#eff6ff,#e8f0fe)',border:'1px solid #bfdbfe',borderRadius:'12px',padding:'14px 22px',display:'flex',alignItems:'center',justifyContent:'center',gap:'12px',flexWrap:'wrap',marginBottom:'16px'}}>
-                      <span style={{color:'#6b7a99',fontSize:'12px',fontFamily:'JetBrains Mono,monospace',fontStyle:'italic'}}>U = 1 / {totalR.toFixed(3)}</span>
-                      <span style={{color:'#1d4ed8',fontWeight:700,fontSize:'18px'}}>=</span>
-                      <span style={{color:'#b45309',fontWeight:900,fontSize:'28px',fontFamily:'JetBrains Mono,monospace'}}>{currentU}</span>
-                      <span style={{color:'#94a3b8',fontSize:'12px',fontWeight:700}}>W/m²K</span>
-                    </div>
-                    <div style={{borderTop:'1px solid #e2e8f0',paddingTop:'9px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                      <span style={{fontSize:'8px',color:'#94a3b8',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase'}}>건축물 에너지절약설계기준 · 국토교통부고시 제2025-738호</span>
-                      <span style={{fontSize:'8px',color:'#94a3b8',fontWeight:700,fontFamily:'JetBrains Mono,monospace',letterSpacing:'.1em',textTransform:'uppercase'}}>MANMIN Ver-{VER}</span>
-                    </div>
-                  </div>
-                </div>
+          <div style={{padding:'0 16px 16px'}}>
+            <div className="a4-export-bar no-print">
+              <span className="bar-lbl">📄 A4 출력 :</span>
+              <button className="mm-btn mm-btn-print" onClick={()=>window.printA4&&window.printA4()}>🖨️ 인쇄 / PDF 저장</button>
+              <button className="mm-btn mm-btn-jpg" id="btn-jpg" onClick={()=>window.exportA4Jpg&&window.exportA4Jpg()}>🖼️ JPG 저장</button>
+              <span style={{fontSize:'10px',color:'#64748b',marginLeft:'4px'}}>※ 공사명·작성자는 「검토 조건 입력」 탭에서 입력</span>
+            </div>
+            <div className="a4-wrap" id="a4Wrap" ref={a4WrapRef}>
+              <div className="a4-scale-wrap" id="a4ScaleWrap" style={{transform:`scale(${a4Scale})`,height:a4WrapH?a4WrapH+'px':undefined}}>
+                <A4Sheet {...calcProps} designerName={designerName} targetT={targetT}/>
               </div>
             </div>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* ── 모바일 미리보기 (전체폭) — Samsung Galaxy S24 Ultra ── */}
-      {tab==='mobprev'&&(
-        <div className="full-panel">
-          {/* 버튼 바 */}
-          <div className="card-head" style={{borderBottom:'none',flexWrap:'wrap',gap:'8px',paddingBottom:'10px'}}>
-            <div className="card-icon"><svg viewBox="0 0 24 24" width="13" height="13" stroke="#1d4ed8" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
-            <span className="card-title">모바일 카드 미리보기</span>
-            <span style={{fontSize:'10px',color:'#6b7a99',fontWeight:600,letterSpacing:'.02em'}}>Samsung Galaxy S24 Ultra — 412×916px (CSS)</span>
-            <div style={{marginLeft:'auto',display:'flex',gap:'7px',flexShrink:0,alignItems:'center'}}>
-              {/* JPG 저장 */}
-              <button
-                onClick={onMobileJPG}
-                disabled={isCapturing}
-                style={{display:'flex',alignItems:'center',gap:'5px',padding:'7px 14px',height:'32px',background:isCapturing?'#6b7a99':'#1d4ed8',color:'#fff',border:'none',borderRadius:'8px',cursor:isCapturing?'not-allowed':'pointer',fontFamily:'inherit',fontSize:'11px',fontWeight:800,whiteSpace:'nowrap',boxShadow:'0 2px 8px rgba(29,78,216,.3)',transition:'all .15s'}}
-                onMouseOver={e=>{if(!isCapturing)e.currentTarget.style.background='#1e40af';}}
-                onMouseOut={e=>{if(!isCapturing)e.currentTarget.style.background='#1d4ed8';}}>
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                {isCapturing?'저장 중...':'📱 JPG 저장'}
-              </button>
-              {/* 공유 버튼 — JPG 저장 완료 후 자동 표시 */}
-              {showMobShare&&(
-                <button
-                  onClick={shareMobJpg}
-                  style={{display:'flex',alignItems:'center',gap:'5px',padding:'7px 14px',height:'32px',background:'#fff',color:'#1d4ed8',border:'1.5px solid #1d4ed8',borderRadius:'8px',cursor:'pointer',fontFamily:'inherit',fontSize:'11px',fontWeight:800,whiteSpace:'nowrap',transition:'all .15s'}}
-                  onMouseOver={e=>{e.currentTarget.style.background='#eff6ff';}}
-                  onMouseOut={e=>{e.currentTarget.style.background='#fff';}}>
-                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                  📤 공유
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* S24 Ultra 기기 프레임 래퍼 */}
-          <div style={{
-            background:'linear-gradient(160deg,#111827 0%,#0d0d1a 50%,#080810 100%)',
-            backgroundImage:'radial-gradient(ellipse at 30% 20%,rgba(29,78,216,.1) 0%,transparent 55%)',
-            padding:'28px 16px 36px',
-            display:'flex',
-            justifyContent:'center',
-            alignItems:'flex-start',
-            minHeight:'560px'
-          }}>
-            {/* 기기 외형 */}
-            <div style={{
-              position:'relative',
-              background:'linear-gradient(160deg,#1a1a2e 0%,#0d0d1a 40%,#0a0a14 100%)',
-              borderRadius:'44px',
-              width:'412px',
-              padding:'11px',
-              boxShadow:'0 0 0 1px rgba(255,255,255,.08),0 0 0 2px rgba(0,0,0,.9),0 30px 80px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.05)',
-              transform:'scale(0.86)',
-              transformOrigin:'top center',
-              pointerEvents:'none'
-            }}>
-              {/* 전원/볼륨 버튼 — 우측 */}
-              <div style={{position:'absolute',right:'-3px',top:'130px',width:'3px',height:'68px',background:'linear-gradient(180deg,#2a2a3e,#1a1a2e)',borderRadius:'0 2px 2px 0',boxShadow:'0 40px 0 #1a1a2e,0 70px 0 #1a1a2e'}}/>
-              {/* S펜 슬롯 — 좌측 하단 */}
-              <div style={{position:'absolute',left:'-3px',bottom:'60px',width:'3px',height:'80px',background:'linear-gradient(180deg,#1e1e30,#14141f)',borderRadius:'2px 0 0 2px'}}/>
-
-              {/* 화면 */}
-              <div style={{background:'#0f172a',borderRadius:'38px',overflow:'hidden'}}>
-                {/* 펀치홀 카메라 */}
-                <div style={{background:'#0a0a14',height:'32px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'38px 38px 0 0'}}>
-                  <div style={{width:'12px',height:'12px',background:'radial-gradient(circle at 35% 35%,#2a2a3e,#050508)',borderRadius:'50%',boxShadow:'0 0 0 1px rgba(255,255,255,.06),0 0 6px rgba(99,102,241,.25)'}}/>
-                </div>
-                {/* 상태바 */}
-                <div style={{background:'#0f172a',height:'28px',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 18px',fontSize:'10.5px',color:'#e2e8f0',fontWeight:700,letterSpacing:'.02em',fontFamily:"'Pretendard',sans-serif"}}>
-                  <span>{(()=>{const n=new Date();const h=n.getHours();const m=('0'+n.getMinutes()).slice(-2);return (h>=12?'오후 ':'오전 ')+(h%12||12)+':'+m;})()}</span>
-                  <span style={{display:'flex',alignItems:'center',gap:'5px',fontSize:'10px'}}>
-                    <span style={{fontWeight:800,letterSpacing:'.04em'}}>5G</span>
-                    <svg width="15" height="11" viewBox="0 0 15 11" fill="none"><rect x="0" y="7" width="3" height="4" rx="1" fill="white" opacity=".35"/><rect x="4" y="5" width="3" height="6" rx="1" fill="white" opacity=".6"/><rect x="8" y="3" width="3" height="8" rx="1" fill="white" opacity=".8"/><rect x="12" y="0" width="3" height="11" rx="1" fill="white"/></svg>
-                    <svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x=".5" y=".5" width="18" height="10" rx="2.5" stroke="white" strokeOpacity=".35"/><rect x="1.5" y="1.5" width="15" height="8" rx="1.5" fill="white"/><path d="M20 3.5V7.5C20.8 7.2 21.5 6.5 21.5 5.5C21.5 4.5 20.8 3.8 20 3.5Z" fill="white" opacity=".4"/></svg>
-                  </span>
-                </div>
-
-                {/* 앱 콘텐츠 — MobileCard 내용과 동일 */}
-                <div style={{background:'#1e3456',fontFamily:"'Pretendard','Apple SD Gothic Neo',sans-serif"}}>
-                  {/* 앱 헤더 */}
-                  <div style={{background:'#162a4a',padding:'18px 18px 14px',borderBottom:'1px solid rgba(255,255,255,.08)'}}>
-                    <div style={{fontSize:'8px',fontWeight:700,color:'#7da8d8',letterSpacing:'.18em',textTransform:'uppercase',marginBottom:'5px'}}>열관류율 종합 검토 시스템</div>
-                    <div style={{fontSize:'15px',fontWeight:900,color:'#e8f1fb',marginBottom:'4px',lineHeight:1.3}}>{projectName}</div>
-                    <div style={{fontSize:'8px',fontWeight:700,color:'#5b84b1',letterSpacing:'.08em',textTransform:'uppercase'}}>MANMIN Ver-{VER} · 국토교통부 제2025-738호</div>
-                  </div>
-                  <div style={{padding:'14px 16px',display:'flex',flexDirection:'column',gap:'12px'}}>
-                    {/* 검토 조건 */}
-                    <div style={{background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.1)',borderRadius:'10px',padding:'12px 14px'}}>
-                      <div style={{fontSize:'8px',fontWeight:800,color:'#7da8d8',letterSpacing:'.12em',textTransform:'uppercase',marginBottom:'9px'}}>검토 조건</div>
-                      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px'}}>
-                        {[{l:'지역',v:region},{l:'부위',v:part},{l:'외기조건',v:exposure},{l:'용도',v:usage}].map(x=>(
-                          <div key={x.l} style={{background:'rgba(255,255,255,.06)',borderRadius:'7px',padding:'8px 10px'}}>
-                            <div style={{fontSize:'8px',color:'#5b84b1',fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:'3px'}}>{x.l}</div>
-                            <div style={{fontSize:'10px',color:'#c8ddf0',fontWeight:700,lineHeight:1.3}}>{x.v}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    {/* 판정 카드 */}
-                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'9px'}}>
-                      <div style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:'12px',padding:'13px 10px',textAlign:'center'}}>
-                        <div style={{fontSize:'9px',fontWeight:700,color:'#5b84b1',letterSpacing:'.07em',marginBottom:'6px',textTransform:'uppercase'}}>법적 기준</div>
-                        <div style={{fontSize:'22px',fontWeight:900,color:'#c8ddf0',fontFamily:'JetBrains Mono,monospace',lineHeight:1}}>{targetU?targetU.toFixed(3):'—'}</div>
-                        <div style={{fontSize:'8px',color:'#3d6080',marginTop:'5px',fontWeight:600}}>W/m²K 이하</div>
-                      </div>
-                      <div style={{background:isPass?'rgba(16,185,129,.18)':'rgba(225,29,72,.18)',border:`1.5px solid ${isPass?'rgba(52,211,153,.4)':'rgba(251,113,133,.4)'}`,borderRadius:'12px',padding:'13px 10px',textAlign:'center'}}>
-                        <div style={{fontSize:'9px',fontWeight:700,color:isPass?'#34d399':'#fb7185',letterSpacing:'.07em',marginBottom:'6px',textTransform:'uppercase'}}>설계값 · 판정</div>
-                        <div style={{fontSize:'22px',fontWeight:900,color:isPass?'#10b981':'#f43f5e',fontFamily:'JetBrains Mono,monospace',lineHeight:1}}>{currentU}</div>
-                        <div style={{fontSize:'11px',fontWeight:900,color:isPass?'#059669':'#e11d48',marginTop:'5px',letterSpacing:'.06em'}}>{isPass?'✓ 적합':'✗ 부적합'}</div>
-                      </div>
-                    </div>
-                    {/* U 수식 */}
-                    <div style={{background:'rgba(0,0,0,.25)',borderRadius:'12px',padding:'12px 14px',textAlign:'center',lineHeight:1.5}}>
-                      <div style={{color:'#4a6d8c',fontSize:'10px',fontFamily:'JetBrains Mono,monospace',fontStyle:'italic',marginBottom:'4px'}}>U = 1 / {totalR.toFixed(3)}</div>
-                      <div>
-                        <span style={{color:'#f59e0b',fontSize:'26px',fontWeight:900,fontFamily:'JetBrains Mono,monospace'}}>{currentU}</span>
-                        <span style={{color:'#4a6d8c',fontSize:'11px',marginLeft:'6px',fontWeight:600}}>W/m²K</span>
-                      </div>
-                    </div>
-                    {/* 상세 테이블 */}
-                    <div style={{background:'rgba(255,255,255,.04)',borderRadius:'10px',padding:'10px 12px'}}>
-                      <div style={{fontSize:'8px',fontWeight:800,color:'#7da8d8',letterSpacing:'.12em',textTransform:'uppercase',marginBottom:'8px'}}>부위별 산출 근거</div>
-                      <table style={{width:'100%',borderCollapse:'collapse',fontSize:'10px',fontFamily:'JetBrains Mono,monospace'}}>
-                        <thead><tr style={{borderBottom:'1.5px solid rgba(255,255,255,.1)'}}>{['재료 및 사양','T','λ','R'].map((h,i)=><th key={h} style={{padding:'5px 4px 7px',textAlign:i===0?'left':'right',color:'#4a6d8c',fontWeight:700,fontSize:'8px',letterSpacing:'.07em',textTransform:'uppercase'}}>{h}</th>)}</tr></thead>
-                        <tbody>
-                          <tr><td style={{padding:'5px 4px',color:'#4a6d8c',fontStyle:'italic',fontSize:'9px'}}>실외</td><td colSpan={2}></td><td style={{padding:'5px 4px',textAlign:'right',color:'#7da8d8',fontWeight:700}}>{sr.ro.toFixed(3)}</td></tr>
-                          {cl.map((l,i)=>(
-                            <tr key={l.id} style={{borderBottom:'1px solid rgba(255,255,255,.05)'}}>
-                              <td style={{padding:'6px 4px',color:'#b8cfe6',fontWeight:600,maxWidth:'140px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:'10px'}}>{(l.name||'').replace(/_/g,' ')}</td>
-                              <td style={{padding:'6px 4px',textAlign:'right',color:'#fcd34d',fontSize:'10px'}}>{l.name?.includes('공기층')?'—':(l.t||0)}</td>
-                              <td style={{padding:'6px 4px',textAlign:'right',color:'#6b8aab',fontSize:'10px'}}>{l.name?.includes('공기층')?'—':(l.lambda||0).toFixed(3)}</td>
-                              <td style={{padding:'6px 4px',textAlign:'right',color:'#7da8d8',fontWeight:700}}>{l.r.toFixed(3)}</td>
-                            </tr>
-                          ))}
-                          <tr style={{borderBottom:'1px solid rgba(255,255,255,.1)'}}><td style={{padding:'5px 4px',color:'#4a6d8c',fontStyle:'italic',fontSize:'9px'}}>실내</td><td colSpan={2}></td><td style={{padding:'5px 4px',textAlign:'right',color:'#7da8d8',fontWeight:700}}>{sr.ri.toFixed(3)}</td></tr>
-                          <tr><td colSpan={3} style={{padding:'8px 4px 4px',textAlign:'right',color:'#4a6d8c',fontSize:'8px',fontStyle:'italic',fontWeight:600}}>Total Thermal Resistance (ΣR)</td><td style={{padding:'8px 4px 4px',textAlign:'right',color:'#34d399',fontWeight:900,fontSize:'14px'}}>{totalR.toFixed(3)}</td></tr>
-                        </tbody>
-                      </table>
-                    </div>
-                    {/* 푸터 */}
-                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingTop:'4px',borderTop:'1px solid rgba(255,255,255,.07)'}}>
-                      <span style={{fontSize:'7.5px',color:'#2d4a6a',fontWeight:600,textTransform:'uppercase',letterSpacing:'.03em'}}>국토교통부 제2025-738호</span>
-                      <span style={{fontSize:'7.5px',color:'#2d4a6a',fontWeight:700,fontFamily:'JetBrains Mono,monospace'}}>MANMIN Ver-{VER}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 홈 인디케이터 */}
-                <div style={{background:'#1e3456',padding:'10px 0 14px',display:'flex',justifyContent:'center'}}>
-                  <div style={{width:'120px',height:'5px',background:'rgba(255,255,255,.2)',borderRadius:'3px'}}/>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── 재료별 열전도율 (전체폭) ── */}
       {tab==='material'&&(
@@ -1719,7 +1498,7 @@ const App=()=>{
                 <div>
                   <div style={{color:'#fff',fontSize:'15px',fontWeight:900,letterSpacing:'-.01em',display:'flex',alignItems:'center',gap:'8px'}}>
                     RTS-SAREK 건축물 부하계산서
-                    <span style={{background:'linear-gradient(135deg,#1d4ed8,#7c3aed)',color:'#fff',fontSize:'9px',fontWeight:900,padding:'2px 8px',borderRadius:'4px',letterSpacing:'.08em',fontFamily:"'JetBrains Mono',monospace"}}>MANMIN-Ver3.1</span>
+                    <span style={{background:'linear-gradient(135deg,#1d4ed8,#7c3aed)',color:'#fff',fontSize:'9px',fontWeight:900,padding:'2px 8px',borderRadius:'4px',letterSpacing:'.08em',fontFamily:"'JetBrains Mono',monospace"}}>MANMIN-Ver5.0</span>
                   </div>
                   <div style={{color:'rgba(0,180,216,0.7)',fontSize:'10px',fontWeight:600,letterSpacing:'.1em',textTransform:'uppercase',marginTop:'3px'}}>Radiant Time Series Method · ASHRAE Fundamentals 2009</div>
                 </div>
@@ -2033,17 +1812,18 @@ const App=()=>{
       )}
     </div>
 
-    {/* ═══ FAB ═══ */}
-    <button className="fab-pill no-print" onClick={()=>setShowModal(true)}>
-      📐 계산식 안내
-    </button>
+    {/* ═══ FAB (v5.0 §18-11 — 초기화 위 · 계산식 아래) ═══ */}
+    <div id="fab-group" className="no-print">
+      <button className="help-fab" onClick={resetAll} title="입력 초기화">
+        <span className="fab-icon">🔄</span><span className="fab-lbl">초기화</span><span className="fab-sub">전체</span>
+      </button>
+      <button className="help-fab" onClick={()=>setShowModal(true)} title="계산식 안내">
+        <span className="fab-icon">📐</span><span className="fab-lbl">계산식</span><span className="fab-sub">안내</span>
+      </button>
+    </div>
 
     {/* ═══ MODAL ═══ */}
-    {showModal&&<FabModal onClose={()=>setShowModal(false)} onA4Print={()=>window.print()} onA4PNG={onA4PNG} onMobileJPG={onMobileJPG}/>}
-
-    {/* ═══ HIDDEN CAPTURE AREAS ═══ */}
-    <A4Report {...calcProps}/>
-    <MobileCard {...calcProps}/>
+    {showModal&&<FabModal onClose={()=>setShowModal(false)}/>}
 
     {/* ═══ PWA 배너는 DOM(#pwa-banner)에서 단일 관리 ═══ */}
     </>
@@ -2052,6 +1832,106 @@ const App=()=>{
 
 const root=ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App/>);
+</script>
+<script>
+/* ═══════════════ v5.0 — 인쇄 · JPG (React 밖 · A4 DOM 을 읽기만 한다) ═══════════════ */
+function mmToast(m){ var t=document.getElementById('rts-toast'); if(!t){ t=document.createElement('div'); t.id='rts-toast'; t.style.cssText='position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:700;z-index:9500;box-shadow:0 8px 30px rgba(0,0,0,.35);opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;max-width:90vw;'; document.body.appendChild(t);} t.textContent=m; t.style.opacity='1'; clearTimeout(t._h); t._h=setTimeout(function(){t.style.opacity='0';},2400); }
+/* 인쇄 — v5.0 : A4 탭을 열고 window.print() 한 경로(§3-3). 화면 DOM 그대로 인쇄한다(§2②). */
+window.printA4=function(){
+  if(window.__uvSetTab) window.__uvSetTab('a4prev');
+  setTimeout(function(){ window.print(); }, 250);
+};
+function mmSafeCuts(page){
+  var pr=page.getBoundingClientRect(), out=[];
+  page.querySelectorAll('.a4-head2,table.a4-tbl tbody tr,table.a4-meta-table tr')
+    .forEach(function(el){ out.push(el.getBoundingClientRect().bottom-pr.top); });
+  page.querySelectorAll('.a4-sub').forEach(function(el){ out.push(el.getBoundingClientRect().top-pr.top); });
+  out.push(page.scrollHeight);
+  out.sort(function(a,b){return a-b;});
+  return out.filter(function(v,i,a){return i===0 || v-a[i-1]>0.5;});
+}
+function mmPickCut(cuts,y,limit){ var best=0; for(var i=0;i<cuts.length;i++){ if(cuts[i]>y+1 && cuts[i]<=limit) best=cuts[i]; else if(cuts[i]>limit) break; } return best; }
+function mmContentHeight(page){
+  var pr=page.getBoundingClientRect(), max=0;
+  page.querySelectorAll('*').forEach(function(el){ var cs=getComputedStyle(el); if(cs.display==='none'||cs.visibility==='hidden') return; var b=el.getBoundingClientRect().bottom-pr.top; if(b>max) max=b; });
+  var pad=parseFloat(getComputedStyle(page).paddingBottom)||0; var h=Math.ceil(max+pad);
+  return (h>0 && h<page.scrollHeight) ? h : page.scrollHeight;
+}
+var MM_PAGE = { W:794, H:1123, MT:14, MR:12, MB:22, ML:14 };
+function markLongTables(page){ var mmPerPx=210/794, usable=(297-14-22)/mmPerPx; page.querySelectorAll('table.a4-tbl,table.a4-meta-table').forEach(function(t){ t.classList.toggle('long', t.getBoundingClientRect().height > usable); }); }
+function mmBlocks(page){
+  var pr=page.getBoundingClientRect(), out=[], pend=null;
+  Array.prototype.forEach.call(page.children, function(el){
+    var b=el.getBoundingClientRect(); if(b.height<=0) return;
+    var mb=parseFloat(getComputedStyle(el).marginBottom)||0; var top=b.top-pr.top, bot=b.bottom-pr.top+mb;
+    if(el.classList.contains('a4-sub')){ if(pend) out.push(pend); pend={top:top,bot:bot}; return; }
+    if(pend){ out.push({top:pend.top,bot:bot}); pend=null; return; }
+    out.push({top:top,bot:bot});
+  });
+  if(pend) out.push(pend); out.sort(function(a,b){return a.top-b.top;}); return out;
+}
+function mmSegments(page){
+  var mmPerPx=210/MM_PAGE.W, cs=getComputedStyle(page);
+  var padTop=parseFloat(cs.paddingTop)||0, padBot=parseFloat(cs.paddingBottom)||0;
+  var usable=(297-MM_PAGE.MT-MM_PAGE.MB)/mmPerPx, docH=mmContentHeight(page), stop=Math.max(padTop, docH-padBot);
+  var blocks=mmBlocks(page); if(!blocks.length) return [[padTop,stop]];
+  var cuts=mmSafeCuts(page), segs=[], y=padTop, i=0, guard=0;
+  while(i<blocks.length && guard++<120){
+    var limit=y+usable, j=i, end=y;
+    while(j<blocks.length && blocks[j].bot<=limit+0.5){ end=blocks[j].bot; j++; }
+    if(j===i){ var cut=mmPickCut(cuts,y,limit); if(!cut||cut<=y+1) cut=limit; segs.push([y,cut]); if(cut>=blocks[i].bot-0.5) i++; y=cut; continue; }
+    segs.push([y,end]); y=end; i=j;
+  }
+  if(stop-y>5) segs.push([y,stop]);
+  return segs.length ? segs : [[padTop,stop]];
+}
+function mmDownload(url,name){ var a=document.createElement('a'); a.download=name; a.href=url; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+function mmCloseSheet(){ var ov=document.getElementById('mm-save-ov'); if(ov) ov.classList.remove('show'); }
+function mmOpenSheet(shots, base){
+  var prev=document.getElementById('mm-save-ov'); if(prev) prev.remove();
+  var ov=document.createElement('div'); ov.id='mm-save-ov'; var body='';
+  shots.forEach(function(url,i){ body+='<div class="mm-shot"><img src="'+url+'" alt="'+(i+1)+'쪽 미리보기"/><button class="mm-shot-btn" data-i="'+i+'">🖼 '+(i+1)+'쪽 저장</button></div>'; });
+  ov.innerHTML='<div class="mm-sheet" role="dialog" aria-modal="true" aria-label="계산서 저장"><div class="mm-sheet-head"><div><div class="mm-sheet-title">계산서 저장 · 총 '+shots.length+'매</div><div class="mm-sheet-note">'+(shots.length>1?'브라우저가 연속 다운로드를 차단하므로 쪽별로 저장합니다.':'미리보기를 확인하고 저장하세요.')+'</div></div><button class="btn-export mm-btn-close" id="mm-sheet-x">✕ 닫기</button></div><div class="mm-sheet-body'+(shots.length>1?' multi':'')+'">'+body+'</div><div class="mm-sheet-foot"><button class="btn-export mm-btn-jpg" id="mm-save-all">🖼 전체 저장 ('+shots.length+'매)</button></div></div>';
+  document.body.appendChild(ov); ov.classList.add('show');
+  ov.querySelectorAll('.mm-shot-btn').forEach(function(b){ b.addEventListener('click',function(){ mmDownload(shots[+b.getAttribute('data-i')], base+'_'+(+b.getAttribute('data-i')+1)+'of'+shots.length+'.jpg'); }); });
+  document.getElementById('mm-sheet-x').addEventListener('click',mmCloseSheet);
+  ov.addEventListener('click',function(e){ if(e.target===ov) mmCloseSheet(); });
+  document.getElementById('mm-save-all').addEventListener('click',function(){ shots.forEach(function(url,i){ setTimeout(function(){ mmDownload(url, base+'_'+(i+1)+'of'+shots.length+'.jpg'); }, i*400); }); });
+}
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') mmCloseSheet(); });
+window.exportA4Jpg=function(){
+  var el=document.getElementById('a4Page');
+  if(!el){ mmToast('A4 계산서 탭으로 이동 후 시도하세요'); return; }
+  var panel=document.getElementById('tab-print');
+  if(panel && !panel.classList.contains('active')){ if(window.__uvSetTab) window.__uvSetTab('a4prev'); setTimeout(window.exportA4Jpg,350); return; }
+  mmToast('📸 JPG 생성 중...');
+  /* ⛔ 미리보기 축소 배율을 반드시 먼저 푼다(§16-17). 해제 → 리플로우 → 측정·캡처 → 복원 */
+  var scaleWrap=document.getElementById('a4ScaleWrap');
+  var prevTransform=scaleWrap?scaleWrap.style.transform:'';
+  if(scaleWrap) scaleWrap.style.transform='none';
+  void el.offsetHeight;
+  var restoreScale=function(){ if(scaleWrap) scaleWrap.style.transform=prevTransform; };
+  markLongTables(el);
+  var segs=mmSegments(el), fullH=Math.max(mmContentHeight(el),1);
+  html2canvas(el,{scale:2,useCORS:true,allowTaint:false,backgroundColor:'#ffffff',logging:false,width:el.scrollWidth,height:fullH,windowWidth:el.scrollWidth,windowHeight:fullH,scrollX:0,scrollY:0})
+  .then(function(canvas){
+    restoreScale();
+    var now=new Date(), ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+String(now.getMinutes()).padStart(2,'0');
+    var base='열관류율_검토계산서_MANMIN-Ver5.0_'+ts;
+    if(!segs||!segs.length){ mmDownload(canvas.toDataURL('image/jpeg',0.95), base+'.jpg'); mmToast('✅ JPG 저장 완료!'); return; }
+    var S=canvas.width/el.scrollWidth, PAGE_W=MM_PAGE.W, PAGE_H=MM_PAGE.H, mmPerPx=210/PAGE_W, topPx=MM_PAGE.MT/mmPerPx;
+    var shots=segs.map(function(sg,idx){
+      var h=Math.max(1,Math.round((sg[1]-sg[0])*S)); var tmp=document.createElement('canvas'); tmp.width=Math.round(PAGE_W*S); tmp.height=Math.round(PAGE_H*S);
+      var ctx=tmp.getContext('2d'); ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,tmp.width,tmp.height);
+      ctx.drawImage(canvas,0,Math.round(sg[0]*S),canvas.width,h,0,Math.round(topPx*S),canvas.width,h);
+      if(segs.length>1){ var fs=Math.round(9*S); ctx.fillStyle='#9CA3AF'; ctx.font='700 '+fs+'px Orbitron, "JetBrains Mono", monospace'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+        ctx.fillText((idx+1)+' / '+segs.length, Math.round(MM_PAGE.ML/mmPerPx*S), Math.round((MM_PAGE.H-MM_PAGE.MB/mmPerPx+fs/S*0.4)*S)); }
+      return tmp.toDataURL('image/jpeg',0.95);
+    });
+    mmOpenSheet(shots,base);
+    mmToast(shots.length>1?'📄 '+shots.length+'매로 나눴습니다':'📄 미리보기에서 저장하세요');
+  }).catch(function(err){ restoreScale(); mmToast('❌ JPG 저장 실패: '+err.message); });
+};
 </script>
 <!-- ═══ iOS 홈화면 추가 안내 모달 ═══ -->
 <div id="ios-modal-heat">

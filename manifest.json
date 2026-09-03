@@ -1,11 +1,11 @@
 {
-  "name": "열관류율 종합 검토 시스템 MANMIN-Ver3.1",
+  "name": "열관류율 종합 검토 시스템 · MANMIN Ver-5.0",
   "short_name": "열관류율",
-  "description": "건축물 에너지절약설계기준 국토교통부고시 제2025-738호 기반 열관류율 자동 산출 시스템",
+  "description": "건축물의 에너지절약설계기준 국토교통부고시 제2025-738호 기반 열관류율 자동 산출 시스템 — MANMIN Ver-5.0",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f0f4f9",
-  "theme_color": "#1d4ed8",
+  "theme_color": "#15803d",
   "orientation": "any",
   "lang": "ko",
   "icons": [

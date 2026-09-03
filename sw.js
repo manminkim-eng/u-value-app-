@@ -9,7 +9,7 @@
    [변경] React·Babel·Pretendard CDN 프리캐시 유지 · dom-to-image 제거 · html2canvas 추가.
 ═══════════════════════════════════════════════════ */
 const PREFIX = 'uval-';
-const CACHE  = 'uval-v5.0.0';
+const CACHE  = 'uval-v5.0.1';
 const ORPHAN = ['manmin-uval-v3.2','manmin-uval-v3.1','manmin-uval-v3.0'];
 const ASSETS = [
   './',
@@ -74,7 +74,7 @@ self.addEventListener('fetch', e => {
       return fetch(e.request).then(res => {
         if (!res || res.status !== 200 || res.type === 'opaque') return res;
         const clone = res.clone(); caches.open(CACHE).then(c => c.put(e.request, clone)); return res;
-      }).catch(() => caches.match('./index.html'));
+      }).catch(() => Response.error());   /* R19 (2026-09-04): 스크립트·스타일 실패 시 index.html 을 돌려주면 SyntaxError 로 빈 화면이 된다 — 네트워크 오류로 드러낸다 */
     })
   );
 });

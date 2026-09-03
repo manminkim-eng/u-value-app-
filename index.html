@@ -21,7 +21,9 @@
 <link rel="stylesheet" href="./assets/fonts/manmin-fonts.css"/><!-- v5.0 로컬 폴백 폰트 — CDN 차단·오프라인 대비 (§3-7) -->
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
-<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+<script>
+/* R22 (2026-09-04): 아래 RTS IIFE 가 src 있는 <script> 안에 들어 있어 브라우저가 무시 → sendToRTS 미정의 (v3.1 배포본부터) — 태그 분리 */
 /* ══════════════════════════════════════════════════════
    sendToRTS(data)  ·  MANMIN Ver3.1 — 개선판
    ─────────────────────────────────────────────────────

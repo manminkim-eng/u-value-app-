@@ -1,4 +1,5 @@
 /* ═══════════════════════════════════════════════════
+   R25 회차 2026-09-04 — 자기 접두어 캐시 조회 · cors 프리캐시 · opaque 가드 · 캐시명 v5.0.2 (S10)
    열관류율 종합 검토 시스템  MANMIN Ver-5.0
    Service Worker — 오프라인 캐시 + 버전 업데이트  ·  ARCHITECT KIM MANMIN
 
@@ -9,7 +10,20 @@
    [변경] React·Babel·Pretendard CDN 프리캐시 유지 · dom-to-image 제거 · html2canvas 추가.
 ═══════════════════════════════════════════════════ */
 const PREFIX = 'uval-';
-const CACHE  = 'uval-v5.0.1';
+/* ═ R25 (2026-09-04) — SW 캐시 origin 오염 차단 (S10 · 지시서 §21-1 R25)
+   전역 caches 의 match 는 origin 전체를 검색한다. manminkim-eng.github.io 는 34종이 한 origin 이라
+   다른 도구 캐시의 opaque 응답이 <script crossorigin>(cors) 요청에 돌아가 스크립트가 폐기됐다
+   (30 #root 빈 화면 · 40 html2canvas undefined). 자기 접두어 캐시만 조회하고, cross-origin
+   프리캐시는 cors 로 받으며, opaque↔cors 불일치 시 캐시를 쓰지 않는다. */
+const MM_EXCLUDE = [];   /* 내 접두어로 시작하지만 남의 캐시인 이름 (§17-1 충돌) */
+const mmOwn   = (k) => k.indexOf(PREFIX) === 0 && !MM_EXCLUDE.some((x) => k.indexOf(x) === 0);
+const mmReq   = (u) => (typeof u === 'string' && u.indexOf('http') === 0) ? new Request(u, { mode: 'cors' }) : u;
+const mmMatch = (req, opt) => caches.keys()
+  .then((ks) => ks.filter(mmOwn))
+  .then((ks) => ks.reduce((p, k) => p.then((r) => r || caches.open(k).then((c) => c.match(req, opt))), Promise.resolve(undefined)))
+  .then((r) => (r && r.type === 'opaque' && req && req.mode === 'cors') ? undefined : r);
+
+const CACHE  = 'uval-v5.0.2';
 const ORPHAN = ['manmin-uval-v3.2','manmin-uval-v3.1','manmin-uval-v3.0'];
 const ASSETS = [
   './',
@@ -33,7 +47,7 @@ self.addEventListener('install', e => {
   console.log('[SW] Install:', CACHE);
   e.waitUntil(
     caches.open(CACHE)
-      .then(c => Promise.allSettled(ASSETS.map(u => c.add(u).catch(err => console.warn('[SW] precache skip:', u, err)))))
+      .then(c => Promise.allSettled(ASSETS.map(u => c.add(mmReq(u)).catch(err => console.warn('[SW] precache skip:', u, err)))))
       .then(() => self.skipWaiting())
   );
 });
@@ -43,7 +57,7 @@ self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
       .then(keys => Promise.all(
-        keys.filter(k => k !== CACHE && (k.indexOf(PREFIX) === 0 || ORPHAN.indexOf(k) !== -1))
+        keys.filter(k => k !== CACHE && (mmOwn(k) || ORPHAN.indexOf(k) !== -1))
             .map(k => { console.log('[SW] 구버전 캐시 삭제:', k); return caches.delete(k); })
       ))
       .then(() => self.clients.claim())
@@ -59,14 +73,14 @@ self.addEventListener('fetch', e => {
     e.respondWith(
       fetch(e.request)
         .then(res => { if (res && res.status === 200) { const clone = res.clone(); caches.open(CACHE).then(c => c.put(e.request, clone)); } return res; })
-        .catch(() => caches.match(e.request).then(c => c || caches.match('./index.html')))
+        .catch(() => mmMatch(e.request).then(c => c || mmMatch('./index.html')))
     );
     return;
   }
 
   /* 정적 자산 · CDN : Cache-First + 백그라운드 갱신 */
   e.respondWith(
-    caches.match(e.request).then(cached => {
+    mmMatch(e.request).then(cached => {
       if (cached) {
         fetch(e.request).then(res => { if (res && res.status === 200) caches.open(CACHE).then(c => c.put(e.request, res.clone())); }).catch(() => {});
         return cached;

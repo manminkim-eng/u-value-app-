@@ -735,8 +735,8 @@ const DB={
 const DB_H={};
 Object.entries(DB).forEach(([k,c])=>{const g={};Object.entries(c.groups).forEach(([gk,gv])=>{g[gk]=gv.items;});DB_H[k]=g;});
 
-const lambdaColor=v=>v<=0.034?'#1d4ed8':v<=0.040?'#059669':v<=0.046?'#b45309':v<=0.052?'#be123c':'#4b5563';
-const lambdaGrade=v=>v<=0.034?'가':v<=0.040?'나':v<=0.046?'다':v<=0.052?'라':'—';
+const lambdaColor=v=>v<=0.034?'#1d4ed8':v<=0.040?'#059669':v<=0.046?'#b45309':v<=0.051?'#be123c':'#4b5563';
+const lambdaGrade=v=>v<=0.034?'가':v<=0.040?'나':v<=0.046?'다':v<=0.051?'라':'—';
 const lambdaPill=v=>{
   const g=lambdaGrade(v);
   const cls=g==='가'?'ga-pill':g==='나'?'gb-pill':g==='다'?'gc-pill':g==='라'?'gd-pill':'';
@@ -843,7 +843,7 @@ const MaterialTab=()=>{
         <input style={{flex:1,minWidth:'160px',padding:'8px 11px',background:'#f8fafd',border:'1.5px solid #dde3ed',borderRadius:'8px',color:'#1a2744',fontSize:'12px',fontFamily:'inherit',outline:'none',transition:'border-color .15s'}} placeholder="🔍 재료명 검색..." value={query} onChange={e=>setQuery(e.target.value)} onFocus={e=>e.target.style.borderColor='#1d4ed8'} onBlur={e=>e.target.style.borderColor='#dde3ed'}/>
         {selCat==='K_단열재계'&&(
           <div style={{display:'flex',gap:'5px',flexWrap:'wrap'}}>
-            {[{l:'가급 λ≤0.034',c:'#eff6ff',bc:'#bfdbfe',tc:'#1d4ed8'},{l:'나급 ≤0.040',c:'#f0fdf4',bc:'#a7f3d0',tc:'#059669'},{l:'다급 ≤0.046',c:'#fefce8',bc:'#fde047',tc:'#854d0e'},{l:'라급 ≤0.052',c:'#fff1f2',bc:'#fecdd3',tc:'#be123c'}].map(({l,c,bc,tc})=>(
+            {[{l:'가급 λ≤0.034',c:'#eff6ff',bc:'#bfdbfe',tc:'#1d4ed8'},{l:'나급 ≤0.040',c:'#f0fdf4',bc:'#a7f3d0',tc:'#059669'},{l:'다급 ≤0.046',c:'#fefce8',bc:'#fde047',tc:'#854d0e'},{l:'라급 ≤0.051',c:'#fff1f2',bc:'#fecdd3',tc:'#be123c'}].map(({l,c,bc,tc})=>(
               <span key={l} style={{background:c,border:`1px solid ${bc}`,color:tc,borderRadius:'6px',padding:'3px 8px',fontSize:'9px',fontWeight:800}}>{l}</span>
             ))}
           </div>
@@ -935,7 +935,7 @@ const FabModal=({onClose,onA4Print,onA4PNG,onMobileJPG})=>{
                 <div style={{fontSize:'12px',fontWeight:900,color:'#0c4da2',marginBottom:'5px'}}>🗺️ 지역 및 건물 조건 선택</div>
                 <div style={{fontSize:'10.5px',color:'#374151',lineHeight:1.85}}>
                   ① <strong>지역 구분</strong>을 선택합니다 — 중부1 / 중부2 / 남부 / 제주 (국토부고시 별표1 기준).<br/>
-                  ② <strong>건물 용도</strong>(공동주택·비주거 등)와 <strong>검토 부위</strong>(외벽·지붕·바닥·창호 등)를 선택합니다.<br/>
+                  ② <strong>건축 부위</strong>(외벽·지붕·바닥·층간바닥)와 <strong>외기 조건</strong>(직접·간접), <strong>용도</strong>(공동주택 여부·바닥난방 여부)를 선택합니다.<br/>
                   ③ 선택과 동시에 해당 부위의 <strong>법정 허용 U값 기준(W/m²K)</strong>이 자동으로 표시됩니다.
                 </div>
               </div>
@@ -947,9 +947,9 @@ const FabModal=({onClose,onA4Print,onA4PNG,onMobileJPG})=>{
               <div style={{flex:1,minWidth:0}}>
                 <div style={{fontSize:'12px',fontWeight:900,color:'#c2410c',marginBottom:'5px'}}>🧱 단열 구조 레이어 입력</div>
                 <div style={{fontSize:'10.5px',color:'#374151',lineHeight:1.85}}>
-                  ① <strong>실외 표면저항(Ro)</strong>은 외기 직접(0.043) / 외기 간접(Ri와 동일) 중 선택합니다.<br/>
-                  ② <strong>+ 레이어 추가</strong> 버튼으로 구성 재료를 순서대로 입력합니다.<br/>
-                  ③ 재료별로 <strong>재료명 검색</strong>(DB 자동완성) → <strong>열전도율 λ(W/mK)</strong> → <strong>두께 t(mm)</strong>를 입력합니다.<br/>
+                  ① <strong>표면 열전달저항(Ri·Ro)</strong>은 부위와 외기 조건에 따라 별표5 값이 자동 적용됩니다.<br/>
+                  ② <strong>+ 추가</strong> 버튼으로 구성 재료를 실외 → 실내 순서로 입력합니다.<br/>
+                  ③ <strong>대분류 → 중분류 → 재료</strong>를 고르면 <strong>열전도율 λ(W/mK)</strong>가 채워지고, <strong>두께 t(mm)</strong>를 입력합니다.<br/>
                   ④ '공기층' 포함 재료는 두께에 따라 <strong>R값이 자동 특수 처리</strong>됩니다(최대 0.086 m²K/W).
                 </div>
               </div>
@@ -972,11 +972,11 @@ const FabModal=({onClose,onA4Print,onA4PNG,onMobileJPG})=>{
             <div style={{display:'flex',gap:'11px',alignItems:'flex-start',background:'#f5f3ff',border:'1.5px solid #ddd6fe',borderLeft:'4px solid #7c3aed',borderRadius:'10px',padding:'13px 14px',marginBottom:'9px'}}>
               <div style={{minWidth:'30px',height:'30px',background:'linear-gradient(135deg,#7c3aed,#6d28d9)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:900,color:'#fff',flexShrink:0,boxShadow:'0 2px 8px rgba(124,58,237,.35)'}}>4</div>
               <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:'12px',fontWeight:900,color:'#6d28d9',marginBottom:'5px'}}>📋 다부위 종합 검토</div>
+                <div style={{fontSize:'12px',fontWeight:900,color:'#6d28d9',marginBottom:'5px'}}>📋 부위별 반복 검토</div>
                 <div style={{fontSize:'10.5px',color:'#374151',lineHeight:1.85}}>
-                  ① <strong>외벽·지붕·바닥·창호</strong> 등 여러 부위를 각각 탭으로 전환하며 입력합니다.<br/>
-                  ② 모든 부위 입력 후 <strong>종합 판정표</strong>에서 전 부위 적합 여부를 한눈에 확인합니다.<br/>
-                  ③ 평균 열관류율(Um) 계산이 필요한 경우 면적 가중 평균 계산 기능을 활용합니다.
+                  ① <strong>외벽·지붕·바닥</strong>은 건축 부위를 바꿔 가며 부위별로 각각 계산합니다.<br/>
+                  ② 부위마다 <strong>A4 계산서</strong>를 출력해 묶습니다(계산서는 부위 1개에 1장).<br/>
+                  ③ 평균 열관류율과 창 및 문은 이 프로그램의 계산 대상이 아니므로 별도로 확인합니다.
                 </div>
               </div>
             </div>
@@ -988,8 +988,8 @@ const FabModal=({onClose,onA4Print,onA4PNG,onMobileJPG})=>{
                 <div style={{fontSize:'12px',fontWeight:900,color:'#1d4ed8',marginBottom:'5px'}}>🖨️ 결과 출력 및 저장</div>
                 <div style={{fontSize:'10.5px',color:'#374151',lineHeight:1.85}}>
                   ① 상단의 <strong>「A4 미리보기」 탭</strong>에서 보고서를 확인한 뒤 <strong>산출서 인쇄/PDF</strong>로 저장합니다.<br/>
-                  ② <strong>「모바일 미리보기」 탭</strong>에서 JPG 이미지로 저장하거나 공유할 수 있습니다.<br/>
-                  ③ <strong>「재료별 열전도율」 탭</strong>에서 DB에 없는 재료의 λ값을 조회할 수 있습니다.<br/>
+                  ② 같은 탭의 <strong>「JPG 저장」</strong>으로 계산서를 이미지로 저장할 수 있습니다.<br/>
+                  ③ <strong>「재료별 열전도율」 탭</strong>에서 재료 DB의 λ값을 조회·검색할 수 있습니다.<br/>
                   ④ PWA 설치: 브라우저 주소창 아이콘 또는 iOS Safari → 공유 → 홈 화면에 추가.
                 </div>
               </div>
@@ -1008,11 +1008,11 @@ const FabModal=({onClose,onA4Print,onA4PNG,onMobileJPG})=>{
               </div>
               <div className="fml-card" style={{borderLeft:'3px solid #16a34a'}}>
                 <div className="fml-card-ttl" style={{color:'#16a34a'}}>🧱 재료 DB 검색</div>
-                <div className="fml-note">재료명 입력 시 내장 DB에서 자동완성됩니다. 「재료별 열전도율」 탭에서 전체 목록을 조회하거나 직접 λ값을 입력할 수 있습니다.</div>
+                <div className="fml-note">대분류 → 중분류 → 재료를 고르면 내장 DB의 λ값이 입력됩니다. 「재료별 열전도율」 탭에서 전체 목록을 조회하고, λ 칸은 시험성적서 값으로 직접 고칠 수 있습니다.</div>
               </div>
               <div className="fml-card" style={{borderLeft:'3px solid #7c3aed'}}>
                 <div className="fml-card-ttl" style={{color:'#7c3aed'}}>🌡️ 공기층 자동 처리</div>
-                <div className="fml-note">재료명에 '공기층'을 입력하면 두께에 따라 R = 0.086×(d/10) 공식이 자동 적용됩니다. d ≥ 10mm이면 최대 R = 0.086으로 고정됩니다.</div>
+                <div className="fml-note">이름에 '공기층'이 든 재료를 고르면 별표6 현장시공 값이 적용됩니다 — 두께 10mm 이하 R = 0.086×(d/10), 10mm 초과 R = 0.086 고정.</div>
               </div>
             </div>
 
@@ -1020,10 +1020,10 @@ const FabModal=({onClose,onA4Print,onA4PNG,onMobileJPG})=>{
             <div className="fml-hi" style={{marginTop:'4px'}}>
               <div className="fml-card-ttl" style={{color:'#0c4da2'}}>📌 주요 법적 근거</div>
               <div className="fml-note" style={{fontSize:'10.5px',lineHeight:2.1}}>
-                <strong>국토교통부고시 제2026-360호</strong>(2026. 7. 8. 시행 · 실체개정 제2025-738호 2025. 12. 31.) — 건축물의 에너지절약설계기준 (별표1 지역 구분, 별표3 허용 U값)<br/>
-                <strong>KS L 9102 / KS M 3808</strong> — 단열재 열전도율 시험 기준<br/>
-                <strong>에너지절약설계기준 해설서(2025)</strong> — 표면 열전달저항 및 공기층 처리 기준<br/>
-                <strong>건축물 에너지 효율등급 인증 기준</strong> — 비주거 건물 평균 열관류율(Um) 산출
+                <strong>국토교통부고시 제2026-360호</strong>(2026. 7. 8. 시행 · 실체개정 제2025-738호 2025. 12. 31.) — 건축물의 에너지절약설계기준 (별표1 부위별 열관류율·지역 구분, 별표3 단열재 두께)<br/>
+                <strong>제6조제1호 라목</strong> — 단열재 열전도율은 KS L 9016 · KS L ISO 8301(또는 8302) 측정 값, 시료 평균온도 20±5℃<br/>
+                <strong>별표5 · 별표6</strong> — 표면 열전달저항 및 중공층(공기층)의 열저항<br/>
+                <strong>제6조제1호 다목 5)</strong> — 계산결과는 소수점 3자리로 맺음(넷째 자리에서 반올림)하여 판정
               </div>
             </div>
 
@@ -1069,17 +1069,17 @@ const FabModal=({onClose,onA4Print,onA4PNG,onMobileJPG})=>{
             </table>
             <div className="fml-hi" style={{marginTop:'10px'}}>
               <strong>ℹ 적용 기준</strong><br/>
-              · 외기 직접: Ro = 0.043 (외풍이 있는 환경)<br/>
-              · 외기 간접: Ro = Ri (완충 공간이 있는 경우)<br/>
-              · 층간바닥: Ri = Ro = 0.086 (양측 모두 실내)<br/>
-              ※ 출처: 에너지절약설계기준 해설서(2025)
+              · 외기 직접: Ro = 0.043<br/>
+              · 외기 간접: 외벽 0.110 · 지붕 0.086 · 바닥 0.150<br/>
+              · 층간바닥: 별표5는 실내 0.086만 정함 — 본 프로그램은 반대쪽 면에도 0.086 적용<br/>
+              ※ 출처: 건축물의 에너지절약설계기준 별표5
             </div>
           </div>
           {/* ── 단열등급 ── */}
           <div className={`fml-panel${itab==='insul'?' on':''}`}>
             <div className="fml-sec" style={{color:'#0c4da2'}}>단열재 등급 분류 (λ 기준)</div>
             <div className="fml-g2">
-              {[{g:'가급',bg:'#eff6ff',bc:'#bfdbfe',tc:'#1d4ed8',r:'λ ≤ 0.034 W/mK',ex:['PF보드 1종 (0.022~)','XPS 1·2종 (0.026~0.029)','EPS 3종A (0.029~0.031)','폴리에스테르 1급 (0.034)']},{g:'나급',bg:'#f0fdf4',bc:'#a7f3d0',tc:'#059669',r:'0.035 ~ 0.040 W/mK',ex:['그라스울 40K~48K (0.034~0.035)','미네랄울 보온판 (0.036~0.038)','EPS 1종A (0.033~0.039)','폴리에스테르 2급 (0.040)']},{g:'다급',bg:'#fefce8',bc:'#fde047',tc:'#854d0e',r:'0.041 ~ 0.046 W/mK',ex:['EPS 1종B/C (0.043)','비드법보호판 4호 (0.043)','폴리에스테르 3급 (0.045)']},{g:'라급',bg:'#fff1f2',bc:'#fecdd3',tc:'#be123c',r:'0.047 ~ 0.052 W/mK',ex:['그 외 열전도율 0.047 ~ 0.052 소재']}].map(({g,bg,bc,tc,r,ex})=>(
+              {[{g:'가급',bg:'#eff6ff',bc:'#bfdbfe',tc:'#1d4ed8',r:'λ ≤ 0.034 W/mK',ex:['압출법보온판 Ⅰ종(A-1, A-2) · Ⅱ종(A, B-1, B-2) · Ⅲ종(A, B-2, C)','비드법보온판 Ⅰ종 A-1 · Ⅱ종 A-1 · Ⅲ종(A-1, A-2, B)','경질우레탄폼보온판 · 페놀 폼 Ⅰ종(A, C, D) · Ⅱ종 A','그라스울 보온판 48K~120K · 폴리에스테르 1급']},{g:'나급',bg:'#f0fdf4',bc:'#a7f3d0',tc:'#059669',r:'0.035 ~ 0.040 W/mK',ex:['비드법보온판 Ⅰ종 A-2 · Ⅱ종(A-2, B) · Ⅲ종 C','페놀 폼 Ⅰ종 B · Ⅱ종 B · Ⅲ종 A','미네랄울 보온판 1~3호 · 그라스울 24K~40K','폴리에스테르 2급']},{g:'다급',bg:'#fefce8',bc:'#fde047',tc:'#854d0e',r:'0.041 ~ 0.046 W/mK',ex:['비드법보온판 Ⅰ종(B, C)','폴리에스테르 흡음 단열재 3급']},{g:'라급',bg:'#fff1f2',bc:'#fecdd3',tc:'#be123c',r:'0.047 ~ 0.051 W/mK',ex:['기타 단열재로서 열전도율이 이 범위인 경우']}].map(({g,bg,bc,tc,r,ex})=>(
                 <div key={g} style={{background:bg,border:`1.5px solid ${bc}`,borderRadius:'10px',padding:'13px'}}>
                   <div style={{fontSize:'18px',fontWeight:900,color:tc,marginBottom:'4px'}}>{g}</div>
                   <div style={{fontSize:'10px',fontWeight:700,color:'#1a2744',marginBottom:'7px',fontFamily:'JetBrains Mono,monospace'}}>{r}</div>
@@ -1109,19 +1109,18 @@ const FabModal=({onClose,onA4Print,onA4PNG,onMobileJPG})=>{
                   <span style={{color:'#bfdbfe',fontSize:'9px',fontWeight:700}}>최저 U값 적용</span>
                 </div>
                 <div style={{padding:'12px 14px'}}>
-                  <div style={{fontSize:'10px',fontWeight:700,color:'#1e40af',marginBottom:'7px',letterSpacing:'.04em'}}>▸ 강원특별자치도 산간 지역</div>
-                  <div style={{display:'flex',flexWrap:'wrap',gap:'5px',marginBottom:'8px'}}>
-                    {['태백시','정선군','평창군','홍천군(일부)','인제군','양구군','화천군','철원군','춘천시(일부)'].map(c=>(
-                      <span key={c} style={{background:'#dbeafe',color:'#1d4ed8',borderRadius:'5px',padding:'3px 8px',fontSize:'10px',fontWeight:700}}>{c}</span>
-                    ))}
-                  </div>
-                  <div style={{fontSize:'10px',fontWeight:700,color:'#1e40af',marginBottom:'7px',letterSpacing:'.04em'}}>▸ 경기도</div>
-                  <div style={{display:'flex',flexWrap:'wrap',gap:'5px'}}>
-                    {['연천군(일부)'].map(c=>(
-                      <span key={c} style={{background:'#dbeafe',color:'#1d4ed8',borderRadius:'5px',padding:'3px 8px',fontSize:'10px',fontWeight:700}}>{c}</span>
-                    ))}
-                  </div>
-                  <div style={{marginTop:'8px',fontSize:'9px',color:'#3b82f6',fontWeight:600}}>※ 해발고도 600m 이상 또는 별도 고시 지역 포함</div>
+                  {[
+                    {t:'강원특별자치도', items:['고성·속초·양양·강릉·동해·삼척을 제외한 전 지역']},
+                    {t:'경기도', items:['연천','포천','가평','남양주','의정부','양주','동두천','파주']},
+                    {t:'충청북도 · 경상북도', items:['충청북도 제천','경상북도 봉화','경상북도 청송']},
+                  ].map(({t,items})=>(
+                    <div key={t} style={{marginBottom:'8px'}}>
+                      <div style={{fontSize:'10px',fontWeight:700,color:'#1e40af',marginBottom:'5px',letterSpacing:'.04em'}}>▸ {t}</div>
+                      <div style={{display:'flex',flexWrap:'wrap',gap:'5px'}}>
+                        {items.map(c=><span key={c} style={{background:'#dbeafe',color:'#1d4ed8',borderRadius:'5px',padding:'3px 8px',fontSize:'10px',fontWeight:700}}>{c}</span>)}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -1135,10 +1134,10 @@ const FabModal=({onClose,onA4Print,onA4PNG,onMobileJPG})=>{
                 </div>
                 <div style={{padding:'12px 14px'}}>
                   {[
-                    {t:'서울·인천·경기', items:['서울특별시','인천광역시','경기도 전역(연천군 일부 제외)']},
-                    {t:'강원특별자치도 동해안', items:['강릉시','동해시','속초시','삼척시','고성군','양양군']},
-                    {t:'충청도', items:['충청북도 전역','충청남도 전역','세종특별자치시','대전광역시']},
-                    {t:'전북·경북 일부', items:['전북(고창·부안·정읍·남원·순창·임실·진안·무주 제외)','경북(봉화·영주·문경·예천·안동·의성·청송·영양·영덕·울진·울릉 제외)']},
+                    {t:'특별시·광역시', items:['서울특별시','인천광역시','대전광역시','세종특별자치시','대구광역시(군위)']},
+                    {t:'강원특별자치도 동해안', items:['고성','속초','양양','강릉','동해','삼척']},
+                    {t:'경기도 · 충청도', items:['경기도(연천·포천·가평·남양주·의정부·양주·동두천·파주 제외)','충청북도(제천 제외)','충청남도']},
+                    {t:'전북 · 경북 · 경남', items:['전북특별자치도 전 지역','경상북도(봉화·청송·울진·영덕·포항·경주·청도·경산 제외)','경상남도(거창·함양)']},
                   ].map(({t,items})=>(
                     <div key={t} style={{marginBottom:'8px'}}>
                       <div style={{fontSize:'10px',fontWeight:700,color:'#065f46',marginBottom:'5px',letterSpacing:'.04em'}}>▸ {t}</div>
@@ -1160,8 +1159,8 @@ const FabModal=({onClose,onA4Print,onA4PNG,onMobileJPG})=>{
                 </div>
                 <div style={{padding:'12px 14px'}}>
                   {[
-                    {t:'광역시', items:['부산광역시','대구광역시','광주광역시','울산광역시']},
-                    {t:'전라·경상', items:['전라남도 전역','경상남도 전역','전북(고창·부안·정읍·남원·순창·임실·진안·무주)','경북(봉화·영주·문경·예천·안동·의성·청송·영양·영덕·울진·울릉)']},
+                    {t:'광역시', items:['부산광역시','대구광역시(군위 제외)','울산광역시','광주광역시']},
+                    {t:'전라 · 경상', items:['전라남도','경상북도(울진·영덕·포항·경주·청도·경산)','경상남도(거창·함양 제외)']},
                   ].map(({t,items})=>(
                     <div key={t} style={{marginBottom:'8px'}}>
                       <div style={{fontSize:'10px',fontWeight:700,color:'#78350f',marginBottom:'5px',letterSpacing:'.04em'}}>▸ {t}</div>
@@ -1183,7 +1182,7 @@ const FabModal=({onClose,onA4Print,onA4PNG,onMobileJPG})=>{
                 </div>
                 <div style={{padding:'12px 14px'}}>
                   <div style={{display:'flex',flexWrap:'wrap',gap:'5px',marginBottom:'6px'}}>
-                    {['제주시','서귀포시','제주특별자치도 전 지역'].map(c=>(
+                    {['제주특별자치도'].map(c=>(
                       <span key={c} style={{background:'#ffe4e6',color:'#be123c',borderRadius:'5px',padding:'3px 8px',fontSize:'10px',fontWeight:700}}>{c}</span>
                     ))}
                   </div>
@@ -1192,9 +1191,9 @@ const FabModal=({onClose,onA4Print,onA4PNG,onMobileJPG})=>{
 
               <div className="fml-hi" style={{marginTop:'2px'}}>
                 <strong>ℹ 적용 안내</strong><br/>
-                · 동일 시·군·구 내에서도 행정구역 일부만 해당 지역으로 지정되는 경우가 있음<br/>
+                · 지역 구분은 시·군 단위 — 대지 소재지를 별표1 비고에서 확인<br/>
                 · 경계 지역은 국토교통부 고시 [별표 1] 원문 또는 인허가 담당 행정청에 확인<br/>
-                · 지역 구분은 제2025-738호 시행일(2025년) 기준
+                · 출처: 별표1 비고 — 제2025-738호(2025. 12. 31. 시행) 개정 내용, 현행 제2026-360호와 동일
               </div>
             </div>
           </div>

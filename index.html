@@ -292,6 +292,7 @@ input[type="number"]{-moz-appearance:textfield;}
 .tb svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .tb:hover{color:#fff;background:rgba(255,255,255,.09);}
 .tb.active{color:#fff;background:#15803d;border-bottom-color:#86efac;}
+.tb.tb-manual{margin-left:auto;text-decoration:none;}   /* v5.0.8 — 사용자 매뉴얼(탭 막대 오른쪽 끝 · 헤더 버튼 0개 규격 유지) */
 .tab-panel{display:none;width:100%;}
 .tab-panel.active{display:block;}
 /* v5.0-HDR — 요약 스트립 (헤더 3층) */
@@ -1442,6 +1443,7 @@ const App=()=>{
               {icon}{label}
             </button>
           ))}
+          <a className="tb tb-manual" href="https://manminkim-eng.github.io/u-value-app-/manual/" target="_blank" rel="noopener" title="사용자 매뉴얼 (새 창)" onClick={e=>{if(navigator.onLine===false){e.preventDefault();mmToast('매뉴얼은 인터넷 연결 시 열립니다');}}}>📘 매뉴얼</a>
         </div>
       </nav>
     </header>

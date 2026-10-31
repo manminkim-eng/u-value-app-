@@ -216,7 +216,7 @@
   <div style="background:linear-gradient(135deg,#1d4ed8,#7c3aed);width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📤</div>
   <div style="flex:1;min-width:0">
     <div style="font-size:12px;font-weight:900;color:#93c5fd;letter-spacing:.04em;margin-bottom:2px">RTS 부하계산서로 전송</div>
-    <div style="font-size:11px;color:#94a3b8">부위 <strong style="color:#e2e8f0">${partShort}</strong> · U = <strong style="color:#fbbf24;font-family:'JetBrains Mono',monospace">${currentU}</strong> W/m²K · ${passStr} · 기준 ${stdStr} · 레이어 ${layerCount}개</div>
+    <div style="font-size:11px;color:#94a3b8">부위 <strong style="color:#e2e8f0">${partShort}</strong> · U = <strong style="color:#fbbf24;font-family:'JetBrains Mono',Consolas,'Pretendard Variable',Pretendard,'Malgun Gothic',monospace">${currentU}</strong> W/m²K · ${passStr} · 기준 ${stdStr} · 레이어 ${layerCount}개</div>
   </div>
   <button id="_rts-toast-close" style="background:none;border:none;color:#475569;font-size:18px;cursor:pointer;padding:0;line-height:1;flex-shrink:0" aria-label="닫기">✕</button>
 </div>
@@ -270,7 +270,7 @@ input[type="number"]{-moz-appearance:textfield;}
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:#f0f4f9;}
 ::-webkit-scrollbar-thumb{background:#f1dfb5;border-radius:10px;}
-.mono{font-family:'JetBrains Mono','Courier New',monospace!important;}
+.mono{font-family:'JetBrains Mono','Courier New',Consolas,'Pretendard Variable',Pretendard,'Malgun Gothic',monospace!important;}
 
 /* ═══ HEADER (v5.0 §3-1 · §18-1 — 탭이 <header> 안이라 래퍼 불필요 · sticky 금지) ═══ */
 .app-header{background:linear-gradient(135deg,#14110b 0%,#785a28 50%,#8f6b2e 100%);color:#fff;
@@ -543,7 +543,7 @@ input[type="number"]{-moz-appearance:textfield;}
 .fml-sec{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin:16px 0 8px;display:flex;align-items:center;gap:7px;border-left:3px solid #785a28;padding-left:9px;color:#1a2744;}
 .fml-sec:first-child{margin-top:0;}
 .fml-card{background:#f8fafc;border:1px solid #e4e9f0;border-radius:10px;padding:12px 13px;margin-bottom:8px;}
-.fml-eq{display:block;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#785a28;background:#fbf6ea;border-radius:8px;padding:10px 13px;margin:6px 0;word-break:break-all;line-height:1.75;}
+.fml-eq{display:block;font-family:'JetBrains Mono',Consolas,'Pretendard Variable',Pretendard,'Malgun Gothic',monospace;font-size:13px;font-weight:700;color:#785a28;background:#fbf6ea;border-radius:8px;padding:10px 13px;margin:6px 0;word-break:break-all;line-height:1.75;}
 .fml-eq.amber{background:#fff7ed;color:#b45309;}
 .fml-eq.em{background:#f0fdf4;color:#059669;}
 .fml-note{font-size:11px;color:#64748b;margin-top:5px;line-height:1.8;}
@@ -581,8 +581,8 @@ input[type="number"]{-moz-appearance:textfield;}
 .a4-scale-wrap{display:block;transform-origin:top center;flex-shrink:0;}
 /* ⛔ .a4-page 는 언제나 794px 고정(§17-2). 화면 여백 = @page 여백 (53/45/83/53px) → 내용 696×986px */
 .a4-page{background:#fff;width:794px;min-height:1122px;margin:0;padding:53px 45px 83px 53px;box-shadow:0 8px 40px rgba(0,0,0,.28);font-size:11px;color:#111827;display:block;position:relative;line-height:1.5;
-  font-family:'Noto Sans KR Local','Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;}
-.a4-page .mono,.a4-page code{font-family:'JetBrains Mono','Noto Sans KR Local',monospace;}
+  font-family:'Pretendard Variable','Pretendard','Noto Sans KR Local','Apple SD Gothic Neo','Malgun Gothic',sans-serif;}
+.a4-page .mono,.a4-page code{font-family:'JetBrains Mono',Consolas,'Pretendard Variable',Pretendard,'Noto Sans KR Local','Malgun Gothic',monospace;}
 .a4-page table td,.a4-page table th{line-height:1.45!important;vertical-align:middle!important;}
 .a4-tit{font-size:22px;font-weight:900;color:#14110b;text-align:center;border-bottom:2.5px solid #785a28;padding-bottom:9px;margin-bottom:12px;letter-spacing:-.02em;}
 .a4-head2{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:12px;}
@@ -592,7 +592,7 @@ input[type="number"]{-moz-appearance:textfield;}
 .a4-tbl,.a4-meta-table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:7px;}
 .a4-tbl th,.a4-meta-table th{background:#f6ecd6;padding:5px 6px;text-align:center;font-weight:700;font-size:11px;color:#3d2e15;border:1px solid #f1dfb5;}
 .a4-tbl td,.a4-meta-table td{padding:5px 7px;text-align:left;border:1px solid #e2e8f0;font-weight:600;color:#111827;vertical-align:top;}
-.a4-tbl td.c{text-align:center;} .a4-tbl td.r{text-align:right;font-family:'JetBrains Mono','Noto Sans KR Local',monospace;}
+.a4-tbl td.c{text-align:center;} .a4-tbl td.r{text-align:right;font-family:'JetBrains Mono',Consolas,'Pretendard Variable',Pretendard,'Noto Sans KR Local','Malgun Gothic',monospace;}
 .a4-meta-table td.k{background:#fbf6ea;font-weight:800;color:#3d2e15;width:110px;white-space:nowrap;}
 .a4-tbl tfoot td{background:#f6ecd6!important;font-weight:900;}
 .a4-verdict{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;margin-bottom:8px;border:1.5px solid;}
@@ -601,8 +601,8 @@ input[type="number"]{-moz-appearance:textfield;}
 .a4-verdict .v-main{font-size:16px;font-weight:900;letter-spacing:-.01em;}
 .a4-verdict .v-sub{font-size:10px;font-weight:600;opacity:.85;}
 .a4-ubar{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:7px;}
-.a4-ubar .u-eq{font-family:'JetBrains Mono',monospace;font-size:12px;color:#64748b;font-style:italic;}
-.a4-ubar .u-val{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:900;color:#785a28;}
+.a4-ubar .u-eq{font-family:'JetBrains Mono',Consolas,'Pretendard Variable',Pretendard,'Malgun Gothic',monospace;font-size:12px;color:#64748b;font-style:italic;}
+.a4-ubar .u-val{font-family:'JetBrains Mono',Consolas,'Pretendard Variable',Pretendard,'Malgun Gothic',monospace;font-size:24px;font-weight:900;color:#785a28;}
 .a4-ubar .u-val.ng{color:#b91c1c;}
 .a4-tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:800;white-space:nowrap;}
 .a4-tag.pass{background:#dcfce7;color:#15803d;} .a4-tag.fail{background:#fee2e2;color:#b91c1c;} .a4-tag.info{background:#f6ecd6;color:#3d2e15;}
@@ -707,7 +707,7 @@ footer.mm-foot{position:relative;z-index:1;border-top:1px solid #e4e9f0;backgrou
 .mm-foot .foot-inner{max-width:1320px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 .mm-foot .foot-nm{font-weight:900;font-size:13px;color:#785a28;letter-spacing:.06em}
 .mm-foot .foot-desc{font-size:11px;color:#64748b;line-height:1.6}
-.mm-foot .foot-copy{font-size:11px;color:#64748b;font-family:'DM Mono',ui-monospace,monospace}
+.mm-foot .foot-copy{font-size:11px;color:#64748b;font-family:'DM Mono',Consolas,'Pretendard Variable',Pretendard,'Malgun Gothic',ui-monospace,monospace}
 @media print{footer.mm-foot{display:none!important}}
 </style>
 </head>
@@ -2139,5 +2139,59 @@ if('serviceWorker' in navigator){
     <div class="foot-copy">ARCHITECT KIM MANMIN © 2026</div>
   </div>
 </footer>
+<script id="mm-print-meta" data-name="열관류율검토계산서" data-pageno="0">/* v5.0.15 (2026-10-31) — 쪽 번호 · PDF 저장 이름(작업지시서 §25-6-26) */
+/* MANMIN 인쇄 정보 v1 (2026-10-31, 작업지시서 §25-6-26) — ① 쪽 번호 「n / N」(A4 아래 여백 가운데, data-pageno="1" 일 때)
+   ② PDF 저장 이름 = 계산서명_공사명_YYYYMMDD — 크롬이 문서 제목을 파일 이름으로 쓰므로 인쇄 직전(beforeprint)에만 제목을 바꾸고 끝나면(afterprint) 되돌림.
+   이름 붙이기는 「제목 비우기(§20-15 ③ R26)」보다 뒤에 돌아 그것을 대신함(MIN 승인 R2, 2026-10-31).
+   설정은 script 태그 속성: data-name = 계산서명 · data-alt = "선택자=이름;…"(그 선택자가 있으면 다른 이름) · data-proj = 공사명 입력칸 선택자(없으면 자동 찾기). */
+(function () {
+  var me = document.currentScript; if (!me || window.__mmMeta) return; window.__mmMeta = 1;
+  var NAME = me.getAttribute('data-name') || '', ALT = me.getAttribute('data-alt') || '', PROJ = me.getAttribute('data-proj') || '';
+  if (me.getAttribute('data-pageno') === '1') {
+    var st = document.createElement('style'); st.id = 'mm-pageno';
+    st.textContent = '@page{@bottom-center{content:counter(page) " / " counter(pages);font-family:"Pretendard Variable",Pretendard,"Malgun Gothic",sans-serif;font-size:8pt;color:#555;vertical-align:top;padding-top:5mm}}';
+    document.head.appendChild(st);
+  }
+  var KEY = /공사\s*\(?현장\)?\s*명|공사명|현장명|용역명|프로젝트명|사업명|건물명|건축물명/;
+  function label(e) {
+    var t = (e.placeholder || '') + ' ' + (e.getAttribute('aria-label') || '') + ' ' + (e.labels && e.labels[0] ? e.labels[0].innerText : '');
+    var p = e.parentElement;
+    for (var k = 0; k < 3 && p; k++, p = p.parentElement) {
+      var x = Array.prototype.filter.call(p.childNodes, function (n) { return n !== e && (n.nodeType === 3 || !n.querySelector || !n.querySelector('input,select,textarea')); })
+        .map(function (n) { return n.textContent; }).join(' ').trim();
+      if (x) { t += ' ' + x.slice(0, 40); break; }
+    }
+    return t;
+  }
+  function proj() {
+    var list = PROJ ? document.querySelectorAll(PROJ) : Array.prototype.filter.call(document.querySelectorAll('input[type=text],input:not([type])'), function (e) { return KEY.test(label(e)); });
+    var vis = null, any = null;
+    Array.prototype.forEach.call(list, function (e) { var v = (e.value || '').trim(); if (!v) return; if (!any) any = v; if (!vis && e.getClientRects().length) vis = v; });
+    return vis || any || fromText();
+  }
+  /* 입력 탭이 인쇄 때 화면에서 빠지는 도구(소방 펌프 등) — 계산서 본문의 「공사명 : 값」 또는 「공사명」 칸 다음 칸에서 읽음 */
+  var LBL = /^(공사\s*\(?현장\)?\s*명|공\s*사\s*명|현장명|용역명|프로젝트명|사업명)\s*[:：]?\s*/;
+  function fromText() {
+    var els = document.querySelectorAll('td,th,dt,dd,div,span,b,strong,p,li,label'), v = '';
+    for (var i = 0; i < els.length && !v; i++) {
+      var e = els[i], t = (e.textContent || '').replace(/\s+/g, ' ').trim(); if (!t || t.length > 70 || !LBL.test(t) || e.children.length > 3) continue;
+      var rest = t.replace(LBL, '').split(/\s*(설계자|작성자|작성일|발주처|대지위치|위치|날짜|일자|용도)\s*[:：]/)[0].trim();
+      if (!rest && e.nextElementSibling) rest = (e.nextElementSibling.textContent || '').replace(/\s+/g, ' ').trim();
+      if (rest && rest.length <= 60 && !/^(\(미입력\)|미입력|[-—–·]+)$/.test(rest) && !/^[·\/|(]/.test(rest) && !/작성자|설계자|입력|카드|선택|예\)|예:/.test(rest)) v = rest;
+    }
+    return v;
+  }
+  function ymd() { var d = new Date(), z = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()); }
+  var old = null, stamp = null; /* 도구의 기존 제목 비우기(§20-15 ③ R26)가 먼저 돌고 되돌리므로, 끝날 때는 제목이 아직 이 모듈이 붙인 이름일 때만 되돌림 */
+  addEventListener('beforeprint', function () {
+    var n = NAME;
+    ALT.split(';').forEach(function (kv) { var i = kv.lastIndexOf('='); if (i > 0) { try { if (document.querySelector(kv.slice(0, i))) n = kv.slice(i + 1); } catch (e) {} } });
+    if (!n) return;
+    if (old === null) old = document.title;
+    stamp = document.title = [n, proj(), ymd()].filter(Boolean).map(function (s) { return s.replace(/[\\\/:*?"<>|]/g, '').replace(/\s+/g, ''); }).join('_');
+  });
+  addEventListener('afterprint', function () { if (old !== null && document.title === stamp) document.title = old; old = stamp = null; });
+})();
+</script>
 </body>
 </html>

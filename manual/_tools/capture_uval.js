@@ -29,6 +29,8 @@ const SHOTS=[
  {id:'s15_help_surface',tab:null,pre:"__mtab('표면저항')",clip:'viewport',m:[]},
  {id:'s16_help_grade',tab:null,pre:"__mtab('단열등급')",clip:'viewport',m:[]},
  {id:'s17_help_region',tab:null,pre:"__mtab('지역 구분')",post:"__modal(false)",clip:'viewport',m:[]},
+ {id:"s20_proj_menu",pre:"__tab(0);localStorage.setItem('MANMIN_PROJECT_V1',JSON.stringify({\"사업명\": \"만민 건축사 신사옥 신축공사 설계용역\", \"작성자\": \"김만민 건축사\", \"연면적\": \"12500\", \"지상층\": \"15\", \"지하층\": \"2\", \"updated\": \"2026-11-08 10:00\", \"from\": \"부하계산(RTS)\"}));window.scrollTo(0,0);document.querySelector('.mm-proj-btn').click()",wait:700,clip:'viewport',post:"document.querySelectorAll('.mm-proj-menu').forEach(e=>e.remove())",m:[[".mm-proj-btn", "「🏢 건물개요」 단추(오른쪽 아래)"], [".mm-proj-menu button[data-a=\"save\"]", "저장 — 지금 값 담기"], [".mm-proj-menu button[data-a=\"load\"]", "불러오기"], [".mm-proj-menu button[data-a=\"exp\"]", "파일로 내보내기(.json)"], [".mm-proj-menu button[data-a=\"imp\"]", "파일 가져오기"]]},
+ {id:"s21_proj_load",pre:"__tab(0);(()=>{const e=MMProject.fields('사업명')[0];if(e){const d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');d.set.call(e,'');e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));}localStorage.setItem('MANMIN_PROJECT_V1',JSON.stringify({\"사업명\": \"만민 건축사 신사옥 신축공사 설계용역\", \"작성자\": \"김만민 건축사\", \"연면적\": \"12500\", \"지상층\": \"15\", \"지하층\": \"2\", \"updated\": \"2026-11-08 10:00\", \"from\": \"부하계산(RTS)\"}));MMProject.load();})()",wait:900,fixed:true,clip:'.mm-proj-dlg',post:"document.querySelectorAll('.mm-proj-back').forEach(e=>e.remove())",m:[[".mm-proj-dlg input[type=checkbox]", "체크한 항목만 채움(빈 칸은 체크된 채로)"], [".mm-proj-dlg .mm-proj-warn", "이미 입력된 칸 — 직접 체크해야 덮어씀"], [".mm-proj-dlg .mm-proj-ok", "채우기"]]},
 ];
 const FIND=`window.__find=(sel)=>{const vis=e=>e&&e.getClientRects().length>0;
  if(sel.startsWith('card:')){const t=sel.slice(5);const h=[...document.querySelectorAll('.card-head')].find(e=>vis(e)&&e.textContent.includes(t));return h?h.parentElement:null;}
@@ -71,6 +73,7 @@ const FIND=`window.__find=(sel)=>{const vis=e=>e&&e.getClientRects().length>0;
   if(info.err){errs.push(S.id+' '+info.err);continue;}
   const c=info.clip;const cl={x:Math.max(0,c.x),y:Math.max(0,c.y),width:Math.min(c.width,VW),height:c.height};
   if(S.clip==='viewport'){await pg.screenshot({path:path.join(out,S.id+'.png'),clip:{x:0,y:0,width:VW,height:VH}});}
+  else if(S.fixed){const sx=await pg.evaluate(()=>scrollX),sy=await pg.evaluate(()=>scrollY);await pg.screenshot({path:path.join(out,S.id+'.png'),clip:{x:Math.max(0,c.x-sx),y:Math.max(0,c.y-sy),width:Math.min(c.width,VW),height:Math.min(c.height,VH)}});}   /* 화면에 고정된 창(건물개요 등) */
   else{await pg.screenshot({path:path.join(out,S.id+'.png'),clip:cl,fullPage:true});}
   meta[S.id]={w:Math.round(cl.width),h:Math.round(cl.height),marks:info.marks};
   if(S.post){try{await pg.evaluate(S.post);}catch(e){}await pg.waitForTimeout(300);}

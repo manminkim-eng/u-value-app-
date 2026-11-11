@@ -4,24 +4,26 @@
    <script defer src="/manmin-blog-report/web/assets/manmin-analytics.js"></script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-<title>열관류율 종합 검토 시스템 · MANMIN Ver-5.0</title>
+<title>열관류율 종합 검토 시스템 · MANMIN Ver-6.1</title>
+<!-- 검색 설명(정밀검토 B15 · 2026-11-12) -->
+<meta name="description" content="건축물의 에너지절약설계기준 국토교통부고시 제2026-360호(실체개정 제2025-738호) 기반 열관류율 자동 산출 시스템 — MANMIN Ver-6.1">
 <!-- 링크 미리보기(네이버 · 카카오 · SNS) — 2026-10-30 전수 정비 -->
 <link rel="canonical" href="https://manminkim-eng.github.io/u-value-app-/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="MANMIN ENGINEERING">
 <meta property="og:locale" content="ko_KR">
-<meta property="og:title" content="열관류율 종합 검토 시스템 · MANMIN Ver-5.0">
-<meta property="og:description" content="건축물의 에너지절약설계기준 국토교통부고시 제2026-360호(실체개정 제2025-738호) 기반 열관류율 자동 산출 시스템 — MANMIN Ver-5.0">
+<meta property="og:title" content="열관류율 종합 검토 시스템 · MANMIN Ver-6.1">
+<meta property="og:description" content="건축물의 에너지절약설계기준 국토교통부고시 제2026-360호(실체개정 제2025-738호) 기반 열관류율 자동 산출 시스템 — MANMIN Ver-6.1">
 <meta property="og:url" content="https://manminkim-eng.github.io/u-value-app-/">
 <meta property="og:image" content="https://manminkim-eng.github.io/u-value-app-/og-card.jpg">
 <meta property="og:image:secure_url" content="https://manminkim-eng.github.io/u-value-app-/og-card.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="열관류율 종합 검토 시스템 · MANMIN Ver-5.0">
+<meta property="og:image:alt" content="열관류율 종합 검토 시스템 · MANMIN Ver-6.1">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="열관류율 종합 검토 시스템 · MANMIN Ver-5.0">
-<meta name="twitter:description" content="건축물의 에너지절약설계기준 국토교통부고시 제2026-360호(실체개정 제2025-738호) 기반 열관류율 자동 산출 시스템 — MANMIN Ver-5.0">
+<meta name="twitter:title" content="열관류율 종합 검토 시스템 · MANMIN Ver-6.1">
+<meta name="twitter:description" content="건축물의 에너지절약설계기준 국토교통부고시 제2026-360호(실체개정 제2025-738호) 기반 열관류율 자동 산출 시스템 — MANMIN Ver-6.1">
 <meta name="twitter:image" content="https://manminkim-eng.github.io/u-value-app-/og-card.jpg">
 <link rel="manifest" href="manifest.json"/>
 <meta name="theme-color" content="#785a28"/>
@@ -836,7 +838,7 @@ const A4Sheet=({projectName,designerName,region,part,exposure,usage,sr,cl,totalR
       </tbody>
     </table>
     <div className="a4-footer">
-      <span>열관류율 종합 검토 시스템 [MANMIN-Ver5.0]</span>
+      <span>열관류율 종합 검토 시스템 [MANMIN-Ver6.1]</span>
       <span>건축물의 에너지절약설계기준 · 국토교통부고시 제2026-360호(실체개정 제2025-738호) 별표1</span>
       <span>작성일: {fmtDate()}</span>
     </div>
@@ -1454,7 +1456,7 @@ const App=()=>{
             <h1 className="hdr-h1">열관류율 종합 검토 시스템</h1>
             <div className="hdr-sub">
               건축물의 에너지절약설계기준 별표1 · 부위별 열관류율 산출 · 법정 기준 판정 · RTS 부하계산 연계
-              <span className="hdr-manmin">MANMIN · Ver-5.0</span>
+              <span className="hdr-manmin">MANMIN · Ver-6.1</span>
             </div>
           </div>
         </div>
@@ -1537,7 +1539,7 @@ const App=()=>{
                 <div>
                   <div style={{color:'#fff',fontSize:'15px',fontWeight:900,letterSpacing:'-.01em',display:'flex',alignItems:'center',gap:'8px'}}>
                     RTS-SAREK 건축물 부하계산서
-                    <span style={{background:'linear-gradient(135deg,#1d4ed8,#7c3aed)',color:'#fff',fontSize:'11px',fontWeight:900,padding:'2px 8px',borderRadius:'4px',letterSpacing:'.08em',fontFamily:"'JetBrains Mono',monospace"}}>MANMIN-Ver5.0</span>
+                    <span style={{background:'linear-gradient(135deg,#1d4ed8,#7c3aed)',color:'#fff',fontSize:'11px',fontWeight:900,padding:'2px 8px',borderRadius:'4px',letterSpacing:'.08em',fontFamily:"'JetBrains Mono',monospace"}}>MANMIN-Ver6.1</span>
                   </div>
                   <div style={{color:'rgba(0,180,216,0.7)',fontSize:'11px',fontWeight:600,letterSpacing:'.1em',textTransform:'uppercase',marginTop:'3px'}}>Radiant Time Series Method · ASHRAE Fundamentals 2009</div>
                 </div>
@@ -1958,7 +1960,7 @@ window.exportA4Jpg=function(){
   .then(function(canvas){
     restoreScale();
     var now=new Date(), ts=now.getFullYear()+''+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+String(now.getMinutes()).padStart(2,'0');
-    var base='열관류율_검토계산서_MANMIN-Ver5.0_'+ts;
+    var base='열관류율_검토계산서_MANMIN-Ver6.1_'+ts;
     if(!segs||!segs.length){ mmDownload(canvas.toDataURL('image/jpeg',0.95), base+'.jpg'); mmToast('✅ JPG 저장 완료!'); return; }
     var S=canvas.width/el.scrollWidth, PAGE_W=MM_PAGE.W, PAGE_H=MM_PAGE.H, mmPerPx=210/PAGE_W, topPx=MM_PAGE.MT/mmPerPx;
     var shots=segs.map(function(sg,idx){
@@ -2126,7 +2128,7 @@ if('serviceWorker' in navigator){
 <footer class="mm-foot no-print">
   <div class="foot-inner">
     <div>
-      <div class="foot-nm">MANMIN Ver-5.0</div>
+      <div class="foot-nm">MANMIN Ver-6.1</div>
       <div class="foot-desc">열관류율 종합 검토 시스템 | 국토교통부고시 제2026-360호</div>
     </div>
     <div class="foot-copy">ARCHITECT KIM MANMIN © 2026</div>

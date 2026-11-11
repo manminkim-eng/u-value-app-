@@ -1,10 +1,11 @@
 /* ═══════════════════════════════════════════════════
+   v6.1.0 (2026-11-12) — 검색 설명 메타(description) 추가(정밀검토 B15 · 작업지시서 §25-6-75) · 판 6.1 · 캐시명 v6.1.0 (종전 uval-v5.0.19)
    S6 회차 2026-09-05 — R24①② 표 선 separate·mono 한글 폴백 소급 동반 캐시명 v5.0.6
    S5 회차 2026-09-04 — R23② JPG 엔진 행 나눔 소급 동반 캐시명 v5.0.5
    S3-0 회차 2026-09-04 — R27 html2canvas 클론 정화 동반 캐시명 v5.0.4
    S2 회차 2026-09-04 — index 소급(R1·R21·R26 등) 동반 캐시명 v5.0.3
    R25 회차 2026-09-04 — 자기 접두어 캐시 조회 · cors 프리캐시 · opaque 가드 · 캐시명 v5.0.2 (S10)
-   열관류율 종합 검토 시스템  MANMIN Ver-5.0
+   열관류율 종합 검토 시스템  MANMIN Ver-6.1
    Service Worker — 오프라인 캐시 + 버전 업데이트  ·  ARCHITECT KIM MANMIN
 
    v5.0.0 (2026-09-03)
@@ -27,7 +28,7 @@ const mmMatch = (req, opt) => caches.keys()
   .then((ks) => ks.reduce((p, k) => p.then((r) => r || caches.open(k).then((c) => c.match(req, opt))), Promise.resolve(undefined)))
   .then((r) => (r && r.type === 'opaque' && req && req.mode === 'cors') ? undefined : r);
 
-const CACHE  = 'uval-v5.0.19';
+const CACHE  = 'uval-v6.1.0';
 const ORPHAN = ['manmin-uval-v3.2','manmin-uval-v3.1','manmin-uval-v3.0'];
 const ASSETS = [
   './',

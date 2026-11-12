@@ -39,9 +39,9 @@
 <meta name="msapplication-TileColor" content="#785a28"/>
 <meta name="msapplication-TileImage" content="icons/icon-144x144.png"/>
 <link rel="stylesheet" href="./assets/fonts/manmin-fonts.css"/><!-- v5.0 로컬 폴백 폰트 — CDN 차단·오프라인 대비 (§3-7) -->
-<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"/>
+<link rel="stylesheet" as="style" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" integrity="sha384-SN6A48CJQjx946+DRb8wsoifC4a8ur9ZS6R+HCTgnBHOKCa6GLXAR3Qn8d1jztxg" crossorigin="anonymous"/>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
-<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js" integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z" crossorigin="anonymous"></script>
 <script>
 /* R22 (2026-09-04): 아래 RTS IIFE 가 src 있는 <script> 안에 들어 있어 브라우저가 무시 → sendToRTS 미정의 (v3.1 배포본부터) — 태그 분리 */
 /* ══════════════════════════════════════════════════════
@@ -258,8 +258,8 @@
 })();
 /* window.sendToRTS 는 위 IIFE 내부에서 등록됨 */
 </script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.7/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js" integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.29.7/babel.min.js" integrity="sha384-ezQ6HS3FLspd9te19o2McUV6FAK091+GG7KO54f/R8DKgCDi7fULhapNrd5LY+vG" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script><!-- v5.0 JPG 엔진 (dom-to-image 제거) -->
 
 <style>:root{--d:#d8ac50;--d-deep:#785a28;--d-lt:#f1cd7c;--d-tint:#f6ecd6;--d-rgb:216,172,80;--fs-badge:11px;--fs-cap:11.5px;--fs-sm:12.5px;--fs-desc:13px;--fs-body:14px;--fs-sec:16px;--fs-card:17px;--fs-stat:20px;}

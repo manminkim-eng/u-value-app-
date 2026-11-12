@@ -1,4 +1,5 @@
 /* ═══════════════════════════════════════════════════
+   v6.1.4 (2026-11-12) — React 18.3.1 · Babel 7.29.7 주소 unpkg → cdnjs(같은 파일 · 해시 일치) · SRI(integrity) · Pretendard CSS SRI(정밀검토 C2) — 화면 · 계산 · 인쇄 불변 · 작업지시서 §25-6-82 · 캐시명 v6.1.4 (종전 v6.1.3)
    v6.1.3 (2026-11-12) — 건물개요 공통 원본 MM-PROJECT v1.2 → v1.3(불러오기 창 표 칸 모양 고정 — 도구 CSS 가 새지 않음 · 저장값 같음, 정밀검토 C10) · 작업지시서 §25-6-80 · 판 6.1 · 캐시명 v6.1.3 (종전 v6.1.2)
    v6.1.2 (2026-11-12) — 화면 확대 허용(viewport 의 maximum-scale=1.0 · user-scalable=no 삭제 — 휴대폰에서 두 손가락 확대 가능) (정밀검토 B17 · 작업지시서 §25-6-78) · 판 6.1 · 캐시명 v6.1.2 (종전 uval-v6.1.1)
    v6.1.1 (2026-11-12) — 건물개요 공통 원본 MM-PROJECT v1.0 → v1.2(불러오기 창 칸 줄바꿈 · 저장값 같음, 정밀검토 B5 · 작업지시서 §25-6-76) · 캐시명 v6.1.1 (종전 uval-v6.1.0)
@@ -31,7 +32,7 @@ const mmMatch = (req, opt) => caches.keys()
   .then((ks) => ks.reduce((p, k) => p.then((r) => r || caches.open(k).then((c) => c.match(req, opt))), Promise.resolve(undefined)))
   .then((r) => (r && r.type === 'opaque' && req && req.mode === 'cors') ? undefined : r);
 
-const CACHE  = 'uval-v6.1.3';
+const CACHE  = 'uval-v6.1.4';
 const ORPHAN = ['manmin-uval-v3.2','manmin-uval-v3.1','manmin-uval-v3.0'];
 const ASSETS = [
   './',
@@ -45,9 +46,9 @@ const ASSETS = [
   './assets/fonts/NotoSansKR-var.woff2',
   'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css',
   'https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=JetBrains+Mono:wght@400;600;700&display=swap',
-  'https://unpkg.com/react@18.3.1/umd/react.production.min.js',
-  'https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js',
-  'https://unpkg.com/@babel/standalone@7.29.7/babel.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.29.7/babel.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'
 ];
 

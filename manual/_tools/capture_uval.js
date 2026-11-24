@@ -2,12 +2,15 @@
 // EPI·RTS 매뉴얼과 같은 규격: 1440×900 · DSF 1.25 · _marks.json(번호 배지 % 좌표) · _example.json(예제 검증값)
 const {chromium}=require(process.env.MM_PW||'playwright');const fs=require('fs');const path=require('path');const {setup,server}=require('./serve');
 const repo=path.resolve(process.argv[2]),out=path.resolve(process.argv[3]);fs.mkdirSync(out,{recursive:true});
-const VW=1440,VH=900,DSF=1.25,PORT=8893;
+const VW=1440,VH=900,DSF=1.25,PORT=+(process.env.MM_PORT||8893);
 /* 예제 = 앱 초기값: 중부2지역 · 거실의 외벽 · 외기 직접 · 공동주택 외 / 몰탈20 + XPS 1종 A-1 155 + RC200 + 몰탈20 → ΣR 6.268 · U 0.160 ≤ 0.240 적합 */
-const FREEZE=`(()=>{const T=new Date(2026,9,10,10,0,0).getTime();const D=Date;class F extends D{constructor(...a){if(a.length)super(...a);else super(T);}static now(){return T;}}window.Date=F;window.alert=()=>{};window.confirm=()=>true;try{localStorage.clear()}catch(e){}})()`;
+const FREEZE=`(()=>{const T=new Date(2026,10,24,10,0,0).getTime();const D=Date;class F extends D{constructor(...a){if(a.length)super(...a);else super(T);}static now(){return T;}}window.Date=F;window.alert=()=>{};window.confirm=()=>true;try{localStorage.clear()}catch(e){}})()`;
 const SETNUM=`window.__setNum=(layerIdx,which,val)=>{const c=document.querySelectorAll('.layer-card')[layerIdx];const el=c.querySelectorAll('input.finput.mono')[which];const st=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;st.call(el,String(val));el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));};
 window.__setSearch=(v)=>{const el=document.querySelector('.mat-wrap input');const st=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;st.call(el,v);el.dispatchEvent(new Event('input',{bubbles:true}));};
 window.__tab=(i)=>document.querySelectorAll('.tb')[i].click();
+window.__setSel=(i,v)=>{const c=[...document.querySelectorAll('.card-head')].find(e=>e.textContent.includes('검토 조건 설정')).parentElement;const el=c.querySelectorAll('select')[i];const st=Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value').set;st.call(el,v);el.dispatchEvent(new Event('change',{bubbles:true}));};
+window.__setLSel=(li,i,v)=>{const el=document.querySelectorAll('.layer-card')[li].querySelectorAll('select')[i];const st=Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value').set;st.call(el,v);el.dispatchEvent(new Event('change',{bubbles:true}));};
+window.__wait=(ms)=>new Promise(r=>setTimeout(r,ms));
 window.__modal=(open,i)=>{const ov=document.querySelector('.fml-overlay');if(open&&!ov)document.querySelectorAll('.help-fab')[1].click();if(!open&&ov){const x=[...ov.querySelectorAll('button')].find(b=>b.textContent.trim()==='✕');x&&x.click();}};
 window.__mtab=(t)=>{const ov=document.querySelector('.fml-overlay');const b=[...ov.querySelectorAll('button')].find(b=>b.textContent.includes(t));b&&b.click();};`;
 const TAB={input:0,a4:1,mat:2,rts:3};
@@ -29,6 +32,11 @@ const SHOTS=[
  {id:'s15_help_surface',tab:null,pre:"__mtab('표면저항')",clip:'viewport',m:[]},
  {id:'s16_help_grade',tab:null,pre:"__mtab('단열등급')",clip:'viewport',m:[]},
  {id:'s17_help_region',tab:null,pre:"__mtab('지역 구분')",post:"__modal(false)",clip:'viewport',m:[]},
+ /* v6.1.6 — 무효 입력 「계산 불가」(XPS 두께 빈 칸) · 공기층(별표6) 종류 · 반사형 · 층간바닥 Ro 「-」 */
+ {id:'s22_invalid',tab:'input',pre:"__setNum(1,0,'');window.scrollTo(0,0)",clip:'viewport',m:[['.sum-bar-wrap','요약 스트립 — 설계 U 「—」 · 판정 「계산 불가」'],['.v3 .vc:nth-child(3)','판정 「계산 불가 · 입력 확인」'],['.fml-box-lg','산출식 U = 1 / — = —'],['row:2','2번 층 — T · R 「—」'],['row:6','총 열저항 ΣR 「—」']]},
+ {id:'s22b_invalid_layer',tab:null,clip:'lcard:1',post:"__setNum(1,0,155);window.scrollTo(0,0)",m:[['lin1:0','빨간 테두리 칸(빈 칸 · 0 · 음수)'],['.mm-bad-msg','입력 안내 — 계산 불가'],['lr1','열저항 R 「—」']]},
+ {id:'s23_air',tab:'input',pre:"(async()=>{document.querySelector('.btn-add').click();await __wait(300);__setLSel(4,0,'M_공기층');await __wait(300);__setNum(4,0,30);await __wait(200);__setLSel(4,3,'factory');await __wait(300);const c=document.querySelectorAll('.layer-card')[4];window.scrollTo(0,c.getBoundingClientRect().top+scrollY-200);})()",wait:800,post:"(async()=>{const c=document.querySelectorAll('.layer-card')[4];[...c.querySelectorAll('button')].find(b=>b.textContent.trim()==='✕').click();await __wait(300);window.scrollTo(0,0);})()",clip:'lcard:4',m:[['lsel4:0','대분류 「M 공기층」(재료 탭 이름 「M. 공기층 (별표6)」)'],['lin4:0','두께 (mm) — da = 두께 ÷ 10 (cm)'],['lsel4:3','공기층 종류 — 현장시공 등 / 공장생산된 기밀제품'],['lsel4:4','반사형 단열재 — 없음 / 방사율 0.5 이하 ×1.5 / 0.1 이하 ×2.0'],['lr4','열저항 R — 별표6 값(이 예 0.170)']]},
+ {id:'s24_floor',tab:'input',pre:"__setSel(1,'바닥난방인 층간바닥')",wait:900,post:"(async()=>{__setSel(1,'거실의 외벽');await __wait(300);__setSel(2,'외기에 직접 면하는 경우');await __wait(300);__setSel(3,'공동주택 외');await __wait(300);window.scrollTo(0,0);})()",clip:'card:부위별 상세 산출 근거',m:[['row:0','실외 표면열전달저항 — 별표5 「-」(미적용)'],['row:5','실내 표면열전달저항 Ri 0.086'],['row:6','총 열저항 ΣR 6.201']]},
  {id:"s20_proj_menu",pre:"__tab(0);localStorage.setItem('MANMIN_PROJECT_V1',JSON.stringify({\"사업명\": \"만민 건축사 신사옥 신축공사 설계용역\", \"작성자\": \"김만민 건축사\", \"연면적\": \"12500\", \"지상층\": \"15\", \"지하층\": \"2\", \"updated\": \"2026-11-08 10:00\", \"from\": \"부하계산(RTS)\"}));window.scrollTo(0,0);document.querySelector('.mm-proj-btn').click()",wait:700,clip:'viewport',post:"document.querySelectorAll('.mm-proj-menu').forEach(e=>e.remove())",m:[[".mm-proj-btn", "「🏢 건물개요」 단추(오른쪽 아래)"], [".mm-proj-menu button[data-a=\"save\"]", "저장 — 지금 값 담기"], [".mm-proj-menu button[data-a=\"load\"]", "불러오기"], [".mm-proj-menu button[data-a=\"exp\"]", "파일로 내보내기(.json)"], [".mm-proj-menu button[data-a=\"imp\"]", "파일 가져오기"]]},
  {id:"s21_proj_load",pre:"__tab(0);(()=>{const e=MMProject.fields('사업명')[0];if(e){const d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');d.set.call(e,'');e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));}localStorage.setItem('MANMIN_PROJECT_V1',JSON.stringify({\"사업명\": \"만민 건축사 신사옥 신축공사 설계용역\", \"작성자\": \"김만민 건축사\", \"연면적\": \"12500\", \"지상층\": \"15\", \"지하층\": \"2\", \"updated\": \"2026-11-08 10:00\", \"from\": \"부하계산(RTS)\"}));MMProject.load();})()",wait:900,fixed:true,clip:'.mm-proj-dlg',post:"document.querySelectorAll('.mm-proj-back').forEach(e=>e.remove())",m:[[".mm-proj-dlg input[type=checkbox]", "체크한 항목만 채움(빈 칸은 체크된 채로)"], [".mm-proj-dlg .mm-proj-warn", "이미 입력된 칸 — 직접 체크해야 덮어씀"], [".mm-proj-dlg .mm-proj-ok", "채우기"]]},
 ];
@@ -38,6 +46,10 @@ const FIND=`window.__find=(sel)=>{const vis=e=>e&&e.getClientRects().length>0;
  if(sel.startsWith('select:')){const c=[...document.querySelectorAll('.card-head')].find(e=>e.textContent.includes('검토 조건 설정')).parentElement;return c.querySelectorAll('select')[+sel.slice(7)]||null;}
  if(sel.startsWith('lsel:')){return document.querySelector('.layer-card').querySelectorAll('select')[+sel.slice(5)]||null;}
  if(sel.startsWith('lin:')){return document.querySelector('.layer-card').querySelectorAll('input.finput.mono')[+sel.slice(4)]||null;}
+ if(sel.startsWith('lcard:')){return document.querySelectorAll('.layer-card')[+sel.slice(6)]||null;}
+ if(/^lsel[0-9]+:/.test(sel)){const m=sel.slice(4).split(':');return document.querySelectorAll('.layer-card')[+m[0]].querySelectorAll('select')[+m[1]]||null;}
+ if(/^lin[0-9]+:/.test(sel)){const m=sel.slice(3).split(':');return document.querySelectorAll('.layer-card')[+m[0]].querySelectorAll('input.finput.mono')[+m[1]]||null;}
+ if(/^lr[0-9]+$/.test(sel)){return document.querySelectorAll('.layer-card')[+sel.slice(2)].querySelector('div.finput.mono')||null;}
  if(sel==='ldel'){return [...document.querySelector('.layer-card').querySelectorAll('button')].find(b=>b.textContent.trim()==='✕')||null;}
  if(sel.startsWith('row:')){return document.querySelectorAll('.rtbl tr')[+sel.slice(4)+1]||document.querySelector('.rtbl tfoot tr')||null;}
  if(sel.startsWith('a4sub:')){const t=sel.slice(6);return [...document.querySelectorAll('#a4Page .a4-sub')].find(e=>e.textContent.trim().startsWith(t))||null;}
@@ -53,13 +65,16 @@ const FIND=`window.__find=(sel)=>{const vis=e=>e&&e.getClientRects().length>0;
  await pg.goto(`http://127.0.0.1:${PORT}/index.html`);await pg.evaluate(()=>document.fonts.ready);await pg.waitForTimeout(3000);
  await pg.evaluate(SETNUM+FIND);
  const readEx=()=>pg.evaluate(()=>{const q=s=>(document.querySelector(s)||{}).innerText||'';return {sum:q('.sum-bar-wrap').replace(/\s+/g,' ').trim(),std:q('.vc-n').replace(/\s+/g,' ').trim(),u:q('.vc-a').replace(/\s+/g,' ').trim(),verdict:q('.vc-p').replace(/\s+/g,' ').trim(),formula:q('.fml-box-lg').replace(/\s+/g,' ').trim(),tgrid:q('.t-grid').replace(/\s+/g,' ').trim(),rows:[...document.querySelectorAll('.rtbl tr')].map(r=>r.innerText.replace(/\s+/g,' ').trim())};});
- const example=await readEx();let fail=null;
+ const example=await readEx();let fail=null,invalid=null,air=null,floor=null;
  const meta={};
  for(const S of SHOTS){
   if(S.tab){await pg.evaluate(i=>{__tab(i);window.scrollTo(0,0);},TAB[S.tab]);await pg.waitForTimeout(700);}
   if(S.pre){try{await pg.evaluate(S.pre);}catch(e){errs.push(S.id+' pre '+e.message);}}
   await pg.waitForTimeout(S.wait||600);
   if(S.id==='s07_fail')fail=await readEx();
+  if(S.id==='s22_invalid')invalid=await readEx();
+  if(S.id==='s23_air')air=await readEx();
+  if(S.id==='s24_floor')floor=await readEx();
   const info=await pg.evaluate(({S,VW,VH})=>{
    const abs=e=>{const r=e.getBoundingClientRect();return {x:r.left+scrollX,y:r.top+scrollY,w:r.width,h:r.height};};
    let clip;
@@ -87,8 +102,8 @@ const FIND=`window.__find=(sel)=>{const vis=e=>e&&e.getClientRects().length>0;
  await mp.evaluate(()=>{const h=[...document.querySelectorAll('.card-head')].find(e=>e.textContent.includes('실시간 산출 결과'));window.scrollTo(0,h.getBoundingClientRect().top+scrollY-110);});await mp.waitForTimeout(600);
  await mp.screenshot({path:path.join(out,'s19_mobile_result.png')});meta['s19_mobile_result']={w:390,h:844,marks:[]};
  fs.writeFileSync(path.join(out,'_marks.json'),JSON.stringify(meta,null,1));
- fs.writeFileSync(path.join(out,'_example.json'),JSON.stringify({example,fail,after},null,1));
+ fs.writeFileSync(path.join(out,'_example.json'),JSON.stringify({example,fail,invalid,air,floor,after},null,1));
  const miss=[];Object.entries(meta).forEach(([k,v])=>v.marks.forEach(m=>{if(m.miss)miss.push(k+':'+m.miss);else if(m.x<0||m.y<0||m.x>100||m.y>100)miss.push(k+':OUT '+m.label+' '+m.x+','+m.y);}));
- console.log(JSON.stringify({example,fail,same:JSON.stringify(example)===JSON.stringify(after),miss,errs:errs.slice(0,15)},null,1));
+ console.log(JSON.stringify({example,fail,invalid,air,floor,same:JSON.stringify(example)===JSON.stringify(after),miss,errs:errs.slice(0,15)},null,1));
  await b.close();s.close();
 })();

@@ -1,4 +1,5 @@
 /* ═══════════════════════════════════════════════════
+   v6.1.7 (2026-11-25) — 헤더 고정 — 공통 원본 MM-HEADER v1.1 주입(태블릿 · 데스크톱만 — 폭 768px · 높이 600px 이상, 휴대폰은 고정 없음 · 머리+탭 sticky · 내리면 제목 한 줄+탭으로 접힘 · 다른 sticky 패널 top 보정) — 계산 · 인쇄 불변 · MIN 「추천안대로 승인」 · 「추천안대로 진행해줘」(모바일 제외) · 캐시명 v6.1.7 (종전 v6.1.6)
    v6.1.6 (2026-11-24) — 건축 2차 교차검증 반영: 두께 · λ ≤ 0 · 빈 칸 「계산 불가」(적합 오판 막음) · 창 · 문 DB 항목 제외 · 층간바닥 Ro 「-」 미적용(별표5) · 별표6 공기층 종류 · 반사형 단열재 · 근거 인용(제2조①1 · 제6조1호 다목 3)·4)·5) · 마목 · 바목 · 제23조④) · 개정 메모 · 화면 판 Ver-6.1 · 캐시명 v6.1.6 (종전 v6.1.5)
    v6.1.5 (2026-11-12) — html2canvas 1.4.1 머리 태그 SRI(integrity sha384 · crossorigin) · 공통 인쇄 원본 MM-PRINT v1.0 → v1.1(지연 로더도 SRI)(정밀검토 B8 · html2canvas SRI) — 화면 · 계산 · 인쇄 불변 · 작업지시서 §25-6-87 · 캐시명 v6.1.5 (종전 v6.1.4)
    v6.1.4 (2026-11-12) — React 18.3.1 · Babel 7.29.7 주소 unpkg → cdnjs(같은 파일 · 해시 일치) · SRI(integrity) · Pretendard CSS SRI(정밀검토 C2) — 화면 · 계산 · 인쇄 불변 · 작업지시서 §25-6-82 · 캐시명 v6.1.4 (종전 v6.1.3)
@@ -34,7 +35,7 @@ const mmMatch = (req, opt) => caches.keys()
   .then((ks) => ks.reduce((p, k) => p.then((r) => r || caches.open(k).then((c) => c.match(req, opt))), Promise.resolve(undefined)))
   .then((r) => (r && r.type === 'opaque' && req && req.mode === 'cors') ? undefined : r);
 
-const CACHE  = 'uval-v6.1.6';
+const CACHE  = 'uval-v6.1.7';
 const ORPHAN = ['manmin-uval-v3.2','manmin-uval-v3.1','manmin-uval-v3.0'];
 const ASSETS = [
   './',
